@@ -74,13 +74,14 @@ h1 .accent{color:var(--yellow);}
 .vs-aws{text-align:right;}
 .vs-l{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;
   letter-spacing:2px;color:var(--soft-grey);}
-.vs-akka .vs-l{color:var(--yellow);}
+
 .vs-v{font-family:var(--mono);font-size:clamp(34px,6.6vw,60px);font-weight:600;line-height:1;
   letter-spacing:-.035em;margin-top:10px;color:var(--white);font-variant-numeric:tabular-nums;}
-.vs-akka .vs-v{color:var(--yellow);}
+.vs-akka .vs-v{color:var(--green);}
+.vs-aws .vs-v{color:var(--red);}
 .vs-n{font-family:var(--mono);font-size:10px;color:var(--medium-grey);margin-top:9px;}
 .vs-n:empty{display:none;}
-.vs-akka .vs-n{color:var(--yellow);opacity:.75;}
+.vs-akka .vs-n{color:var(--yellow);}
 .vs-mid{display:flex;flex-direction:column;align-items:center;gap:10px;align-self:stretch;
   justify-content:center;}
 .vs-mid::before,.vs-mid::after{content:"";flex:1;width:1px;background:var(--line);min-height:14px;}
@@ -337,7 +338,6 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
   <div class="vs-side vs-aws">
     <p class="vs-l">Building it yourself on AWS</p>
     <p class="vs-v" id="kAws">—</p>
-    <p class="vs-n">a year, at list price</p>
   </div>
 </div>
 
@@ -628,7 +628,7 @@ function render(){
   const diff=d.aws.base.total-d.price;
 
   $("kFee").textContent=d.below?"—":money(d.price);
-  $("kFeeSub").textContent=d.below?"too small for us to price well":"a year, one charge";
+  $("kFeeSub").textContent=d.below?"too small for us to price well":"";
   $("kAws").textContent=money(d.aws.base.total);
 
   $("volConv").textContent=(d.totalB/1000).toFixed(1)+" trillion";
