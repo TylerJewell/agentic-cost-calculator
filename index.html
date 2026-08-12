@@ -241,7 +241,7 @@ details .body{margin-top:13px;}
 <!-- ============ 1 ============ -->
 <section class="panel on" data-panel="0">
   <div class="form">
-    <h4>How much work, in a year <span class="r" id="volConv">5.0 trillion</span></h4>
+    <h4>How many tokens will you consume in Y1? <span class="r" id="volConv">5.0 trillion</span></h4>
     <div class="grid">
       <div class="field">
         <label>Billion tokens</label>
@@ -257,7 +257,7 @@ details .body{margin-top:13px;}
 
     <h4>What kind of work is it <span class="r" id="alloc">100%</span></h4>
     <div class="grid five" id="mix"></div>
-    <p class="note">Routine work gets cheap once we tune for it. One-off work stays expensive. Reading documents looks much the same every time, so a small trained model can do it for a fraction of the price. Writing software almost never repeats, so it keeps needing the expensive model.</p>
+    <p class="note">The types of AI use cases you expect determines which kinds of models we need and whether any SLMs can be trained from narrow, repetitive work. For example, reading documents looks similar each time, so a small trained model can do it for a fraction of the price. Akka will automatically train the right models for you.</p>
   </div>
 
   <div class="mini four">
@@ -330,10 +330,6 @@ details .body{margin-top:13px;}
         <tbody id="tcoBody"></tbody>
       </table>
     </div>
-
-    <h4>What you agree to, and what the bill can become</h4>
-    <div id="bars"></div>
-    <p class="note">The solid bar is what you sign up for. The striped part is how much more it becomes once someone decides how much you log, how long you keep memories, and which models you pick. Ours has no striped part.</p>
 
     <div class="hl"><p class="h" id="hlH">—</p><p class="p" id="hlP">—</p></div>
 
@@ -637,16 +633,6 @@ function render(){
   h+='<tr><td>How long you wait</td>'+K.map(k=>'<td class="n">'+LAT[k].toFixed(1)+"s</td>").join("")+'<td class="n akka">'+LAT.akka.toFixed(1)+"s</td></tr>";
   h+='<tr><td>Charges on your invoice</td>'+K.map(()=>'<td class="n">7</td>').join("")+'<td class="n akka acc">1</td></tr>';
   $("tcoBody").innerHTML=h;
-
-  const VAR={low:.30,base:.30,high:.35,max:.32};
-  const rows=K.map(k=>({c:CAP[k],v:d.aws[k].total,x:d.aws[k].total*VAR[k],a:ACC[k],y:false}));
-  if(!d.below)rows.push({c:"Akka",v:d.price,x:0,a:ACC.akka,y:true});
-  const mx=Math.max(...rows.map(r=>r.v+r.x));
-  $("bars").innerHTML=rows.map(r=>
-    '<div class="barr'+(r.y?" akka":"")+'"><span class="c">'+r.c+"</span>"+
-    '<span class="btrack"><span class="bvar" style="left:'+(r.v/mx*100)+"%;width:"+(r.x/mx*100)+'%"></span>'+
-    '<span class="bfill'+(r.y?" y":"")+'" style="width:'+(r.v/mx*100)+'%"></span></span>'+
-    '<span class="bval">'+money(r.v)+"<span>"+r.a+"%</span></span></div>").join("");
 
   if(!d.below){
     $("hlH").textContent="You get the best answers for "+Math.round(d.price/d.aws.max.total*100)+"% of what they cost on AWS.";
