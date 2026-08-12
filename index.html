@@ -280,8 +280,8 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
   </div>
 
   <div class="mini four">
-    <div class="metric"><div class="lbl">You send in</div><div class="val" id="c1In">—</div><div class="sub" id="c1Ratio">—</div></div>
-    <div class="metric"><div class="lbl">Comes back</div><div class="val" id="c1Out">—</div><div class="sub">Seven times dearer to produce</div></div>
+    <div class="metric"><div class="lbl">You send in</div><div class="val" id="c1In">—</div><div class="sub">tokens</div></div>
+    <div class="metric"><div class="lbl">Comes back</div><div class="val" id="c1Out">—</div><div class="sub">tokens</div></div>
     <div class="metric"><div class="lbl">Conversations</div><div class="val" id="c1Sess">—</div><div class="sub">A year</div></div>
     <div class="metric"><div class="lbl">Computing needed</div><div class="val" id="c1Gpu">—</div><div class="sub">Machine-hours, untuned</div></div>
   </div>
@@ -558,7 +558,6 @@ function render(){
     $("pc_"+p.key).textContent=Math.round(p.share*100)+"%";
     $("ab_"+p.key).textContent=bn(p.tok/1e9);});
   $("c1In").textContent=bn(d.inTok/1e9);
-  $("c1Ratio").textContent=(d.inTok/d.tok*100).toFixed(0)+"% of the total, all billable";
   $("c1Out").textContent=bn(d.outTok/1e9);
   $("c1Sess").textContent=(d.sessions/1e6).toFixed(0)+"M";
   $("c1Gpu").textContent=kh(d.base);
