@@ -647,11 +647,11 @@ function compute(){
   const margin=marginAt(totalB), price=cost/(1-margin);
   // the 88% tier runs best-of-three over the work no adapter serves
   const upHw=size(adEff+tailEff*MAX_MULT);
-  const upPrice=upHw.cost/(1-margin);
+  const upCost=upHw.cost, upPrice=upHw.cost/(1-margin);
   const cont=hw.eff/GPN/HRS;
   const fleet=nodes*HRS,serve=hw.eff/GPN,idle=fleet-serve,need=4750*(tok/5e12);
   return{totalB,tok,inTok,outTok,sessions,parts:rows,aws,nodes,cont,base,gpuHr,hw,cost,
-    removed,adapters,price,fleet,serve,idle,need,upPrice,upNodes:upHw.nodes,
+    removed,adapters,price,fleet,serve,idle,need,upPrice,upCost,upNodes:upHw.nodes,
     below:totalB<MIN_VOLUME_B};
 }
 
@@ -722,7 +722,7 @@ function render(){
   $("tcoBody").innerHTML=h;
 
   if(!d.below){
-    $("hlH").textContent="Akka can reach "+ACC.max+"% accuracy for an additional "+money(d.upPrice-d.price)+".";
+    $("hlH").textContent="Akka can reach "+ACC.max+"% accuracy for an additional "+money(d.upCost-d.cost)+".";
   }else{
     $("hlH").textContent="Building this yourself costs you "+money(d.aws.base.total)+" the way most teams do it.";
   }
