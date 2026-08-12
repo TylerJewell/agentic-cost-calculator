@@ -131,6 +131,8 @@ td.akka{color:var(--white);}
 #tco th.akka{width:19%;}
 #tco tr.tot td.akka{font-size:17px;}
 #tco th.akka,#tco td.akka{padding-left:18px;padding-right:16px;}
+#tco th.akka{padding-top:10px;vertical-align:middle;}
+th.akka .akka-mark{height:12px;position:static;}
 .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--medium-grey) var(--medium-black);}
 .scroller::-webkit-scrollbar{height:9px;}
 .scroller::-webkit-scrollbar-track{background:var(--medium-black);}
@@ -406,7 +408,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 
 <script>
 "use strict";
-const TABS=["Your workload","Cutting the bill","The comparison","Three years"];
+const TABS=["Your workload","Cutting the bill","AWS vs Akka","Three years"];
 const PRESETS=[1000,2500,5000,10000,20000];
 const WORKLOADS=[
   {key:"swe",name:"Writing software",short:"Software",inRatio:0.90,repeat:0.15,def:30},
