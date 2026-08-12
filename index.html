@@ -358,6 +358,13 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 
     <div class="hl"><p class="h" id="hlH">—</p><p class="p" id="hlP">—</p></div>
 
+    <h4>What we deploy and commit for you</h4>
+    <div class="scroller">
+      <table class="tight stack" id="akkaSpec">
+        <tbody></tbody>
+      </table>
+    </div>
+
 
   </div>
 </section>
@@ -604,6 +611,22 @@ function render(){
     $("hlH").textContent="Building this yourself costs you "+money(d.aws.base.total)+" the way most teams do it.";
     $("hlP").textContent="The same work costs "+money(d.aws.max.total)+" for the best answers. Across the four builds your bill spans "+(d.aws.max.total/d.aws.low.total).toFixed(1)+" times, on identical work.";
   }
+
+  const trained=d.parts.filter(p=>p.isAd).map(p=>p.name);
+  const spec=[
+    ["Base models","MiniMax M2.5 and Qwen3 Coder Next, held in GPU memory and served from two availability zones"],
+    ["Trained adapters", d.adapters?d.adapters+" LoRA adapters on your own traffic: "+trained.join(", "):"None at this mix. Raise the share of repeating work to earn one."],
+    ["GPU committed", d.nodes+" \u00d7 p5.48xlarge, "+(d.nodes*8)+" NVIDIA H100 80GB, reserved for twelve months"],
+    ["CPU and memory committed", (d.nodes*192).toLocaleString()+" vCPU and "+(d.nodes*2)+" TiB on the GPU nodes, plus the Akka cluster sized to your agent count"],
+    ["Inference server","vLLM, serving every adapter from a shared base model"],
+    ["Clustering","Kubernetes on EKS for the node pool, Akka clustering for agent placement, sharding and failover"],
+    ["Gateway","agentgateway for model routing, tool calls and identity"],
+    ["Agent memory","Event-sourced, on Postgres, replicated across zones"],
+    ["Tracing and logging","Written to object storage in full, rather than metered log ingestion"],
+    ["Availability","99.9999% on the Akka Agentic AI Platform"]
+  ];
+  $("akkaSpec").querySelector("tbody").innerHTML=spec.map(r=>
+    '<tr><td class="nm" style="width:190px">'+r[0]+'</td><td data-l="'+r[0]+'">'+r[1]+'</td></tr>').join("");
 
   const caps=[d.totalB,d.totalB*Y2,d.totalB*Y3],mults=[1,Y2,Y3];
   $("outlookBody").innerHTML=caps.map((c,i)=>
