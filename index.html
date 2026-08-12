@@ -247,6 +247,11 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
   .mini.four{grid-template-columns:repeat(2,1fr);}
 }
 @media (max-width:620px){
+  /* four tabs will not fit one row on a phone, so wrap them into a 2x2 */
+  .tabs{flex-wrap:wrap;overflow:visible;gap:5px;border-bottom:none;margin:16px 0 0;}
+  .tab{flex:1 1 calc(50% - 3px);text-align:center;padding:10px 6px;font-size:10px;
+    letter-spacing:.4px;border:1px solid var(--line);border-radius:6px;margin-bottom:0;}
+  .tab.on{padding:10px 6px;border-radius:6px;}
   .wrap{padding:20px 16px 60px;}
   header{gap:8px;}
   .kpis{grid-template-columns:1fr 1fr;gap:10px;}
