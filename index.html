@@ -438,6 +438,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 <script>
 "use strict";
 const TABS=["Your workload","Cutting the bill","AWS vs Akka","Future savings"];
+const SLUGS=["workload","savings","compare","outlook"];
 const PRESETS=[1000,2500,5000,10000,20000];
 const WORKLOADS=[
   {key:"swe",name:"Writing software",short:"Software",inRatio:0.90,repeat:0.15,def:30},
@@ -497,14 +498,28 @@ $("vol").addEventListener("input",render);
 $("prev").addEventListener("click",()=>go(tab-1));
 $("next").addEventListener("click",()=>go(tab+1));
 
-function go(i){
+function go(i,quiet){
   tab=Math.max(0,Math.min(TABS.length-1,i));
   document.querySelectorAll(".tab").forEach((b,j)=>b.classList.toggle("on",j===tab));
   document.querySelectorAll(".panel").forEach((p,j)=>p.classList.toggle("on",j===tab));
   $("prev").disabled=tab===0; $("next").disabled=tab===TABS.length-1;
   $("next").textContent=["Cut the bill","Compare prices","Look ahead","Future savings"][tab];
-  window.scrollTo({top:0,behavior:"smooth"});
+  const want="#"+SLUGS[tab];
+  if(location.hash!==want){
+    try{history.replaceState(null,"",want);}catch(e){location.hash=SLUGS[tab];}
+  }
+  if(!quiet)window.scrollTo({top:0,behavior:"smooth"});
 }
+
+function tabFromHash(){
+  const h=(location.hash||"").replace(/^#/,"").toLowerCase();
+  const i=SLUGS.indexOf(h);
+  return i<0?0:i;
+}
+window.addEventListener("hashchange",()=>{
+  const i=tabFromHash();
+  if(i!==tab)go(i,true);
+});
 function support(a){const m=a/12;let s=Math.min(m,150000)*.10;
   if(m>150000)s+=(Math.min(m,500000)-150000)*.07;
   if(m>500000)s+=(Math.min(m,1e6)-500000)*.05;
@@ -659,7 +674,7 @@ function render(){
     '<td class="n '+(i===0?'':'ok')+'" data-l="Cost per million tokens">'+
       (d.below?'\u2014':'$'+(d.price/(c*1000)).toFixed(3))+'</td></tr>').join("");
 }
-go(0);render();
+go(tabFromHash(),true);render();
 </script>
 </body>
 </html>
