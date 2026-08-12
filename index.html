@@ -56,6 +56,7 @@ h1 .accent{color:var(--yellow);}
 .hero .lbl,.metric .lbl{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:1.4px;color:var(--soft-grey);font-weight:600;}
 .hero .val{font-family:var(--mono);font-size:clamp(30px,4.4vw,42px);color:var(--yellow);margin-top:6px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.03em;font-weight:600;}
 .hero .sublbl{font-size:11.5px;color:var(--soft-grey);margin-top:8px;}
+.hero .sublbl:empty{display:none;}
 .metric{padding:14px 17px;}
 .metric .val{font-family:var(--mono);font-size:clamp(21px,2.6vw,26px);color:var(--white);margin-top:6px;line-height:1;font-variant-numeric:tabular-nums;font-weight:600;}
 .metric .val.acc{color:var(--yellow);} .metric .val.good{color:var(--green);}
@@ -541,7 +542,7 @@ function render(){
   const diff=d.aws.base.total-d.price;
 
   $("kFee").textContent=d.below?"—":money(d.price);
-  $("kFeeSub").textContent=d.below?"Too small for us to price well":"One charge, fixed for the year";
+  $("kFeeSub").textContent=d.below?"Too small for us to price well":"";
   $("kAws").textContent=money(d.aws.base.total);
   $("kSave").textContent=d.below?"—":money(Math.abs(diff));
 
