@@ -422,7 +422,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 
 <script>
 "use strict";
-const TABS=["Your workload","Cutting the bill","AWS vs Akka","Three years"];
+const TABS=["Your workload","Cutting the bill","AWS vs Akka","Future savings"];
 const PRESETS=[1000,2500,5000,10000,20000];
 const WORKLOADS=[
   {key:"swe",name:"Writing software",short:"Software",inRatio:0.90,repeat:0.15,def:30},
@@ -487,7 +487,7 @@ function go(i){
   document.querySelectorAll(".tab").forEach((b,j)=>b.classList.toggle("on",j===tab));
   document.querySelectorAll(".panel").forEach((p,j)=>p.classList.toggle("on",j===tab));
   $("prev").disabled=tab===0; $("next").disabled=tab===TABS.length-1;
-  $("next").textContent=["Cut the bill","Compare prices","Look ahead","Three years"][tab];
+  $("next").textContent=["Cut the bill","Compare prices","Look ahead","Future savings"][tab];
   window.scrollTo({top:0,behavior:"smooth"});
 }
 function support(a){const m=a/12;let s=Math.min(m,150000)*.10;
