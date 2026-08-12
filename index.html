@@ -125,10 +125,12 @@ select{width:100%;height:var(--ctl-h);background:rgba(0,219,221,.06);border:1px 
   border-radius:8px;color:var(--blue);font-family:var(--mono);font-size:14px;font-weight:600;
   padding:0 14px;cursor:pointer;}
 select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,219,221,.16);}
-.provpick{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-.provpick select{width:auto;height:21px;line-height:21px;font-size:10.5px;font-weight:600;padding:0 6px;
-  border-radius:4px;background:var(--medium-black);color:var(--blue);border:1px solid rgba(0,219,221,.4);color-scheme:dark;}
-.provpick select option{background:var(--medium-black);color:var(--white);}
+.provsel{width:auto;height:auto;font-family:var(--sans);font-size:13px;font-weight:700;
+  padding:1px 4px;border:0;border-bottom:2px solid var(--blue);border-radius:0;
+  background:transparent;color:var(--blue);cursor:pointer;color-scheme:dark;
+  -webkit-appearance:none;appearance:none;}
+.provsel:focus{outline:none;border-bottom-color:var(--white);}
+.provsel option{background:var(--medium-black);color:var(--white);font-weight:400;}
 .srcpick{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap;}
 .srcq{font-size:11.5px;color:var(--soft-grey);}
 .srcpick select{width:auto;height:21px;line-height:21px;font-size:10.5px;font-weight:600;
@@ -351,7 +353,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 <header>
   <p class="brand"><svg class="akka-mark" viewBox="0 0 780 178" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Akka"><polygon points="324.67856 .12152 259.48772 72.62656 259.48772 0 216.25386 0 216.25386 177.95226 259.48772 177.95226 259.48772 105.32551 324.67856 177.83055 381.64294 177.83055 301.75157 88.97603 381.64294 .12152 324.67856 .12152"/><polygon points="516.96368 .12152 451.77284 72.62656 451.77284 0 408.53899 0 408.53899 177.95226 451.77284 177.95226 451.77284 105.32551 516.96368 177.83055 573.92807 177.83055 494.0367 88.97603 573.92807 .12152 516.96368 .12152"/><path d="M114.05281.12191h-32.65812L0,177.83094h45.97063l11.10147-25.74347h82.39016l11.10147,25.74347h45.97063L115.13967.12191h-1.08685ZM72.87776,115.43539l25.38942-58.87581,25.38942,58.87581h-50.77884Z"/><path d="M697.67508.12191h-33.74498l-81.39469,177.70903h45.97063l11.10147-25.74347h82.39016l11.10147,25.74347h45.97063L697.67508.12191ZM655.41317,115.43539l25.38942-58.87581,25.38942,58.87581h-50.77884Z"/></svg></p>
   <h1>What your AI agents <span class="accent">will cost you</span></h1>
-  <p class="hsub">Tell us how much AI work you expect next year. We will show you what it costs to build on AWS and what it costs with us.</p>
+  <p class="hsub">Tell us how much AI work you expect next year. We will show you what it costs to build on <select id="prov" class="provsel"></select> and what it costs with us.</p>
 </header>
 
 <div class="vs">
@@ -454,10 +456,6 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 <section class="panel" data-panel="2">
   <div id="sizeNote"></div>
   <div class="form">
-    <div class="provpick">
-      <span class="srcq">Compare against:</span>
-      <select id="prov"></select>
-    </div>
     <h4>Next twelve months estimate</h4>
     <div class="scroller">
       <table id="tco">
@@ -517,6 +515,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
   <p class="lh">Basis of estimate, sources and definitions</p>
   <p><b>What each case runs.</b> <b>Low</b> — the smallest models available (Ministral 3B 70%, Ministral 8B 20%, Llama 4 Scout 10%), memory held on self-managed storage, 5% of payload sampled to logging; approx. 10% accuracy, 3.7s latency. <b>Base</b> — a middle mix (Ministral 8B 50%, Llama 4 Scout 25%, Qwen3 Next 80B 15%, imported SLM 10%) on the managed memory service, 5% sampled; approx. 22% accuracy, 5.0s. <b>High</b> — larger models throughout (Llama 4 Scout 30%, Mistral Large 3 25%, Qwen3 VL 235B 25%, DeepSeek V3.2 20%) with full payload capture; approx. 53% accuracy, 7.4s. <b>Max</b> — MiniMax M2.5 sampled three times per task with a verifier rerank, full payload capture; approx. 88% accuracy, 9.0s. <b>Akka</b> — MiniMax M2.5 and Qwen3 Coder Next with customer-trained LoRA adapters, served in a single pass on reserved capacity; 80.2% accuracy, 4.5s. Best-of-three sampling is not applied, so the Akka figure is the published score of the base model rather than a modelled uplift.</p>
   <p><b>Model inference.</b> Input tokens × input rate plus output tokens × output rate, summed across each mix. Rates per million tokens, Amazon Bedrock public list, on-demand, US East: Ministral 3B $0.10/$0.10; Ministral 8B $0.15/$0.15; Llama 4 Scout $0.20/$1.00; Qwen3 Next 80B $0.15/$1.20; Mistral Large 3 $0.50/$1.50; Qwen3 VL 235B $0.53/$2.66; DeepSeek V3.2 $0.62/$1.85; MiniMax M2.5 $0.30/$1.20, corroborated by one published rate card, with a second showing $0.36/$1.44, exactly 20% higher, which is consistent with a gateway uplift rather than a differing Bedrock rate. The Amazon Bedrock model card for MiniMax M2.5 records a launch date of 12 February 2026, a 196K context window and an 8K maximum output, and refers pricing to the Bedrock pricing page. <b>Best-of-three sampling</b> applies a 3.35× multiplier: each attempt re-reads the full context, tripling both input and output, plus one verifier pass reading the context and all three candidates. <b>Customer-trained models on Bedrock</b> bill through Custom Model Import at $0.05718 per Custom Model Unit-minute, divided by 120,000 tokens per minute at an assumed 2,000 tokens per second per unit, giving $0.4765 per million. Amazon Bedrock documentation states that a model unit specifies the input and output tokens it can process in one minute, and directs customers to their AWS account manager for the figure rather than publishing it. The 2,000 tokens per second assumption is therefore ours, and it decides whether an imported-model strategy has a cost basis at all.</p>
+  <p><b>Google Cloud basis.</b> Vertex AI does not sell open-weight models by the token. Google models bill per token, third-party models follow vendor pricing, and open models bill per endpoint instance hour plus a per-model container fee. The rates here are therefore derived rather than quoted: an a3-highgpu-8g endpoint at $88.49 an hour, eight H100 at $11.06 each, divided by the serving throughput modelled elsewhere on this page, and divided again by 40% endpoint utilisation, since a rented endpoint bills whether or not it is serving. That yields approximately $0.19/$1.28 per million tokens for a small model, $0.51/$4.92 for a mid-size model and $0.77/$8.53 for a large one. The per-model container fee is charged on top and is published per listing rather than centrally, so it is excluded and the Google figures understate the real cost. One source quotes a3-highgpu-8g at $9.46 an hour, which is inconsistent with the $11.06 per-GPU figure and is treated as an error. Reserved capacity uses Google’s published three-year committed-use discount of 6%, the only committed rate of the three that is published rather than assumed. The Max case runs the strongest open model in Model Garden, reaching approximately 81%.</p>
   <p><b>Azure basis.</b> Azure AI Foundry serverless rates per million tokens: Ministral 3B $0.04/$0.04, Phi-4 $0.125/$0.50, Llama 4 Scout $0.20/$0.78, Mistral Medium 2505 $0.40/$2.00, Mistral Large 3 $0.50/$1.50, DeepSeek V3.2 $0.58/$1.68. Azure prices at or below Bedrock on every model both platforms carry. The mixes differ from the AWS ones because Azure does not serve Ministral 8B, Qwen3 Next 80B, Qwen3 Coder Next, Qwen3 VL 235B or MiniMax M2.5. Phi-4 and Mistral Medium substitute for the Qwen and Ministral 8B positions. The Max case runs DeepSeek V3.2, the strongest model with a published Azure rate, so its ceiling is approximately 81% rather than the 88% MiniMax M2.5 reaches on Bedrock. Llama 4 Maverick is excluded: the published rate of $1.41 input against $0.35 output appears transposed. Durable memory, agent hosting, observability, storage, support and professional services carry the AWS figures, on the basis that those services price comparably across hyperscalers; only inference and reserved GPU are re-derived. Reserved capacity inside an Azure VPC is modelled at $59.00 an hour for an ND96isr H100 v5, a 40% reduction on the $98.32 on-demand rate, which is an assumption rather than a quoted figure.</p>
   <p><b>Durable memory.</b> Bedrock AgentCore. Short-term events $0.25 per 1,000; long-term storage billed monthly against the accumulated balance at $0.75 per 1,000 per month, or $0.25 per 1,000 per month self-managed; retrieval $0.50 per 1,000. Volumetrics assume 50,000 tokens per session, with 8 short-term events, 3 long-term records and 2 retrievals per session. The billed balance is the mean of a linear ramp to full year-one accrual; because stored records accumulate, year two bills approximately 2.5× year one at flat token volume. <b>Agent hosting.</b> AgentCore Runtime, $0.0895 per vCPU-hour billed on active execution and $0.00945 per GB-hour billed across the full session wall clock including time blocked awaiting a model response; session profiles 1 vCPU / 2 GB / 120s, 2 / 4 / 300s and 3 / 6 / 400s. <b>Observability.</b> Payload estimated at 4 bytes per token; CloudWatch Logs Standard ingestion $0.50 per GB, storage $0.03 per GB-month, custom metrics $0.30 per metric per month; routing payload to S3 Standard at $0.023 per GB-month approximately halves the same volume. CloudWatch does operate volume tiers of $0.50 per GB to 10 TB a month, then $0.25, $0.10 and $0.05, but those tiers apply only to AWS vended logs such as VPC Flow Logs and Route 53 query logs. Agent request and response payload reaches CloudWatch through PutLogEvents and the CloudWatch agent, which are excluded from tiering and bill flat at $0.50 per GB. Tiering is also assessed per account and cannot be aggregated across a multi-account structure. The Infrequent Access log class at $0.25 per GB has supported full Logs Insights queries since early 2026 and halves ingestion where it is acceptable.</p>
   <p><b>Enterprise Support Plan.</b> Billed as the greater of $15,000 per month or a tiered percentage of monthly consumption: 10% to $150,000, 7% to $500,000, 5% to $1,000,000, 3% thereafter; a Technical Account Manager is included at this tier at no separate charge. <b>Professional services.</b> Blended at $350 per hour; Low approx. 500 hours, Base two engineers for six months (1,920 hours), High and Max three to four engineers for twelve months. <b>Availability.</b> The AWS figure of 99.9% is the monthly uptime percentage committed in the Amazon Bedrock Service Level Agreement. The Akka figure of 99.9999% is the availability commitment of the Akka Agentic AI Platform.</p>
@@ -528,7 +527,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 
 <script>
 "use strict";
-const TABS=["Your workload","Cutting the bill","Hyperscaler vs Akka","Future savings"];
+const TABS=["Your workload","Cutting the bill","AWS vs Akka","Future savings"];
 const SLUGS=["workload","savings","compare","outlook"];
 const PRESETS=[1000,2500,5000,10000,20000];
 const WORKLOADS=[
@@ -562,6 +561,15 @@ const PROV={
       high:[{s:.30,i:0.20,o:0.78},{s:.25,i:0.50,o:1.50},{s:.25,i:0.58,o:1.68},{s:.20,i:0.40,o:2.00}],
       max:[{s:1.0,i:0.58,o:1.68}]},
     acc:{low:10,base:22,high:50,max:81},
+    lat:{low:3.7,base:5.0,high:7.4,max:9.0}},
+  gcp:{
+    label:"Google Cloud", vpcLabel:"Google reserved capacity", vpcH100:83.19, vpcB200:172.00,
+    mixes:{
+      low:[{s:.70,i:0.192,o:1.28},{s:.20,i:0.192,o:1.28},{s:.10,i:0.512,o:4.92}],
+      base:[{s:.50,i:0.192,o:1.28},{s:.25,i:0.512,o:4.92},{s:.15,i:0.512,o:4.92},{s:.10,i:0.192,o:1.28}],
+      high:[{s:.30,i:0.512,o:4.92},{s:.25,i:0.768,o:8.53},{s:.25,i:0.768,o:8.53},{s:.20,i:0.768,o:8.53}],
+      max:[{s:1.0,i:0.768,o:8.53}]},
+    acc:{low:10,base:22,high:53,max:81},
     lat:{low:3.7,base:5.0,high:7.4,max:9.0}}
 };
 let MIXES=PROV.aws.mixes;
@@ -739,6 +747,8 @@ function render(){
   $("kFeeSub").textContent=d.below?"too small for us to price well":"";
   $("kAws").textContent=money(d.aws.base.total);
   document.querySelector(".vs-aws .vs-l").textContent="Integrating it yourself on "+d.prov.label;
+  TABS[2]=d.prov.label+" vs Akka";
+  document.querySelectorAll(".tab").forEach((b,i)=>{if(i===2)b.textContent=TABS[2];});
 
   document.querySelectorAll(".pbtn").forEach(b=>b.classList.toggle("on",+b.dataset.vol===d.totalB));
   $("srcNote").innerHTML=d.src.vpc ? ""
