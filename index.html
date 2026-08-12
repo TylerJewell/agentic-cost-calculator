@@ -134,14 +134,15 @@ select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,2
 .provsel:hover{background-color:rgba(0,219,221,.20);}
 .provsel:focus{outline:none;box-shadow:0 0 0 3px rgba(0,219,221,.20);}
 .provsel option{background:var(--medium-black);color:var(--white);font-weight:400;}
-.srcpick{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.vs-foot{grid-column:1 / -1;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  margin-top:16px;padding-top:13px;border-top:1px solid var(--hair);}
 .srcq{font-size:10.5px;color:var(--soft-grey);}
-.srcpick select{width:auto;height:21px;line-height:21px;font-size:10.5px;font-weight:600;
-  padding:0 6px;border-radius:4px;background:var(--medium-black);color:var(--blue);
+.vs-foot select{width:auto;height:18px;line-height:18px;font-size:9.5px;font-weight:600;
+  padding:0 5px;border-radius:3px;background:var(--medium-black);color:var(--blue);
   border:1px solid rgba(0,219,221,.4);color-scheme:dark;}
-.srcpick select option{background:var(--medium-black);color:var(--white);}
-.srcpick select option:checked{color:var(--blue);}
-.srcnote{font-size:10px;color:var(--medium-grey);margin-top:6px;line-height:1.45;max-width:46ch;}
+.vs-foot select option{background:var(--medium-black);color:var(--white);}
+.srcnote{flex-basis:100%;font-size:10px;color:var(--medium-grey);margin-top:2px;line-height:1.45;}
+.srcnote:empty{display:none;}
 .srcnote:empty{display:none;}
 
 input[type=number]:focus{outline:none;border-color:var(--blue);background:rgba(0,219,221,.11);
@@ -364,16 +365,16 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
     <p class="vs-l">With Akka</p>
     <p class="vs-v" id="kFee">—</p>
     <p class="vs-n" id="kFeeSub"></p>
-    <div class="srcpick">
-      <span class="srcq">You can save even more with a neocloud</span>
-      <select id="src"></select>
-    </div>
-    <p class="srcnote" id="srcNote"></p>
   </div>
   <div class="vs-mid"><span>vs</span></div>
   <div class="vs-side vs-aws">
     <p class="vs-l" id="kAwsLbl">Integrating it yourself on AWS</p>
     <p class="vs-v" id="kAws">—</p>
+  </div>
+  <div class="vs-foot">
+    <span class="srcq">You can save even more with a neocloud</span>
+    <select id="src"></select>
+    <p class="srcnote" id="srcNote"></p>
   </div>
 </div>
 
