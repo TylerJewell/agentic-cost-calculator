@@ -122,14 +122,22 @@ td.acc{color:var(--yellow);} td.ok{color:var(--green);} td.dim{color:var(--mediu
 tr.tot td{border-top:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--white);font-weight:600;padding-top:9px;padding-bottom:9px;}
 tr.tot td.n{font-size:14px;}
 tr.tot td.akka{color:var(--yellow);font-size:15px;}
-td.akka,th.akka{background:rgba(255,206,74,.05);border-left:1px solid var(--line);padding-left:12px;}
+td.akka,th.akka{background:rgba(255,206,74,.10);border-left:2px solid var(--yellow);padding-left:14px;padding-right:14px;}
+th.akka{color:var(--yellow);font-size:10px;}
+td.akka{color:var(--white);}
+#tco{table-layout:fixed;}
+#tco th:first-child{width:auto;}
+#tco th:not(:first-child):not(.akka){width:10.5%;}
+#tco th.akka{width:19%;}
+#tco tr.tot td.akka{font-size:17px;}
+#tco th.akka,#tco td.akka{padding-right:14px;}
 .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--medium-grey) var(--medium-black);}
 .scroller::-webkit-scrollbar{height:9px;}
 .scroller::-webkit-scrollbar-track{background:var(--medium-black);}
 .scroller::-webkit-scrollbar-thumb{background:var(--medium-grey);}
 .scroller::-webkit-scrollbar-thumb:hover{background:var(--blue);}
 .tag{font-family:var(--mono);font-size:8.5px;line-height:17px;height:17px;padding:0 7px;border-radius:3px;white-space:nowrap;display:inline-block;vertical-align:top;}
-.tag.yes{color:var(--green);background:rgba(114,211,91,.10);border:1px solid rgba(114,211,91,.4);}
+.tag.yes{color:var(--green);background:rgba(114,211,91,.20);border:1px solid rgba(114,211,91,.75);font-weight:600;}
 .tag.no{color:var(--medium-grey);background:rgba(241,241,241,.03);border:1px solid var(--line);}
 
 details{border-top:1px solid var(--hair);margin-top:16px;padding-top:14px;}
@@ -323,10 +331,10 @@ details .body{margin-top:13px;}
 <section class="panel" data-panel="2">
   <div id="sizeNote"></div>
   <div class="form">
-    <h4>Your first year, priced five ways <span class="r">AWS list price, no discount</span></h4>
+    <h4>Next twelve months estimate <span class="r">AWS list price, no discount</span></h4>
     <div class="scroller">
       <table id="tco">
-        <thead><tr><th>Billed for</th><th class="n">Cheapest</th><th class="n">Likeliest</th><th class="n">Generous</th><th class="n">Best</th><th class="n akka">Akka</th></tr></thead>
+        <thead><tr><th>Billed for</th><th class="n">Low</th><th class="n">Base</th><th class="n">High</th><th class="n">Max</th><th class="n akka">Akka</th></tr></thead>
         <tbody id="tcoBody"></tbody>
       </table>
     </div>
@@ -475,7 +483,7 @@ const STO5={low:.08e6,base:.18e6,high:.30e6,max:.30e6};
 const PRE=25000,DEC=3000,GPN=8,HRS=8760,P5=27.52,PEAK=2.8;
 const MIN_NODES=2,CPU_MIN=50000,CPU_PCT=.125,SRE=2500,MISC=10000,MARKUP=2.0;
 const MIN_VOLUME_B=1000,Y2=1.6,Y3=2.6;
-const CAP={low:"Cheapest",base:"Likeliest",high:"Generous",max:"Best"};
+const CAP={low:"Low",base:"Base",high:"High",max:"Max"};
 
 const $=id=>document.getElementById(id);
 const money=n=>n>=1e6?"$"+(n/1e6).toFixed(2)+"M":"$"+Math.round(n/1000)+"K";
@@ -629,9 +637,8 @@ function render(){
   h+='<tr><td>The machines</td>'+K.map(()=>'<td class="n dim">you rent</td>').join("")+'<td class="n akka">'+inc+"</td></tr>";
   h+='<tr class="tot"><td>Your first year</td>'+K.map(k=>'<td class="n">'+money(d.aws[k].total)+"</td>").join("")+
      '<td class="n akka">'+(d.below?"—":money(d.price))+"</td></tr>";
-  h+='<tr><td>Answers it gets right</td>'+K.map(k=>'<td class="n acc">'+ACC[k]+"%</td>").join("")+'<td class="n akka acc">'+ACC.akka+"%</td></tr>";
-  h+='<tr><td>How long you wait</td>'+K.map(k=>'<td class="n">'+LAT[k].toFixed(1)+"s</td>").join("")+'<td class="n akka">'+LAT.akka.toFixed(1)+"s</td></tr>";
-  h+='<tr><td>Charges on your invoice</td>'+K.map(()=>'<td class="n">7</td>').join("")+'<td class="n akka acc">1</td></tr>';
+  h+='<tr><td>Accuracy</td>'+K.map(k=>'<td class="n acc">'+ACC[k]+"%</td>").join("")+'<td class="n akka acc">'+ACC.akka+"%</td></tr>";
+  h+='<tr><td>Latency</td>'+K.map(k=>'<td class="n">'+LAT[k].toFixed(1)+"s</td>").join("")+'<td class="n akka">'+LAT.akka.toFixed(1)+"s</td></tr>";
   $("tcoBody").innerHTML=h;
 
   if(!d.below){
