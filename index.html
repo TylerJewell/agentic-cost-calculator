@@ -125,22 +125,25 @@ select{width:100%;height:var(--ctl-h);background:rgba(0,219,221,.06);border:1px 
   border-radius:8px;color:var(--blue);font-family:var(--mono);font-size:14px;font-weight:600;
   padding:0 14px;cursor:pointer;}
 select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,219,221,.16);}
-.provsel{width:auto;height:auto;font-family:var(--sans);font-size:13px;font-weight:700;
-  padding:1px 4px;border:0;border-bottom:2px solid var(--blue);border-radius:0;
-  background:transparent;color:var(--blue);cursor:pointer;color-scheme:dark;
-  -webkit-appearance:none;appearance:none;}
-.provsel:focus{outline:none;border-bottom-color:var(--white);}
+.provsel{width:auto;height:26px;font-family:var(--sans);font-size:13px;font-weight:700;
+  padding:0 26px 0 10px;border:1px solid var(--blue);border-radius:5px;
+  background-color:rgba(0,219,221,.12);color:var(--blue);cursor:pointer;color-scheme:dark;
+  -webkit-appearance:none;appearance:none;position:relative;top:2px;
+  background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2300DBDD' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 9px center;}
+.provsel:hover{background-color:rgba(0,219,221,.20);}
+.provsel:focus{outline:none;box-shadow:0 0 0 3px rgba(0,219,221,.20);}
 .provsel option{background:var(--medium-black);color:var(--white);font-weight:400;}
-.srcpick{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap;}
-.srcq{font-size:11.5px;color:var(--soft-grey);}
+.srcpick{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.srcq{font-size:10.5px;color:var(--soft-grey);}
 .srcpick select{width:auto;height:21px;line-height:21px;font-size:10.5px;font-weight:600;
   padding:0 6px;border-radius:4px;background:var(--medium-black);color:var(--blue);
   border:1px solid rgba(0,219,221,.4);color-scheme:dark;}
 .srcpick select option{background:var(--medium-black);color:var(--white);}
 .srcpick select option:checked{color:var(--blue);}
-.srcnote{font-size:10.5px;color:var(--medium-grey);text-align:right;margin-top:7px;line-height:1.5;}
+.srcnote{font-size:10px;color:var(--medium-grey);margin-top:6px;line-height:1.45;max-width:46ch;}
 .srcnote:empty{display:none;}
-@media (max-width:620px){.srcpick{justify-content:flex-start;}.srcnote{text-align:left;}}
+
 input[type=number]:focus{outline:none;border-color:var(--blue);background:rgba(0,219,221,.11);
   box-shadow:0 0 0 3px rgba(0,219,221,.16);}
 input[type=range]{width:100%;accent-color:var(--blue);height:18px;cursor:pointer;display:block;}
@@ -361,10 +364,15 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
     <p class="vs-l">With Akka</p>
     <p class="vs-v" id="kFee">—</p>
     <p class="vs-n" id="kFeeSub"></p>
+    <div class="srcpick">
+      <span class="srcq">You can save even more with a neocloud</span>
+      <select id="src"></select>
+    </div>
+    <p class="srcnote" id="srcNote"></p>
   </div>
   <div class="vs-mid"><span>vs</span></div>
   <div class="vs-side vs-aws">
-    <p class="vs-l">Integrating it yourself on AWS</p>
+    <p class="vs-l" id="kAwsLbl">Integrating it yourself on AWS</p>
     <p class="vs-v" id="kAws">—</p>
   </div>
 </div>
@@ -464,16 +472,11 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
       </table>
     </div>
 
-    <div class="srcpick">
-      <span class="srcq">You can save money with a neocloud, but AI traffic will leave your VPC:</span>
-      <select id="src"></select>
-    </div>
-    <p class="srcnote" id="srcNote"></p>
 
     <div class="hl"><p class="h" id="hlH">—</p></div>
 
     <div class="incl">
-      <p class="incl-h">Included in the Akka configuration<span class="dot">•</span>Akka installs in your AWS VPC</p>
+      <p class="incl-h">Included in the Akka configuration<span class="dot">•</span><span id="inclVpc">Akka installs in your AWS VPC</span></p>
       <p class="incl-lede" id="inclLede">—</p>
       <div class="incl-grid" id="akkaSpec"></div>
       <p class="incl-foot"><a href="https://akka.io/platform/capabilities" target="_blank" rel="noopener">See all of Akka’s 400 capabilities</a></p>
@@ -746,8 +749,9 @@ function render(){
   $("kFee").textContent=d.below?"—":money(d.price);
   $("kFeeSub").textContent=d.below?"too small for us to price well":"";
   $("kAws").textContent=money(d.aws.base.total);
-  document.querySelector(".vs-aws .vs-l").textContent="Integrating it yourself on "+d.prov.label;
   TABS[2]=d.prov.label+" vs Akka";
+  $("inclVpc").textContent="Akka installs in your "+d.prov.label+" VPC";
+  $("kAwsLbl").textContent="Integrating it yourself on "+d.prov.label;
   document.querySelectorAll(".tab").forEach((b,i)=>{if(i===2)b.textContent=TABS[2];});
 
   document.querySelectorAll(".pbtn").forEach(b=>b.classList.toggle("on",+b.dataset.vol===d.totalB));
@@ -793,7 +797,7 @@ function render(){
     return '<div class="dseg"><div class="didle" style="height:'+(100-h)+'%"></div><div class="dfill" style="height:'+h+'%"></div></div>';}).join("");
 
   $("sizeNote").innerHTML=d.below
-    ?'<div class="hl" style="margin:12px 0 0"><p class="h">At this size you are better off on AWS, and we would rather say so.</p><p class="p">Under 1,000 billion tokens a year, keeping the two big models loaded in two data centres costs more than paying AWS by the token. Come back when your volume grows.</p></div>':"";
+    ?'<div class="hl" style="margin:12px 0 0"><p class="h">At this size you are better off on '+d.prov.label+', and we would rather say so.</p><p class="p">Under 1,000 billion tokens a year, keeping the two big models loaded in two data centres costs more than metered inference. Come back when your volume grows.</p></div>':"";
   const inc='<span class="tag yes">included</span>';
   const line=(l,f,a)=>"<tr><td>"+l+"</td>"+K.map(k=>'<td class="n mny" data-l="'+CAP[k]+'">'+money(f(d.aws[k]))+"</td>").join("")+'<td class="n akka" data-l="Akka">'+a+"</td></tr>";
   let h="";
