@@ -184,9 +184,10 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 .incl-lede b{color:var(--green);font-weight:600;}
 .incl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px 20px;margin-top:12px;}
 .ic{display:flex;gap:8px;align-items:flex-start;min-width:0;}
+.ic>div{min-width:0;}
 .ick{color:var(--green);font-size:11px;line-height:1.45;flex:none;}
-.ict{font-size:11.5px;font-weight:600;color:var(--white);line-height:1.35;}
-.ics{font-size:10.5px;color:var(--soft-grey);line-height:1.35;margin-top:1px;}
+.ict{font-size:11.5px;font-weight:600;color:var(--white);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ics{font-size:10.5px;color:var(--soft-grey);line-height:1.35;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .incl-foot{font-size:10.5px;color:var(--medium-grey);text-align:center;margin-top:13px;
   padding-top:11px;border-top:1px solid rgba(114,211,91,.22);}
 .incl-foot a{color:var(--blue);text-decoration:none;}
@@ -629,22 +630,22 @@ function render(){
 
   $("inclLede").innerHTML="Reserved for you and run around the clock, at <b>99.9999% availability across two zones</b>.";
   const spec=[
-    ["MiniMax M2.5 and Qwen3 Coder Next","Open-weight base models, held resident"],
+    ["MiniMax M2.5, Qwen3 Coder Next","Open-weight base models"],
     [d.adapters+" trained LoRA adapters","Built from your own traffic"],
     [d.nodes+" \u00d7 p5.48xlarge reserved",(d.nodes*8)+" \u00d7 NVIDIA H100 80GB"],
-    [(d.nodes*192).toLocaleString()+" vCPU, "+(d.nodes*2)+" TiB","Committed alongside the GPU"],
-    ["vLLM multi-LoRA serving","Every adapter on one base model"],
+    [(d.nodes*192).toLocaleString()+" vCPU, "+(d.nodes*2)+" TiB","Committed with the GPU"],
+    ["vLLM multi-LoRA serving","Every adapter on one base"],
     ["Kubernetes on Amazon EKS","Node pool and autoscaling"],
-    ["Akka cluster sharding","Agent placement and failover"],
-    ["agentgateway","Routing, tool calls and identity"],
-    ["Event-sourced agent memory","Postgres, replicated across zones"],
-    ["Object storage tracing","Full retention, no ingest metering"],
-    ["Continuous observability","OTEL, Prometheus and Splunk export"],
-    ["Active-active HA and DR","Sub-1 min RTO, zero-byte RPO"],
-    ["Live CVE patching","Security patches with zero downtime"],
+    ["Akka cluster sharding","Placement and failover"],
+    ["agentgateway","Routing, tools and identity"],
+    ["Event-sourced memory","Postgres, replicated"],
+    ["Object storage tracing","Full retention, no metering"],
+    ["Continuous observability","OTEL, Prometheus, Splunk"],
+    ["Active-active HA and DR","Sub-1 min RTO, 0-byte RPO"],
+    ["Live CVE patching","Patched with zero downtime"],
     ["No-downtime rolling updates","No maintenance windows"],
     ["Automatic failure recovery","State snapshot and replay"],
-    ["24/7 on-call and incident response","Someone is always watching"]
+    ["24/7 on-call","Someone is always watching"]
   ];
   $("akkaSpec").innerHTML=spec.map(r=>
     '<div class="ic"><span class="ick">\u2713</span><div><p class="ict">'+r[0]+'</p><p class="ics">'+r[1]+'</p></div></div>').join("");
