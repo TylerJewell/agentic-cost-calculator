@@ -125,6 +125,12 @@ select{width:100%;height:var(--ctl-h);background:rgba(0,219,221,.06);border:1px 
   border-radius:8px;color:var(--blue);font-family:var(--mono);font-size:14px;font-weight:600;
   padding:0 14px;cursor:pointer;}
 select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,219,221,.16);}
+.srcpick{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.srcq{font-size:11.5px;color:var(--soft-grey);}
+.srcpick select{width:auto;height:32px;font-size:11.5px;font-weight:600;padding:0 10px;border-radius:6px;
+  background:rgba(0,219,221,.06);border:1px solid rgba(0,219,221,.4);}
+.srcnote{font-size:10.5px;color:var(--medium-grey);text-align:right;margin-top:7px;line-height:1.5;}
+@media (max-width:620px){.srcpick{justify-content:flex-start;}.srcnote{text-align:left;}}
 input[type=number]:focus{outline:none;border-color:var(--blue);background:rgba(0,219,221,.11);
   box-shadow:0 0 0 3px rgba(0,219,221,.16);}
 input[type=range]{width:100%;accent-color:var(--blue);height:18px;cursor:pointer;display:block;}
@@ -372,18 +378,6 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
       </div>
     </div>
 
-    <h4>Where your inference runs</h4>
-    <div class="grid">
-      <div class="field">
-        <label>You can save money with a neocloud, but AI traffic leaves your VPC</label>
-        <select id="src"></select>
-      </div>
-      <div class="field">
-        <label>What that means</label>
-        <div class="hint" id="srcNote">—</div>
-      </div>
-    </div>
-
     <h4>What kind of work is it <span class="r" id="alloc">100%</span></h4>
     <div class="grid five" id="mix"></div>
     <p class="note wide">The types of AI use cases you expect determines which kinds of models we need and whether any SLMs can be trained from narrow, repetitive work. For example, reading documents looks similar each time, so a small trained model can do it for a fraction of the price. Akka will automatically train the right models for you.</p>
@@ -459,6 +453,12 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
         <tbody id="tcoBody"></tbody>
       </table>
     </div>
+
+    <div class="srcpick">
+      <span class="srcq">You can save money with a neocloud, but AI traffic leaves your VPC:</span>
+      <select id="src"></select>
+    </div>
+    <p class="srcnote" id="srcNote"></p>
 
     <div class="hl"><p class="h" id="hlH">—</p></div>
 
