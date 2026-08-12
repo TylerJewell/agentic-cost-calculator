@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>What your AI agents cost — Akka</title>
+<meta name="description" content="Estimate what an AI agent programme costs to run on AWS, what it costs with Akka, and where the money goes.">
+<link rel="icon" href="https://akka.io/favicon.ico" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=optional" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --black:#000000;
+  --medium-black:#141414;
+  --white:#F1F1F1;
+  --yellow:#FFCE4A;
+  --blue:#00DBDD;
+  --red:#FF5400;
+  --green:#72D35B;
+  --soft-grey:#A6A6A6;
+  --medium-grey:#4E4E4E;
+
+  --line:rgba(78,78,78,.55);
+  --hair:rgba(78,78,78,.26);
+  --fill:rgba(241,241,241,.03);
+  --box:linear-gradient(180deg,#101010,#080808);
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --sans:'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  background:var(--black);color:var(--soft-grey);
+  font-family:var(--sans);font-size:13px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(circle,rgba(255,206,74,.035) 1px,transparent 1px);
+  background-size:48px 48px;
+  overflow-x:hidden;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 5vw 90px;}
+
+/* ---------- header ---------- */
+.product{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:4px;color:var(--soft-grey);text-transform:uppercase;}
+h1{font-size:clamp(25px,4.6vw,44px);font-weight:700;letter-spacing:-.03em;line-height:1.08;color:var(--white);margin:.2em 0 .34em;}
+h1 .accent{color:var(--yellow);}
+.hsub{color:var(--soft-grey);max-width:66ch;font-size:clamp(13.5px,1.5vw,15px);line-height:1.55;}
+header{border-bottom:1px solid var(--line);padding-bottom:20px;}
+
+/* ---------- sticky summary ---------- */
+.summary{
+  position:sticky;top:0;z-index:30;background:var(--black);
+  border-bottom:1px solid var(--line);padding:13px 0 14px;
+  display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr 1fr;gap:14px;
+}
+.sm{border-left:1px solid var(--hair);padding-left:14px;min-width:0;}
+.sm:first-child{border-left:0;padding-left:0;}
+.sm .k{font-family:var(--mono);font-size:8.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--medium-grey);font-weight:600;}
+.sm .v{font-family:var(--mono);font-size:clamp(20px,2.3vw,26px);font-weight:600;color:var(--white);line-height:1.08;margin-top:5px;font-variant-numeric:tabular-nums;letter-spacing:-.02em;}
+.sm .v.hero{font-size:clamp(24px,3vw,34px);color:var(--yellow);}
+.sm .v.s{font-size:clamp(17px,1.9vw,20px);}
+.sm .n{font-family:var(--mono);font-size:9px;color:var(--medium-grey);margin-top:5px;line-height:1.4;}
+.sm .n.good{color:var(--green);}
+
+/* ---------- tabs ---------- */
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin:24px 0 24px;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{background:var(--medium-black);border:1px solid var(--line);border-bottom:none;color:var(--medium-grey);
+  font-family:var(--sans);font-weight:700;font-size:11.5px;letter-spacing:.5px;text-transform:uppercase;
+  padding:11px 18px;cursor:pointer;border-radius:6px 6px 0 0;margin-bottom:-1px;display:flex;gap:8px;align-items:center;
+  white-space:nowrap;flex:none;}
+.tab .n{font-family:var(--mono);font-size:10px;font-weight:600;}
+.tab:hover{color:var(--soft-grey);border-color:var(--soft-grey);}
+.tab.on{color:var(--black);background:var(--yellow);border-color:var(--yellow);border-radius:0;padding:12px 18px;}
+.tab.on .n{color:var(--black);}
+.panel{display:none;}
+.panel.on{display:block;}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);background:var(--box);border-radius:10px;padding:clamp(16px,3vw,24px);margin:16px 0;}
+.box h2{font-size:clamp(16px,2.2vw,19px);font-weight:700;color:var(--white);margin:0 0 8px;letter-spacing:-.015em;}
+.box .intro{font-size:13.5px;color:var(--soft-grey);margin:0 0 20px;max-width:70ch;line-height:1.6;}
+h3{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--medium-grey);margin:0 0 12px;}
+h3.acc{color:var(--yellow);}
+h3:not(:first-child){margin-top:26px;padding-top:22px;border-top:1px solid var(--hair);}
+.note{font-size:12px;color:var(--medium-grey);line-height:1.65;margin-top:13px;max-width:74ch;}
+.note b{color:var(--soft-grey);font-weight:600;}
+
+/* ---------- metric tiles ---------- */
+.mini{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px;}
+.mini.six{grid-template-columns:repeat(6,1fr);}
+.metric{border:1px solid var(--line);border-radius:9px;padding:14px 15px;background:var(--fill);min-width:0;}
+.metric .lbl{font-family:var(--mono);font-size:8.5px;text-transform:uppercase;letter-spacing:1.3px;color:var(--medium-grey);font-weight:600;line-height:1.4;}
+.metric .val{font-family:var(--mono);font-size:clamp(20px,2.2vw,24px);font-weight:600;color:var(--white);margin-top:7px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em;}
+.metric .val.acc{color:var(--yellow);}
+.metric .val.good{color:var(--green);}
+.metric .val.sm{font-size:clamp(17px,1.9vw,19px);}
+.metric .sub{font-size:10.5px;color:var(--medium-grey);margin-top:7px;line-height:1.45;}
+
+/* ---------- inputs ---------- */
+label{display:block;font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:1.4px;color:var(--medium-grey);margin-bottom:7px;font-weight:600;}
+.volrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+input[type=number]{width:190px;max-width:100%;background:var(--medium-black);border:1px solid var(--line);border-radius:7px;color:var(--white);
+  font-family:var(--mono);font-size:clamp(24px,4vw,30px);font-weight:600;padding:11px 13px;font-variant-numeric:tabular-nums;}
+input[type=number]:focus{outline:2px solid rgba(0,219,221,.5);outline-offset:1px;border-color:transparent;}
+.volunit{font-size:13px;color:var(--soft-grey);}
+.volconv{font-family:var(--mono);font-size:15px;color:var(--yellow);font-variant-numeric:tabular-nums;}
+input[type=range]{width:100%;accent-color:var(--yellow);height:24px;cursor:pointer;margin-top:12px;}
+.rangecap{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--medium-grey);}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px;}
+.pbtn{font-family:var(--mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;padding:8px 14px;border-radius:5px;
+  border:1px solid var(--line);background:none;color:var(--medium-grey);cursor:pointer;font-weight:600;}
+.pbtn:hover{border-color:var(--blue);color:var(--blue);}
+.pbtn.on{border-color:var(--yellow);color:var(--yellow);}
+
+.mixr{display:grid;grid-template-columns:190px 1fr 46px 72px;gap:14px;align-items:center;padding:8px 0;border-top:1px solid var(--hair);}
+.mixr:first-of-type{border-top:0;}
+.mixr .nm{font-size:13px;color:var(--soft-grey);}
+.mixr .pc{font-family:var(--mono);font-size:12px;color:var(--white);font-weight:600;text-align:right;font-variant-numeric:tabular-nums;}
+.mixr .ab{font-family:var(--mono);font-size:11px;color:var(--medium-grey);text-align:right;font-variant-numeric:tabular-nums;}
+.mixr input[type=range]{margin-top:0;}
+.alloc{font-family:var(--mono);font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--medium-grey);margin-top:12px;text-align:right;}
+.alloc.off{color:var(--yellow);}
+
+.tgl{display:grid;grid-template-columns:1fr 38px;gap:14px;align-items:center;padding:11px 0;border-top:1px solid var(--hair);}
+.tgl:first-of-type{border-top:0;}
+.tgl .tn{font-size:13px;color:var(--soft-grey);}
+.tgl .td{font-size:11px;color:var(--medium-grey);margin-top:3px;line-height:1.5;}
+.sw{position:relative;width:36px;height:20px;border-radius:10px;background:rgba(241,241,241,.05);border:1px solid var(--line);cursor:pointer;}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--medium-grey);transition:left .13s,background .13s;}
+.sw.on{background:rgba(255,206,74,.16);border-color:var(--yellow);}
+.sw.on::after{left:18px;background:var(--yellow);}
+
+/* ---------- tables ---------- */
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;}
+th{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--medium-grey);font-weight:600;
+  text-align:left;padding:0 13px 8px 0;border-bottom:1px solid var(--line);white-space:nowrap;}
+td{font-size:12px;color:var(--soft-grey);padding:7px 13px 7px 0;border-bottom:1px solid var(--hair);vertical-align:top;}
+th.n,td.n{text-align:right;padding-right:0;}
+td.n{font-family:var(--mono);font-size:12px;white-space:nowrap;}
+td.nm{color:var(--white);font-weight:500;}
+td.acc{color:var(--yellow);}
+td.ok{color:var(--green);}
+td.dim{color:var(--medium-grey);}
+tr.tot td{border-top:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--white);font-weight:600;padding-top:10px;padding-bottom:10px;}
+tr.tot td.n{font-size:15px;}
+tr.tot td.akka{color:var(--yellow);font-size:16px;}
+td.akka,th.akka{background:rgba(255,206,74,.05);border-left:1px solid var(--line);padding-left:13px;}
+table.tight td{padding:6px 12px 6px 0;font-size:11.5px;line-height:1.55;}
+table.tight th{padding:0 12px 6px 0;}
+.scroller{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--medium-grey) var(--medium-black);}
+.scroller::-webkit-scrollbar{height:10px;}
+.scroller::-webkit-scrollbar-track{background:var(--medium-black);}
+.scroller::-webkit-scrollbar-thumb{background:var(--medium-grey);}
+.scroller::-webkit-scrollbar-thumb:hover{background:var(--blue);}
+.swipe{font-family:var(--mono);font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--medium-grey);margin-top:8px;display:none;}
+
+.tag{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;letter-spacing:.3px;white-space:nowrap;display:inline-block;}
+.tag.meas{color:var(--green);background:rgba(114,211,91,.10);border:1px solid rgba(114,211,91,.4);}
+.tag.est{color:var(--medium-grey);background:rgba(241,241,241,.03);border:1px solid var(--line);}
+.tag.inc{color:var(--green);background:rgba(114,211,91,.10);border:1px solid rgba(114,211,91,.4);}
+
+/* ---------- day curve ---------- */
+.daybar{display:flex;height:clamp(64px,12vw,88px);border:1px solid var(--line);border-radius:7px;overflow:hidden;margin-top:10px;}
+.dseg{flex:1;position:relative;border-right:1px solid rgba(0,0,0,.6);}
+.dseg:last-child{border-right:0;}
+.dfill{position:absolute;left:0;right:0;bottom:0;background:var(--blue);}
+.didle{position:absolute;left:0;right:0;top:0;background:repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(241,241,241,.06) 3px,rgba(241,241,241,.06) 6px);}
+.daxis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--medium-grey);margin-top:6px;}
+.key{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-family:var(--mono);font-size:9.5px;color:var(--medium-grey);}
+.key i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:-1px;}
+.key i.serve{background:var(--blue);}
+.key i.idle{background:repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(241,241,241,.25) 2px,rgba(241,241,241,.25) 4px);border:1px solid var(--line);}
+
+/* ---------- bars ---------- */
+.barr{display:grid;grid-template-columns:64px 1fr 138px;gap:12px;align-items:center;padding:7px 0;}
+.barr .c{font-family:var(--mono);font-size:9.5px;letter-spacing:1.3px;text-transform:uppercase;color:var(--medium-grey);font-weight:600;}
+.barr.akka .c{color:var(--yellow);}
+.btrack{height:20px;position:relative;background:rgba(241,241,241,.035);border-radius:3px;overflow:hidden;}
+.bfill{height:100%;background:var(--medium-grey);}
+.bfill.y{background:var(--yellow);}
+.bvar{height:100%;position:absolute;top:0;background:repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(241,241,241,.16) 3px,rgba(241,241,241,.16) 6px);}
+.bval{font-family:var(--mono);font-size:12px;text-align:right;color:var(--white);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.bval span{color:var(--medium-grey);font-size:9.5px;margin-left:6px;}
+
+/* ---------- year columns ---------- */
+.ycols{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;}
+.yc{border:1px solid var(--line);border-radius:9px;padding:15px 17px;background:var(--fill);}
+.yc .yl{font-family:var(--mono);font-size:9px;letter-spacing:1.7px;text-transform:uppercase;color:var(--medium-grey);font-weight:600;}
+.yc .yv{font-family:var(--mono);font-size:clamp(22px,3vw,28px);font-weight:600;color:var(--yellow);line-height:1.05;margin-top:7px;font-variant-numeric:tabular-nums;}
+.yc .ym{font-size:10.5px;color:var(--medium-grey);margin-top:6px;}
+.yc .yb{height:5px;background:var(--yellow);border-radius:2px;margin-top:13px;}
+
+/* ---------- nav ---------- */
+.navf{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:24px;}
+.nbtn{font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.3px;padding:13px 24px;border-radius:8px;
+  border:1px solid var(--line);background:none;color:var(--soft-grey);cursor:pointer;}
+.nbtn:hover{border-color:var(--blue);color:var(--blue);}
+.nbtn.pri{background:var(--yellow);border-color:var(--yellow);color:var(--black);}
+.nbtn.pri:hover{background:var(--white);border-color:var(--white);color:var(--black);}
+.nbtn:disabled{opacity:.3;cursor:default;}
+.nbtn:disabled:hover{border-color:var(--line);color:var(--soft-grey);}
+
+.headline{border:1px solid var(--yellow);border-radius:9px;padding:17px 19px;background:rgba(255,206,74,.06);margin-top:20px;}
+.headline .h{font-size:clamp(15px,2vw,18px);font-weight:700;color:var(--white);letter-spacing:-.015em;line-height:1.3;}
+.headline .p{font-size:12.5px;color:var(--soft-grey);margin-top:8px;max-width:74ch;line-height:1.6;}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:1080px){
+  .summary{grid-template-columns:repeat(3,1fr);}
+  .sm:nth-child(4){border-left:0;padding-left:0;}
+  .mini{grid-template-columns:repeat(2,1fr);}
+  .mini.six{grid-template-columns:repeat(3,1fr);}
+}
+@media (max-width:760px){
+  .wrap{padding:22px 18px 80px;}
+  /* summary becomes a single swipeable row so it never eats the viewport */
+  .summary{display:flex;overflow-x:auto;gap:0;scrollbar-width:none;padding:11px 0 12px;}
+  .summary::-webkit-scrollbar{display:none;}
+  .sm{flex:0 0 auto;min-width:132px;border-left:1px solid var(--hair);padding:0 13px;}
+  .sm:first-child{min-width:150px;padding-left:0;}
+  .sm .v{font-size:22px;} .sm .v.hero{font-size:26px;} .sm .v.s{font-size:18px;}
+  .sm .n{font-size:8.5px;}
+  .mini,.mini.six{grid-template-columns:repeat(2,1fr);}
+  /* mix rows stack: name and value on top, slider full width beneath */
+  .mixr{grid-template-columns:1fr auto;grid-template-areas:"nm pc" "sl sl";gap:6px 10px;padding:11px 0;}
+  .mixr .nm{grid-area:nm;} .mixr .pc{grid-area:pc;}
+  .mixr input[type=range]{grid-area:sl;}
+  .mixr .ab{display:none;}
+  /* keep the row label pinned while the price columns scroll */
+  #tco td:first-child,#tco th:first-child{position:sticky;left:0;z-index:2;background:#0D0D0D;padding-right:10px;}
+  .swipe{display:block;}
+  .barr{grid-template-columns:52px 1fr 108px;gap:9px;}
+  .ycols{grid-template-columns:1fr;}
+  .headline .p{font-size:12px;}
+  /* wide reference tables become stacked blocks */
+  table.stack thead{display:none;}
+  table.stack tr{display:block;border-bottom:1px solid var(--line);padding:11px 0;}
+  table.stack tr:last-child{border-bottom:0;}
+  table.stack td{display:block;border:0;padding:3px 0;text-align:left;}
+  table.stack td.n{text-align:left;}
+  table.stack td::before{content:attr(data-l);display:block;font-family:var(--mono);font-size:8.5px;
+    text-transform:uppercase;letter-spacing:1.2px;color:var(--medium-grey);margin-bottom:3px;}
+  table.stack td:first-child{font-size:13px;}
+  table.stack td:first-child::before{display:none;}
+}
+@media (max-width:430px){
+  .mini,.mini.six{grid-template-columns:1fr;}
+  .volrow{gap:10px;}
+  input[type=number]{width:100%;}
+  .navf .nbtn{flex:1;padding:13px 12px;font-size:12px;}
+  .barr{grid-template-columns:44px 1fr 92px;}
+  .bval{font-size:11px;} .bval span{display:block;margin:2px 0 0;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="product">Akka</p>
+  <h1>See what your AI agents cost to run, and <span class="accent">how much of that you can stop paying</span></h1>
+  <p class="hsub">Tell us how much AI work you expect to do next year. We will show you what it costs to build it yourself on AWS, what it costs with us, and where the money goes in both cases.</p>
+</header>
+
+<div class="summary">
+  <div class="sm"><p class="k">Your price with Akka</p><p class="v hero" id="kFee">—</p><p class="n" id="kFeeSub">—</p></div>
+  <div class="sm"><p class="k">Building it on AWS</p><p class="v" id="kAws">—</p><p class="n">The likeliest of four ways</p></div>
+  <div class="sm"><p class="k">What you keep</p><p class="v" id="kSave">—</p><p class="n good" id="kSaveSub">—</p></div>
+  <div class="sm"><p class="k">Answers it gets right</p><p class="v s" id="kAcc">—</p><p class="n" id="kAccSub">—</p></div>
+  <div class="sm"><p class="k">Work we train away</p><p class="v s" id="kRem">—</p><p class="n" id="kRemSub">—</p></div>
+  <div class="sm"><p class="k">Machines we hold</p><p class="v s" id="kNodes">—</p><p class="n" id="kNodesSub">—</p></div>
+</div>
+
+<nav class="tabs" id="tabs"></nav>
+
+<!-- ================= 1 ================= -->
+<section class="panel on" data-panel="0">
+  <div class="box">
+    <h2>How much AI work will you do?</h2>
+    <p class="intro">Start with the size of the job, then tell us what kind of work it is. Routine work gets cheap once we tune for it. One-off work stays expensive. The split between the two moves your bill more than the total does, and it is the part most budgets get wrong.</p>
+
+    <h3>How much work, in a year</h3>
+    <div class="volrow">
+      <input type="number" id="vol" value="5000" min="100" max="50000" step="100" aria-label="Billion tokens per year">
+      <span class="volunit">billion tokens a year</span>
+      <span class="volconv" id="volConv">5.0 trillion</span>
+    </div>
+    <input type="range" id="volRange" min="500" max="30000" step="100" value="5000" aria-label="Volume slider">
+    <div class="rangecap"><span>500B</span><span>30,000B</span></div>
+    <div class="presets" id="presets"></div>
+    <p class="note">A token is about three quarters of a word, so a billion tokens is roughly 750 million words. Most mid-size companies running AI agents get through <b>2,000 to 8,000 billion</b> of them in a year. If you have no idea yet, start at 5,000 and move the slider. Below 1,000 billion we will tell you to stay on AWS, because at that size we cannot beat their price.</p>
+
+    <h3>What kind of work is it?</h3>
+    <div id="mix"></div>
+    <p class="alloc" id="alloc">Adds up to 100%</p>
+    <p class="note">Each kind of work lands differently on your invoice. Pulling fields out of documents looks much the same every time, so a small trained model can do it for a fraction of the price. Writing software almost never repeats, so it keeps needing the expensive model. Move the sliders to match your business.</p>
+
+    <div class="mini">
+      <div class="metric"><p class="lbl">What you send in</p><p class="val" id="c1In">—</p><p class="sub" id="c1Ratio">—</p></div>
+      <div class="metric"><p class="lbl">What comes back</p><p class="val" id="c1Out">—</p><p class="sub">Costs about seven times as much to produce as what you send in</p></div>
+      <div class="metric"><p class="lbl">Conversations a year</p><p class="val" id="c1Sess">—</p><p class="sub">Counting a long back-and-forth as one</p></div>
+      <div class="metric"><p class="lbl">Computing power needed</p><p class="val" id="c1Gpu">—</p><p class="sub">Machine-hours a year, before we tune anything</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 2 ================= -->
+<section class="panel" data-panel="1">
+  <div class="box">
+    <h2>Where the savings are</h2>
+    <p class="intro">You pay for your machines around the clock, and you work them hard for about eight hours a day. We spend the quiet hours teaching small specialist models to handle your routine jobs, using your own work as the lesson. They then do those jobs for a fraction of what a general model charges. The teaching costs you nothing, because the machines were already yours and already sitting idle.</p>
+
+    <div class="scroller">
+      <table class="stack">
+        <thead><tr><th>Kind of work</th><th class="n">Volume</th><th class="n">How often it repeats</th><th>Specialist model</th><th class="n">Work we remove</th></tr></thead>
+        <tbody id="trainBody"></tbody>
+      </table>
+    </div>
+    <p class="swipe">Swipe the table sideways →</p>
+
+    <div class="mini">
+      <div class="metric"><p class="lbl">What you still pay for</p><p class="val" id="c2Tok">—</p><p class="sub" id="c2TokSub">—</p></div>
+      <div class="metric"><p class="lbl">Computing power needed</p><p class="val" id="c2Gpu">—</p><p class="sub" id="c2GpuSub">—</p></div>
+      <div class="metric"><p class="lbl">Models we train for you</p><p class="val acc" id="c2Ad">—</p><p class="sub">One for each kind of work that repeats</p></div>
+      <div class="metric"><p class="lbl">What the training costs</p><p class="val good">$0</p><p class="sub">It runs while your machines are idle</p></div>
+    </div>
+
+    <h3 class="acc">Techniques we apply</h3>
+    <div id="techs"></div>
+    <p class="note">Turn one off to see what it was worth to you. Each one lowers the computing power your work needs. Computing power is bought a whole machine at a time, so savings arrive in steps rather than smoothly.</p>
+
+    <h3>How busy your machines are across a day</h3>
+    <div class="daybar" id="dayBar"></div>
+    <div class="daxis"><span>Midnight</span><span>6am</span><span>Noon</span><span>6pm</span><span>Midnight</span></div>
+    <div class="key"><span><i class="serve"></i>Working for you</span><span><i class="idle"></i>Idle, where we do the training</span></div>
+
+    <div class="mini six">
+      <div class="metric"><p class="lbl">Machines we hold</p><p class="val sm" id="c2Nodes">—</p><p class="sub">Sized for your busiest hour</p></div>
+      <div class="metric"><p class="lbl">Average in use</p><p class="val sm" id="c2Avg">—</p><p class="sub">Across the year</p></div>
+      <div class="metric"><p class="lbl">How much you use</p><p class="val sm" id="c2Util">—</p><p class="sub">Of what is held for you</p></div>
+      <div class="metric"><p class="lbl">Idle time available</p><p class="val sm" id="c2Idle">—</p><p class="sub">Machine-hours a year</p></div>
+      <div class="metric"><p class="lbl">Training needs</p><p class="val sm" id="c2Need">—</p><p class="sub">Machine-hours a year</p></div>
+      <div class="metric"><p class="lbl">Room to spare</p><p class="val sm good" id="c2Head">—</p><p class="sub">Before training would cost anything</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3 ================= -->
+<section class="panel" data-panel="2">
+  <div class="box">
+    <h2 id="c3Title">Your work, priced five ways</h2>
+    <p class="intro">Four of these columns are the same job built four different ways on AWS. The fifth is ours. Every AWS figure is their published list price with no discount applied, so if you have already negotiated rates your own bill will come in under these numbers.</p>
+
+    <div id="floorNote"></div>
+
+    <div class="scroller">
+      <table id="tco">
+        <thead><tr><th>What you are billed for</th><th class="n">Cheapest</th><th class="n">Likeliest</th><th class="n">Generous</th><th class="n">Best answers</th><th class="n akka">Akka</th></tr></thead>
+        <tbody id="tcoBody"></tbody>
+      </table>
+    </div>
+    <p class="swipe">Swipe the table sideways →</p>
+
+    <h3>What you agree to pay, and what the bill can become</h3>
+    <div id="bars"></div>
+    <p class="note">The solid bar is what you sign up for. The striped part is how much more it can become once someone makes decisions nobody has made yet, such as how much you log, how long you keep memories, and which models you pick. Ours has no striped part.</p>
+
+    <div class="headline">
+      <p class="h" id="hlH">—</p>
+      <p class="p" id="hlP">—</p>
+    </div>
+
+    <h3>What our price includes</h3>
+    <div class="scroller">
+      <table class="tight stack">
+        <tbody>
+          <tr><td class="nm" style="width:190px">The machines</td><td data-l="What that means">We buy them, hold them, and eat the cost of the hours they sit idle.</td></tr>
+          <tr><td class="nm">Everything around them</td><td data-l="What that means">Storage and ordinary computing grow with the agents you run, not with your bill.</td></tr>
+          <tr><td class="nm">Memory</td><td data-l="What that means">Your agents remember as much as they need to. We do not charge per memory, and your bill does not climb as they pile up.</td></tr>
+          <tr><td class="nm">Training your models</td><td data-l="What that means">Trained on your own work, in hours you have already paid for.</td></tr>
+          <tr><td class="nm">Support</td><td data-l="What that means">We do not add a percentage of your spend on top.</td></tr>
+          <tr><td class="nm">The risk of guessing wrong</td><td data-l="What that means">If your volume comes in under plan, your price does not move.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>What each column actually buys</h3>
+    <div class="scroller">
+      <table class="tight stack">
+        <thead><tr><th>Column</th><th>What it runs</th><th class="n">Right answers</th><th class="n">Wait time</th></tr></thead>
+        <tbody>
+          <tr><td class="nm">Cheapest</td><td data-l="What it runs">The smallest models available, memory kept on your own storage, and only a sample of activity logged. It saves money by being wrong most of the time.</td><td class="n acc" data-l="Right answers">~10% <span class="tag est">estimate</span></td><td class="n" data-l="Wait time">3.7s</td></tr>
+          <tr><td class="nm">Likeliest</td><td data-l="What it runs">A sensible middle mix of small and mid-size models, memory on the managed service, a sample of activity logged. This is where most teams land on their own.</td><td class="n acc" data-l="Right answers">~22% <span class="tag est">estimate</span></td><td class="n" data-l="Wait time">5.0s</td></tr>
+          <tr><td class="nm">Generous</td><td data-l="What it runs">Larger models throughout and every request and response written to the logging service. It costs far more without buying much accuracy.</td><td class="n acc" data-l="Right answers">~53% <span class="tag est">estimate</span></td><td class="n" data-l="Wait time">7.4s</td></tr>
+          <tr><td class="nm">Best answers</td><td data-l="What it runs">The strongest model available, asked three times per job with a fourth pass picking the best answer. This is what accuracy costs when you buy it on AWS.</td><td class="n acc" data-l="Right answers">~88% <span class="tag est">estimate</span></td><td class="n" data-l="Wait time">9.0s</td></tr>
+          <tr><td class="nm">Akka</td><td data-l="What it runs">The same strong models and the same triple-check, plus the specialist models we trained on your work, all running on machines we reserved for you.</td><td class="n acc" data-l="Right answers">~88% <span class="tag est">estimate</span></td><td class="n" data-l="Wait time">4.5s</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Every rate, and how we used it</h3>
+    <div class="scroller">
+      <table class="tight stack">
+        <thead><tr><th style="width:150px">What you are billed for</th><th style="width:150px">The rate</th><th>How we worked it out</th><th class="n">Where it comes from</th></tr></thead>
+        <tbody>
+          <tr><td class="nm">Running the models</td><td data-l="The rate">Per model, per million tokens</td><td data-l="How we worked it out">What you send in times the input rate, plus what comes back times the output rate, added up across the mix. Ministral 3B $0.10/$0.10, Ministral 8B $0.15/$0.15, Llama 4 Scout $0.20/$1.00, Qwen3 Next 80B $0.15/$1.20, Mistral Large 3 $0.50/$1.50, Qwen3 VL 235B $0.53/$2.66, DeepSeek V3.2 $0.62/$1.85, MiniMax M2.5 $0.30/$1.20.</td><td class="n dim" data-l="Source">Bedrock</td></tr>
+          <tr><td class="nm">Asking three times</td><td data-l="The rate">3.35×</td><td data-l="How we worked it out">Each of the three attempts re-reads the whole question, so both halves of the bill triple. The fourth pass that picks a winner reads the question and all three answers.</td><td class="n dim" data-l="Source">Worked out</td></tr>
+          <tr><td class="nm">Your own trained model on AWS</td><td data-l="The rate">$0.05718 a minute</td><td data-l="How we worked it out">Divided by 120,000 tokens a minute, assuming 2,000 tokens a second per unit, which gives $0.4765 per million. AWS has never published how fast a unit actually runs, so this figure needs confirming before anyone quotes it.</td><td class="n dim" data-l="Source">Bedrock</td></tr>
+          <tr><td class="nm">Remembering conversations</td><td data-l="The rate">$0.25 / $0.75 / $0.50 per 1,000</td><td data-l="How we worked it out">Short-term notes at $0.25 per thousand. Long-term memories billed every month against everything stored so far, at $0.75 per thousand a month, or $0.25 if you host it yourself. Looking a memory up costs $0.50 per thousand. Because the pile only grows, year two bills about two and a half times year one on the same volume of work.</td><td class="n dim" data-l="Source">AgentCore</td></tr>
+          <tr><td class="nm">Running the agents</td><td data-l="The rate">$0.0895 and $0.00945 an hour</td><td data-l="How we worked it out">Processing is billed while the agent is working. Memory is billed for the whole time a conversation is open, including the time it spends waiting on a model to answer. Sessions modelled at 1 processor and 2 GB for 120 seconds, 2 and 4 GB for 300, and 3 and 6 GB for 400.</td><td class="n dim" data-l="Source">AgentCore</td></tr>
+          <tr><td class="nm">Logging and monitoring</td><td data-l="The rate">$0.50 a gigabyte</td><td data-l="How we worked it out">Text weighs about 4 bytes a token. Logging it costs $0.50 a gigabyte to take in, $0.03 a gigabyte a month to keep, and $0.30 a month for each measurement you track. Writing the same text to ordinary storage at $0.023 a gigabyte a month roughly halves it.</td><td class="n dim" data-l="Source">CloudWatch</td></tr>
+          <tr><td class="nm">AWS support plan</td><td data-l="The rate">10 / 7 / 5 / 3%</td><td data-l="How we worked it out">Whichever is larger: $15,000 a month, or a sliding percentage of what you spend. Ten percent on the first $150,000 a month, seven to $500,000, five to $1,000,000, three above that. A named technical contact is included at this level.</td><td class="n dim" data-l="Source">AWS Support</td></tr>
+          <tr><td class="nm">AWS consultants</td><td data-l="The rate">$350 an hour</td><td data-l="How we worked it out">Cheapest funds about 500 hours. Likeliest funds two engineers for six months, 1,920 hours. The two larger columns fund three to four engineers for a year.</td><td class="n dim" data-l="Source">ProServe</td></tr>
+          <tr><td class="nm">The machines we reserve</td><td data-l="The rate">p5.48xlarge, reserved</td><td data-l="How we worked it out">Your average demand multiplied by 2.8 for your busiest hour, plus one spare machine, and never fewer than the two needed to keep both base models loaded and running in two separate data centres. Reading a question is modelled at 25,000 tokens a second per chip, writing an answer at 3,000.</td><td class="n dim" data-l="Source">EC2</td></tr>
+          <tr><td class="nm">Your busiest hour</td><td data-l="The rate">2.8×</td><td data-l="How we worked it out">Measured across 44 million real requests over nine days in Microsoft's published traces, for workloads like yours. Conversational workloads in the same study peak at only 1.7 times their average.</td><td class="n dim" data-l="Source">Azure traces</td></tr>
+          <tr><td class="nm">Everything around the machines</td><td data-l="The rate">12.5% of the machines, minimum $50,000</td><td data-l="How we worked it out">Grows with the agents you run and the people using them, not with your token volume.</td><td class="n dim" data-l="Source">Akka</td></tr>
+          <tr><td class="nm">Right answers</td><td data-l="The rate">SWE-bench Verified</td><td data-l="How we worked it out">A public test where a model is given real software bugs and scored on how many it fixes. Published results: Llama 4 Scout 47.3%, DeepSeek V3.2 73.1%, Qwen3 Coder Next 74.2%, MiniMax M2.5 80.2%. Estimated where nobody has published a number: Ministral 3B 5%, Ministral 8B and your own trained model 8%, Qwen3 Next 80B 35%, Mistral Large 3 40%, Qwen3 VL 235B 55%. The 8% figure borrows Qwen3-8B, measured at 8.0%, as a stand-in for models that size. Asking three times and picking the best adds roughly 8 points, based on a published result where a 77.2% model reached 90.0% inside a well-built harness.</td><td class="n dim" data-l="Source">Published tests</td></tr>
+          <tr><td class="nm">Wait time</td><td data-l="The rate">First word plus 500 more</td><td data-l="How we worked it out">Ministral 3B writes 188.4 words a second after a 0.64 second pause, Ministral 8B 113.6 after 0.73, Llama 4 Scout 119.9 after 0.83, Qwen3 Next 80B 187.5 after 2.20, Mistral Large 3 40.3 after 1.37, DeepSeek V3.2 108.8 after 0.92 on Bedrock.</td><td class="n dim" data-l="Source">Artificial Analysis</td></tr>
+          <tr><td class="nm">Still to be confirmed</td><td data-l="The rate">Five open figures</td><td data-l="How we worked it out">What MiniMax M2.5 charges for output on Bedrock. How fast a Custom Model Unit actually runs. The hourly rate for Trainium machines. How CloudWatch tiers its pricing between 1.5 and 20 terabytes a year. And what a reserved p5 actually costs, in a market where AWS raised reservation prices 15% in January 2026 and another 20% in July.</td><td class="n dim" data-l="Source">Open</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 4 ================= -->
+<section class="panel" data-panel="3">
+  <div class="box">
+    <h2>The same machines, three years out</h2>
+    <p class="intro">Machines you buy once keep getting faster, because the software that runs them and the models that run on them keep improving. Your price stays where it is. The amount of work it covers does not.</p>
+
+    <div class="ycols" id="years"></div>
+
+    <h3>What a million tokens costs you</h3>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Path</th><th class="n">Year 1</th><th class="n">Year 2</th><th class="n">Year 3</th><th class="n">Change</th></tr></thead>
+        <tbody>
+          <tr><td class="nm">With Akka</td><td class="n acc" id="pa1">—</td><td class="n acc" id="pa2">—</td><td class="n acc" id="pa3">—</td><td class="n ok" id="paD">—</td></tr>
+          <tr><td class="nm">Building it on AWS</td><td class="n" id="pw1">—</td><td class="n" id="pw2">—</td><td class="n" id="pw3">—</td><td class="n" id="pwD" style="color:var(--red)">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Ours falls because the same machines carry more work each year while your price stays put. The AWS figure climbs because they bill you every month for every memory your agents have stored, and that pile only grows.</p>
+
+    <h3>Where the extra speed comes from</h3>
+    <div class="scroller">
+      <table class="tight stack">
+        <thead><tr><th>Improvement</th><th class="n">Worth</th><th>What it is</th></tr></thead>
+        <tbody>
+          <tr><td class="nm">Guessing ahead</td><td class="n" data-l="Worth">1.30×</td><td data-l="What it is">A small fast model guesses the next few words and the big model checks them all at once. Writing answers takes 60% of the work, so this is the largest single gain.</td></tr>
+          <tr><td class="nm">Smaller number formats</td><td class="n" data-l="Worth">1.25×</td><td data-l="What it is">Models can run on smaller numbers without losing much accuracy, which lets more of them fit on the same chip.</td></tr>
+          <tr><td class="nm">Better models arriving</td><td class="n" data-l="Worth">1.40×</td><td data-l="What it is">New open models do the same job with far less of the model switched on. Qwen3 Coder Next scores 74.2% while using only 3 billion of its parameters at a time.</td></tr>
+          <tr><td class="nm">Better serving software</td><td class="n" data-l="Worth">1.15×</td><td data-l="What it is">The software that feeds work to the chips keeps getting better at packing it in.</td></tr>
+          <tr><td class="nm">More specialist models</td><td class="n" data-l="Worth">1.15×</td><td data-l="What it is">A second year of your traffic shows us patterns the first year did not, and each one becomes another cheap specialist.</td></tr>
+          <tr class="tot"><td>All of them together</td><td class="n" data-l="Worth">3.00×</td><td data-l="What it is">We publish about half this figure, because we would rather beat the number than explain it.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Independent trackers put the cost of open-model computing as falling <b>30% to 50% a year</b>, and forecasts run higher still through 2027. The projection above sits under both.</p>
+  </div>
+</section>
+
+<div class="navf">
+  <button class="nbtn" id="prev">Back</button>
+  <button class="nbtn pri" id="next">Continue</button>
+</div>
+
+</div>
+
+<script>
+"use strict";
+
+const TABS=["Your workload","The savings","The comparison","Three years"];
+const PRESETS=[1000,2500,5000,10000,20000];
+
+const WORKLOADS=[
+  {key:"swe",       name:"Writing software",        inRatio:0.90, repeat:0.15, def:30},
+  {key:"support",   name:"Answering customers",     inRatio:0.80, repeat:0.60, def:25},
+  {key:"extract",   name:"Reading documents",       inRatio:0.95, repeat:0.85, def:20},
+  {key:"rag",       name:"Searching and summarising",inRatio:0.92, repeat:0.45, def:15},
+  {key:"transform", name:"Tidying up data",         inRatio:0.85, repeat:0.80, def:10}
+];
+
+const TECHS=[
+  {key:"adapters",name:"Specialist models for your routine work",on:true,
+   desc:"Once trained, a job needs 40% of the question it used to and gives a shorter answer, on a model half the size."},
+  {key:"cache",name:"Remembering what you asked before",on:true,
+   desc:"Your agents repeat the same instructions on every turn. Reading them back from memory costs a fraction of reading them fresh."},
+  {key:"spec",name:"Guessing ahead while writing answers",on:true,
+   desc:"A small fast model guesses the next few words and the big model checks them together. Writing answers is 60% of the work."},
+  {key:"batch",name:"Running unattended work off-peak",on:false,
+   desc:"Anything with nobody waiting on it runs later, on machines that would otherwise be sitting idle."}
+];
+
+const MIXES={
+  low:[{s:.70,i:0.10,o:0.10},{s:.20,i:0.15,o:0.15},{s:.10,i:0.20,o:1.00}],
+  base:[{s:.50,i:0.15,o:0.15},{s:.25,i:0.20,o:1.00},{s:.15,i:0.15,o:1.20},{s:.10,i:0.4765,o:0.4765}],
+  high:[{s:.30,i:0.20,o:1.00},{s:.25,i:0.50,o:1.50},{s:.25,i:0.53,o:2.66},{s:.20,i:0.62,o:1.85}],
+  max:[{s:1.0,i:0.30,o:1.20}]
+};
+const MAX_MULT=3.35;
+const ACC={low:10,base:22,high:53,max:88,akka:88};
+const LAT={low:3.7,base:5.0,high:7.4,max:9.0,akka:4.5};
+const HOST={low:{v:1,g:2,w:120,c:20},base:{v:2,g:4,w:300,c:90},high:{v:3,g:6,w:400,c:120},max:{v:3,g:6,w:400,c:120}};
+const SVC={low:.15e6,base:.70e6,high:2.5e6,max:2.5e6};
+const STO5={low:.08e6,base:.18e6,high:.30e6,max:.30e6};
+const PRE=25000,DEC=3000,GPN=8,HRS=8760,P5=27.52,PEAK=2.8;
+const MIN_NODES=2,CPU_FLOOR=50000,CPU_PCT=.125,SRE=2500,MISC=10000,MARKUP=2.0;
+const FLOOR_B=1000,Y2=1.6,Y3=2.6;
+const LABELS=["Cheapest","Likeliest","Generous","Best answers"];
+
+const $=id=>document.getElementById(id);
+const money=n=>n>=1e6?"$"+(n/1e6).toFixed(2)+"M":"$"+Math.round(n/1000)+"K";
+const bn=n=>Math.round(n).toLocaleString()+"B";
+const kh=n=>Math.round(n).toLocaleString();
+
+let mixVals={},techOn={},tab=0;
+WORKLOADS.forEach(w=>mixVals[w.key]=w.def);
+TECHS.forEach(t=>techOn[t.key]=t.on);
+
+$("tabs").innerHTML=TABS.map((t,i)=>
+  '<button class="tab'+(i===0?" on":"")+'" data-t="'+i+'"><span class="n">'+(i+1)+'</span>'+t+'</button>').join("");
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>go(+b.dataset.t)));
+
+$("presets").innerHTML=PRESETS.map(p=>
+  '<button class="pbtn" data-vol="'+p+'">'+(p/1000)+'T</button>').join("");
+
+$("mix").innerHTML=WORKLOADS.map(w=>
+  '<div class="mixr"><span class="nm">'+w.name+'</span>'+
+  '<input type="range" min="0" max="100" step="1" value="'+w.def+'" id="mx_'+w.key+'" aria-label="'+w.name+'">'+
+  '<span class="pc" id="pc_'+w.key+'">'+w.def+'%</span>'+
+  '<span class="ab" id="ab_'+w.key+'">—</span></div>').join("");
+WORKLOADS.forEach(w=>$("mx_"+w.key).addEventListener("input",e=>{mixVals[w.key]=+e.target.value;render();}));
+
+$("techs").innerHTML=TECHS.map(t=>
+  '<div class="tgl"><div><div class="tn">'+t.name+'</div><div class="td">'+t.desc+'</div></div>'+
+  '<div class="sw'+(t.on?" on":"")+'" data-tech="'+t.key+'" role="switch" tabindex="0"></div></div>').join("");
+document.querySelectorAll(".sw").forEach(s=>{
+  const flip=()=>{const k=s.dataset.tech;techOn[k]=!techOn[k];s.classList.toggle("on",techOn[k]);render();};
+  s.addEventListener("click",flip);
+  s.addEventListener("keydown",e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();flip();}});
+});
+
+document.querySelectorAll(".pbtn").forEach(b=>b.addEventListener("click",()=>{
+  $("vol").value=b.dataset.vol;$("volRange").value=b.dataset.vol;render();}));
+$("vol").addEventListener("input",e=>{$("volRange").value=e.target.value;render();});
+$("volRange").addEventListener("input",e=>{$("vol").value=e.target.value;render();});
+$("prev").addEventListener("click",()=>go(tab-1));
+$("next").addEventListener("click",()=>go(tab+1));
+
+function go(i){
+  tab=Math.max(0,Math.min(TABS.length-1,i));
+  document.querySelectorAll(".tab").forEach((b,j)=>b.classList.toggle("on",j===tab));
+  document.querySelectorAll(".panel").forEach((p,j)=>p.classList.toggle("on",j===tab));
+  $("prev").disabled=tab===0;
+  $("next").disabled=tab===TABS.length-1;
+  $("next").textContent=tab===0?"Show me the savings":tab===1?"Compare the prices":tab===2?"Look three years out":"Three years";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function support(a){
+  const m=a/12;let s=Math.min(m,150000)*.10;
+  if(m>150000)s+=(Math.min(m,500000)-150000)*.07;
+  if(m>500000)s+=(Math.min(m,1e6)-500000)*.05;
+  if(m>1e6)s+=(m-1e6)*.03;
+  return Math.max(s,15000)*12;
+}
+const mixCost=(mx,i,o)=>mx.reduce((a,m)=>a+(i*m.s/1e6)*m.i+(o*m.s/1e6)*m.o,0);
+
+function compute(){
+  const totalB=Math.max(1,+$("vol").value||0),tok=totalB*1e9;
+  const rs=WORKLOADS.reduce((a,w)=>a+mixVals[w.key],0)||1;
+  const parts=WORKLOADS.map(w=>{
+    const share=mixVals[w.key]/rs,t=tok*share;
+    return{...w,share,tok:t,inTok:t*w.inRatio,outTok:t*(1-w.inRatio)};});
+  const inTok=parts.reduce((a,p)=>a+p.inTok,0);
+  const outTok=parts.reduce((a,p)=>a+p.outTok,0);
+  const sessions=tok/50000;
+
+  const aws={};
+  ["low","base","high","max"].forEach(k=>{
+    let inf=mixCost(MIXES[k],inTok,outTok);if(k==="max")inf*=MAX_MULT;
+    const rate=k==="low"?.25:.75;
+    const mem=(sessions*8/1000)*.25+((sessions*3/2)/1000)*rate*12+(sessions*2/1000)*.50;
+    const h=HOST[k];
+    const host=(sessions*h.c/3600)*h.v*.0895+(sessions*h.w/3600)*h.g*.00945;
+    const gb=tok*4/1e9,smp=(k==="low"||k==="base")?.05:1;
+    const met=k==="low"?20000:k==="base"?40000:100000;
+    const obs=gb*smp*.50+gb*smp*.03*6+met;
+    const sto=STO5[k]*(tok/5e12);
+    const cons=inf+mem+host+obs+sto;
+    aws[k]={inf,mem,host,obs,sto,cons,sup:support(cons),svc:SVC[k]};
+    aws[k].total=cons+aws[k].sup+aws[k].svc;});
+
+  const pH=1/(PRE*3600),dH=1/(DEC*3600);
+  let base=0,trained=0,removed=0,adapters=0;
+  const rows=parts.map(p=>{
+    const use=techOn.adapters,r=use?p.repeat:0,isAd=use&&p.repeat>=.40;
+    if(isAd)adapters++;
+    base+=p.inTok*pH+p.outTok*dH;
+    trained+=p.inTok*(1-r)*pH+p.inTok*r*.40*pH*.5+p.outTok*(1-r)*dH+p.outTok*r*.60*dH*.5;
+    const rm=isAd?(p.inTok*r*.60+p.outTok*r*.40):0;removed+=rm;
+    return{...p,isAd,rm};});
+
+  let gpuHr=trained;
+  if(techOn.cache)gpuHr-=inTok*pH*.30;
+  if(techOn.spec)gpuHr*=.82;
+  if(techOn.batch)gpuHr*=.94;
+  gpuHr=Math.max(gpuHr,base*.16);
+
+  const cont=gpuHr/GPN/HRS;
+  const nodes=Math.max(MIN_NODES,Math.ceil(cont*PEAK)+1);
+  const gpu=nodes*HRS*P5,cpu=Math.max(CPU_FLOOR,gpu*CPU_PCT);
+  const price=(gpu+cpu+SRE+MISC)*MARKUP;
+  const fleet=nodes*HRS,serve=gpuHr/GPN,idle=fleet-serve,need=4750*(tok/5e12);
+
+  return{totalB,tok,inTok,outTok,sessions,parts:rows,aws,nodes,cont,base,gpuHr,
+    removed,adapters,price,fleet,serve,idle,need,below:totalB<FLOOR_B};
+}
+
+function render(){
+  const d=compute(),K=["low","base","high","max"];
+  const diff=d.aws.base.total-d.price,diffMax=d.aws.max.total-d.price;
+
+  $("kFee").textContent=d.below?"—":money(d.price);
+  $("kFeeSub").textContent=d.below?"Your volume is below our floor":"One price, fixed for the year";
+  $("kAws").textContent=money(d.aws.base.total);
+  $("kSave").textContent=d.below?"—":money(Math.abs(diff));
+  $("kSaveSub").textContent=d.below?"":Math.round(Math.abs(diff)/d.aws.base.total*100)+"% of what AWS would charge";
+  $("kAcc").textContent=ACC.akka+"%";
+  $("kAccSub").textContent="Against "+ACC.base+"% the AWS way";
+  $("kRem").textContent=Math.round(d.removed/d.tok*100)+"%";
+  $("kRemSub").textContent=bn(d.removed/1e9)+" you stop paying for";
+  $("kNodes").textContent=d.nodes;
+  $("kNodesSub").textContent="Bought and held for you";
+
+  /* 1 */
+  $("volConv").textContent=(d.totalB/1000).toFixed(1)+" trillion";
+  document.querySelectorAll(".pbtn").forEach(b=>b.classList.toggle("on",+b.dataset.vol===d.totalB));
+  const sum=WORKLOADS.reduce((a,w)=>a+mixVals[w.key],0);
+  $("alloc").textContent=sum===100?"Adds up to 100%":"Adds up to "+sum+"%";
+  $("alloc").className="alloc"+(sum===100?"":" off");
+  d.parts.forEach(p=>{
+    $("pc_"+p.key).textContent=Math.round(p.share*100)+"%";
+    $("ab_"+p.key).textContent=bn(p.tok/1e9);});
+  $("c1In").textContent=bn(d.inTok/1e9);
+  $("c1Ratio").textContent=(d.inTok/d.tok*100).toFixed(0)+"% of the total, and every platform charges you for it";
+  $("c1Out").textContent=bn(d.outTok/1e9);
+  $("c1Sess").textContent=(d.sessions/1e6).toFixed(0)+"M";
+  $("c1Gpu").textContent=kh(d.base);
+
+  /* 2 */
+  $("trainBody").innerHTML=d.parts.map(p=>
+    '<tr><td class="nm">'+p.name+'</td><td class="n" data-l="Volume">'+bn(p.tok/1e9)+'</td>'+
+    '<td class="n" data-l="How often it repeats">'+Math.round(p.repeat*100)+"%</td>"+
+    '<td data-l="Specialist model">'+(p.isAd?'<span class="tag meas">we train one</span>':'<span class="tag est">too varied</span>')+"</td>"+
+    '<td class="n '+(p.rm>0?"ok":"dim")+'" data-l="Work we remove">'+(p.rm>0?bn(p.rm/1e9):"none")+"</td></tr>").join("");
+  $("c2Tok").textContent=bn((d.tok-d.removed)/1e9);
+  $("c2TokSub").textContent="Down from "+bn(d.totalB)+", a "+Math.round(d.removed/d.tok*100)+"% cut";
+  $("c2Gpu").textContent=kh(d.gpuHr);
+  $("c2GpuSub").textContent=Math.round((1-d.gpuHr/d.base)*100)+"% less than before we tuned it";
+  $("c2Ad").textContent=d.adapters;
+  $("c2Nodes").textContent=d.nodes;
+  $("c2Avg").textContent=d.cont.toFixed(2);
+  $("c2Util").textContent=Math.round(d.serve/d.fleet*100)+"%";
+  $("c2Idle").textContent=kh(d.idle);
+  $("c2Need").textContent=kh(d.need);
+  $("c2Head").textContent=(d.idle/d.need).toFixed(1)+"×";
+
+  const shape=[.18,.14,.12,.12,.14,.22,.42,.68,.92,1,.96,.84,.78,.92,1,.94,.82,.62,.44,.34,.30,.26,.22,.20];
+  $("dayBar").innerHTML=shape.map(s=>{
+    const h=Math.min(100,(d.cont*PEAK*s/d.nodes)*100);
+    return '<div class="dseg"><div class="didle" style="height:'+(100-h)+'%"></div><div class="dfill" style="height:'+h+'%"></div></div>';}).join("");
+
+  /* 3 */
+  $("c3Title").textContent="Your "+(d.totalB/1000).toFixed(1)+" trillion tokens, priced five ways";
+  $("floorNote").innerHTML=d.below
+    ?'<div class="headline" style="margin:0 0 18px"><p class="h">At this size you are better off on AWS, and we would rather say so.</p><p class="p">Below 1,000 billion tokens a year, keeping the two big models loaded and running in two data centres would cost you more than paying AWS by the token. Come back when your volume grows. The figures below are what AWS charges you today.</p></div>':"";
+
+  const inc='<span class="tag inc">included</span>';
+  const line=(l,f,a)=>"<tr><td>"+l+"</td>"+K.map((k,i)=>'<td class="n" data-l="'+LABELS[i]+'">'+money(f(d.aws[k]))+"</td>").join("")+'<td class="n akka" data-l="Akka">'+a+"</td></tr>";
+  let h="";
+  h+=line("Running the models",a=>a.inf,"");
+  h+=line("Remembering conversations",a=>a.mem,inc);
+  h+=line("Running the agents",a=>a.host,inc);
+  h+=line("Logging and monitoring",a=>a.obs,inc);
+  h+=line("Storage and moving data",a=>a.sto,inc);
+  h+=line("The AWS support plan",a=>a.sup,inc);
+  h+=line("Consultants to build it",a=>a.svc,inc);
+  h+='<tr><td>Training your own models</td>'+K.map(()=>'<td class="n dim">not offered</td>').join("")+'<td class="n akka">'+inc+"</td></tr>";
+  h+='<tr><td>The machines themselves</td>'+K.map(()=>'<td class="n dim">you rent</td>').join("")+'<td class="n akka">'+inc+"</td></tr>";
+  h+='<tr class="tot"><td>Your first year</td>'+K.map(k=>'<td class="n">'+money(d.aws[k].total)+"</td>").join("")+
+     '<td class="n akka">'+(d.below?"—":money(d.price))+"</td></tr>";
+  h+='<tr><td>Answers it gets right</td>'+K.map(k=>'<td class="n acc">'+ACC[k]+"%</td>").join("")+'<td class="n akka acc">'+ACC.akka+"%</td></tr>";
+  h+='<tr><td>How long you wait</td>'+K.map(k=>'<td class="n">'+LAT[k].toFixed(1)+"s</td>").join("")+'<td class="n akka">'+LAT.akka.toFixed(1)+"s</td></tr>";
+  h+='<tr><td>Separate charges on your invoice</td>'+K.map(()=>'<td class="n">7</td>').join("")+'<td class="n akka acc">1</td></tr>';
+  $("tcoBody").innerHTML=h;
+
+  const VAR={low:.30,base:.30,high:.35,max:.32};
+  const CAP={low:"Cheapest",base:"Likeliest",high:"Generous",max:"Best"};
+  const rows=K.map(k=>({c:CAP[k],v:d.aws[k].total,x:d.aws[k].total*VAR[k],a:ACC[k],y:false}));
+  if(!d.below)rows.push({c:"Akka",v:d.price,x:0,a:ACC.akka,y:true});
+  const mx=Math.max(...rows.map(r=>r.v+r.x));
+  $("bars").innerHTML=rows.map(r=>
+    '<div class="barr'+(r.y?" akka":"")+'"><span class="c">'+r.c+"</span>"+
+    '<span class="btrack"><span class="bvar" style="left:'+(r.v/mx*100)+"%;width:"+(r.x/mx*100)+'%"></span>'+
+    '<span class="bfill'+(r.y?" y":"")+'" style="width:'+(r.v/mx*100)+'%"></span></span>'+
+    '<span class="bval">'+money(r.v)+"<span>"+r.a+"% right</span></span></div>").join("");
+
+  if(!d.below){
+    $("hlH").textContent="You get the best answers for "+Math.round(d.price/d.aws.max.total*100)+"% of what they cost on AWS.";
+    $("hlP").textContent="That is "+money(Math.abs(diffMax))+" a year less than the AWS build that gets answers right as often as we do, and "+
+      money(Math.abs(diff))+" less than the way most teams end up building it, which gets them right only "+ACC.base+"% of the time. One charge on your invoice instead of seven, and it is the charge you were quoted.";
+  }else{
+    $("hlH").textContent="Building this yourself on AWS costs you "+money(d.aws.base.total)+" the way most teams do it.";
+    $("hlP").textContent="The same work costs "+money(d.aws.max.total)+" if you want the best answers. Across the four ways of building it your bill spans "+(d.aws.max.total/d.aws.low.total).toFixed(1)+" times, on exactly the same amount of work.";
+  }
+
+  /* 4 */
+  const caps=[d.totalB,d.totalB*Y2,d.totalB*Y3],mxc=caps[2];
+  const ylabel=["What you buy today","Same machines, one year on","Same machines, two years on"];
+  $("years").innerHTML=caps.map((c,i)=>
+    '<div class="yc"><p class="yl">Year '+(i+1)+'</p><p class="yv">'+bn(c)+"</p>"+
+    '<p class="ym">'+ylabel[i]+'</p><div class="yb" style="width:'+(c/mxc*100)+'%"></div></div>').join("");
+  const perM=(p,t)=>"$"+(p/(t*1000)).toFixed(3);
+  if(!d.below){
+    $("pa1").textContent=perM(d.price,caps[0]);
+    $("pa2").textContent=perM(d.price,caps[1]);
+    $("pa3").textContent=perM(d.price,caps[2]);
+    $("paD").textContent="−"+Math.round((1-1/Y3)*100)+"%";
+  }else{["pa1","pa2","pa3","paD"].forEach(i=>$(i).textContent="—");}
+  const wb=d.aws.base.total;
+  $("pw1").textContent=perM(wb,d.totalB);
+  $("pw2").textContent=perM(wb*1.25,d.totalB);
+  $("pw3").textContent=perM(wb*1.56,d.totalB);
+  $("pwD").textContent="+56%";
+}
+
+go(0);render();
+</script>
+</body>
+</html>
