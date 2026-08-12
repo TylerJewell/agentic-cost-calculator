@@ -489,7 +489,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
   <p><b>Model inference.</b> Input tokens × input rate plus output tokens × output rate, summed across each mix. Rates per million tokens, Amazon Bedrock public list, on-demand, US East: Ministral 3B $0.10/$0.10; Ministral 8B $0.15/$0.15; Llama 4 Scout $0.20/$1.00; Qwen3 Next 80B $0.15/$1.20; Mistral Large 3 $0.50/$1.50; Qwen3 VL 235B $0.53/$2.66; DeepSeek V3.2 $0.62/$1.85; MiniMax M2.5 $0.30/$1.20, corroborated by one published rate card, with a second showing $0.36/$1.44, exactly 20% higher, which is consistent with a gateway uplift rather than a differing Bedrock rate. The Amazon Bedrock model card for MiniMax M2.5 records a launch date of 12 February 2026, a 196K context window and an 8K maximum output, and refers pricing to the Bedrock pricing page. <b>Best-of-three sampling</b> applies a 3.35× multiplier: each attempt re-reads the full context, tripling both input and output, plus one verifier pass reading the context and all three candidates. <b>Customer-trained models on Bedrock</b> bill through Custom Model Import at $0.05718 per Custom Model Unit-minute, divided by 120,000 tokens per minute at an assumed 2,000 tokens per second per unit, giving $0.4765 per million. Amazon Bedrock documentation states that a model unit specifies the input and output tokens it can process in one minute, and directs customers to their AWS account manager for the figure rather than publishing it. The 2,000 tokens per second assumption is therefore ours, and it decides whether an imported-model strategy has a cost basis at all.</p>
   <p><b>Durable memory.</b> Bedrock AgentCore. Short-term events $0.25 per 1,000; long-term storage billed monthly against the accumulated balance at $0.75 per 1,000 per month, or $0.25 per 1,000 per month self-managed; retrieval $0.50 per 1,000. Volumetrics assume 50,000 tokens per session, with 8 short-term events, 3 long-term records and 2 retrievals per session. The billed balance is the mean of a linear ramp to full year-one accrual; because stored records accumulate, year two bills approximately 2.5× year one at flat token volume. <b>Agent hosting.</b> AgentCore Runtime, $0.0895 per vCPU-hour billed on active execution and $0.00945 per GB-hour billed across the full session wall clock including time blocked awaiting a model response; session profiles 1 vCPU / 2 GB / 120s, 2 / 4 / 300s and 3 / 6 / 400s. <b>Observability.</b> Payload estimated at 4 bytes per token; CloudWatch Logs Standard ingestion $0.50 per GB, storage $0.03 per GB-month, custom metrics $0.30 per metric per month; routing payload to S3 Standard at $0.023 per GB-month approximately halves the same volume. CloudWatch does operate volume tiers of $0.50 per GB to 10 TB a month, then $0.25, $0.10 and $0.05, but those tiers apply only to AWS vended logs such as VPC Flow Logs and Route 53 query logs. Agent request and response payload reaches CloudWatch through PutLogEvents and the CloudWatch agent, which are excluded from tiering and bill flat at $0.50 per GB. Tiering is also assessed per account and cannot be aggregated across a multi-account structure. The Infrequent Access log class at $0.25 per GB has supported full Logs Insights queries since early 2026 and halves ingestion where it is acceptable.</p>
   <p><b>Enterprise Support Plan.</b> Billed as the greater of $15,000 per month or a tiered percentage of monthly consumption: 10% to $150,000, 7% to $500,000, 5% to $1,000,000, 3% thereafter; a Technical Account Manager is included at this tier at no separate charge. <b>Professional services.</b> Blended at $350 per hour; Low approx. 500 hours, Base two engineers for six months (1,920 hours), High and Max three to four engineers for twelve months. <b>Availability.</b> The AWS figure of 99.9% is the monthly uptime percentage committed in the Amazon Bedrock Service Level Agreement. The Akka figure of 99.9999% is the availability commitment of the Akka Agentic AI Platform.</p>
-  <p><b>Reserved capacity.</b> Sized as continuous demand × 2.8 for peak, plus one spare node, and never below the two nodes required to hold MiniMax M2.5 and Qwen3 Coder Next resident with high availability across two availability zones. Per-GPU serving throughput modelled at 25,000 tokens per second prefill and 3,000 tokens per second decode; prefill is compute-bound and decode is bound by memory bandwidth. The 2.8 peak-to-average factor is the measured figure for coding workloads across 44 million requests over nine days in the published Microsoft Azure LLM inference traces; conversational workloads in the same traces measure 1.7. Supporting compute and storage scale with deployed agents and end-user traffic at 12.5% of reserved capacity, subject to a $50,000 annual minimum. <b>Adapter training</b> executes against idle reserved capacity and carries no incremental charge; a trained workload consumes approximately 40% of prior input tokens and 60% of prior output tokens on a model requiring half the compute per token, and adapters are served as LoRA weights on a shared base model, adding under 1 GB of GPU memory each.</p>
+  <p><b>Reserved capacity.</b> Sized as continuous demand × 2.8 for peak, plus one spare node, and never below the two nodes required to hold MiniMax M2.5 and Qwen3 Coder Next resident with high availability across two availability zones. Two fleets are sized against the same work and the cheaper is taken: p5.48xlarge carrying eight NVIDIA H100 at 80GB, and p6-b200.48xlarge carrying eight NVIDIA B200 at 180GB and modelled at three times the H100 serving throughput. Below roughly 20 trillion tokens a year the H100 fleet wins, because node count is set by peak headroom rather than by throughput and the cheaper node carries the idle hours. Above that the B200 throughput advantage overtakes its higher hourly rate. Per-GPU serving throughput modelled at 25,000 tokens per second prefill and 3,000 tokens per second decode; prefill is compute-bound and decode is bound by memory bandwidth. The 2.8 peak-to-average factor is the measured figure for coding workloads across 44 million requests over nine days in the published Microsoft Azure LLM inference traces; conversational workloads in the same traces measure 1.7. Supporting compute and storage scale with deployed agents and end-user traffic at 12.5% of reserved capacity, subject to a $50,000 annual minimum. <b>Adapter training</b> executes against idle reserved capacity and carries no incremental charge; a trained workload consumes approximately 40% of prior input tokens and 60% of prior output tokens on a model requiring half the compute per token, and adapters are served as LoRA weights on a shared base model, adding under 1 GB of GPU memory each.</p>
   <p><b>Accuracy.</b> SWE-bench Verified, a public benchmark scoring resolution of real software defects, weighted by each mix. Published results: Llama 4 Scout 47.3%; DeepSeek V3.2 73.1%; Qwen3 Coder Next 74.2%; MiniMax M2.5 80.2%. Estimated where no result is published: Ministral 3B 5%; Ministral 8B and customer-trained models 8%; Qwen3 Next 80B 35%; Mistral Large 3 40%; Qwen3 VL 235B 55%. The 8% estimate uses Qwen3-8B, measured at 8.0%, as a size-class proxy; neither Ministral variant publishes a SWE-bench result. Best-of-three sampling with a verifier rerank is modelled as adding approximately 8 percentage points, anchored on a published result in which a 77.2% model reached 90.0% within an engineered agent scaffold; that uplift has not been measured on the configuration priced here. <b>Latency.</b> Blended time to first token plus 500 output tokens at blended output speed, from Artificial Analysis: Ministral 3B 188.4 tokens/second at 0.64s; Ministral 8B 113.6 at 0.73s; Llama 4 Scout 119.9 at 0.83s; Qwen3 Next 80B 187.5 at 2.20s; Mistral Large 3 40.3 at 1.37s; DeepSeek V3.2 108.8 on Bedrock at 0.92s.</p>
   <p><b>Three-year projection.</b> Throughput per GPU-hour is projected to rise 1.6× in year two and 2.6× cumulatively in year three on unchanged hardware, from speculative decoding (1.30×), four-bit quantisation on tolerant traffic (1.25×), newer open-weight models activating fewer parameters (1.40×), inference engine improvements (1.15×) and additional trained adapters (1.15×), which compound to 3.00×; the published projection takes approximately half. Independently observed open-weight inference cost decline runs 30% to 50% annually.</p>
   <p><b>General.</b> All AWS amounts are public list price at on-demand rates, US East, as of August 2026. No Enterprise Discount Program, Private Pricing Agreement, Reserved Instance, Savings Plan, Capacity Block or other committed-use discount is applied; rates already held with AWS reduce these amounts. Amounts exclude customer personnel, third-party software and non-AWS infrastructure. This estimate is a planning aid. It is not a quotation and it commits neither Akka nor Amazon Web Services. Sources: Amazon Bedrock, Bedrock AgentCore, AWS Support and Amazon CloudWatch pricing pages; Amazon EC2 instance pricing; the Amazon Bedrock Service Level Agreement; Artificial Analysis; the Microsoft Azure LLM inference traces; Epoch AI inference price trends.</p>
@@ -524,8 +524,13 @@ const LAT={low:3.7,base:5.0,high:7.4,max:9.0,akka:4.5};
 const HOST={low:{v:1,g:2,w:120,c:20},base:{v:2,g:4,w:300,c:90},high:{v:3,g:6,w:400,c:120},max:{v:3,g:6,w:400,c:120}};
 const SVC={low:.15e6,base:.70e6,high:2.5e6,max:2.5e6};
 const STO5={low:.08e6,base:.18e6,high:.30e6,max:.30e6};
-const PRE=25000,DEC=3000,GPN=8,HRS=8760,P5=27.52,PEAK=2.8;
-const MIN_NODES=2,CPU_MIN=50000,CPU_PCT=.125,SRE=2500,MISC=10000,MARKUP=2.0;
+const PRE=25000,DEC=3000,GPN=8,HRS=8760,PEAK=2.8;
+// reserved rates, and throughput relative to an H100. The cheaper fleet wins on its own.
+const HW=[{node:"p5.48xlarge", gpu:"NVIDIA H100 80GB", rate:27.52, tp:1.0},
+          {node:"p6-b200.48xlarge", gpu:"NVIDIA B200 180GB", rate:56.97, tp:3.0}];
+const MIN_NODES=2,CPU_MIN=50000,CPU_PCT=.125,MISC=12500;
+// margin is capped at 50% and thins with committed volume
+const MRG_HI=.50,MRG_LO=.188,MRG_V0=5000,MRG_V1=1000000;
 const MIN_VOLUME_B=1000,Y2=1.6,Y3=2.6;
 const CAP={low:"Low",base:"Base",high:"High",max:"Max"};
 
@@ -580,6 +585,11 @@ window.addEventListener("hashchange",()=>{
   const i=tabFromHash();
   if(i!==tab)go(i,true);
 });
+function marginAt(v){
+  if(v<=MRG_V0)return MRG_HI;
+  const t=(Math.log10(v)-Math.log10(MRG_V0))/(Math.log10(MRG_V1)-Math.log10(MRG_V0));
+  return Math.max(MRG_LO,MRG_HI-(MRG_HI-MRG_LO)*t);
+}
 function support(a){const m=a/12;let s=Math.min(m,150000)*.10;
   if(m>150000)s+=(Math.min(m,500000)-150000)*.07;
   if(m>500000)s+=(Math.min(m,1e6)-500000)*.05;
@@ -620,12 +630,19 @@ function compute(){
   if(techOn.spec)gpuHr*=.82;
   if(techOn.batch)gpuHr*=.94;
   gpuHr=Math.max(gpuHr,base*.16);
-  const cont=gpuHr/GPN/HRS;
-  const nodes=Math.max(MIN_NODES,Math.ceil(cont*PEAK)+1);
-  const gpu=nodes*HRS*P5,cpu=Math.max(CPU_MIN,gpu*CPU_PCT);
-  const price=(gpu+cpu+SRE+MISC)*MARKUP;
-  const fleet=nodes*HRS,serve=gpuHr/GPN,idle=fleet-serve,need=4750*(tok/5e12);
-  return{totalB,tok,inTok,outTok,sessions,parts:rows,aws,nodes,cont,base,gpuHr,
+  // size both fleets against the same work and keep whichever costs less
+  const hw=HW.map(h=>{
+    const eff=gpuHr/h.tp;
+    const nodes=Math.max(MIN_NODES,Math.ceil(eff/GPN/HRS*PEAK)+1);
+    const gpu=nodes*HRS*h.rate;
+    return{...h,eff,nodes,cost:gpu+Math.max(CPU_MIN,gpu*CPU_PCT)+MISC};
+  }).sort((a,b)=>a.cost-b.cost)[0];
+
+  const nodes=hw.nodes, cost=hw.cost;
+  const margin=marginAt(totalB), price=cost/(1-margin);
+  const cont=hw.eff/GPN/HRS;
+  const fleet=nodes*HRS,serve=hw.eff/GPN,idle=fleet-serve,need=4750*(tok/5e12);
+  return{totalB,tok,inTok,outTok,sessions,parts:rows,aws,nodes,cont,base,gpuHr,hw,cost,
     removed,adapters,price,fleet,serve,idle,need,below:totalB<MIN_VOLUME_B};
 }
 
@@ -705,7 +722,7 @@ function render(){
   const spec=[
     ["MiniMax M2.5, Qwen3 Coder Next","Open-weight base models"],
     [d.adapters+" trained LoRA adapters","Built from your own traffic"],
-    [d.nodes+" \u00d7 p5.48xlarge reserved",(d.nodes*8)+" \u00d7 NVIDIA H100 80GB"],
+    [d.nodes+" \u00d7 "+d.hw.node+" reserved",(d.nodes*8)+" \u00d7 "+d.hw.gpu],
     [(d.nodes*192).toLocaleString()+" vCPU, "+(d.nodes*2)+" TiB","Committed with the GPU"],
     ["vLLM multi-LoRA serving","Every adapter on one base"],
     ["Kubernetes on Amazon EKS","Node pool and autoscaling"],
