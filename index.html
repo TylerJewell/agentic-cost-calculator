@@ -172,13 +172,13 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 .para b{color:var(--white);font-weight:600;}
 .para:last-child{margin-bottom:0;}
 
-/* ---------- specification grid ---------- */
-.spec{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;}
-.sp{background:#0C0C0C;padding:9px 12px;}
-.spl{font-family:var(--mono);font-size:8.5px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--soft-grey);}
-.spv{font-size:11px;line-height:1.4;color:var(--white);margin-top:4px;}
-@media (max-width:760px){.spec{grid-template-columns:repeat(2,1fr);}}
-@media (max-width:420px){.spec{grid-template-columns:1fr;}}
+/* ---------- included list, set like the site footer ---------- */
+.spec{column-count:4;column-gap:28px;}
+.spec p{font-size:11.5px;line-height:1.5;color:var(--soft-grey);padding:3px 0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;break-inside:avoid;}
+@media (max-width:900px){.spec{column-count:3;}}
+@media (max-width:620px){.spec{column-count:2;column-gap:18px;}}
+@media (max-width:400px){.spec{column-count:1;}}
 
 /* ---------- footer legalese ---------- */
 .legal{max-width:1120px;margin:24px auto 0;padding:15px 5vw 30px;border-top:1px solid var(--line);}
@@ -366,7 +366,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
       </table>
     </div>
 
-    <div class="hl"><p class="h" id="hlH">—</p><p class="p" id="hlP">—</p></div>
+    <div class="hl"><p class="h" id="hlH">—</p></div>
 
     <h4>Included in the Akka configuration</h4>
     <div class="spec" id="akkaSpec"></div>
@@ -541,7 +541,7 @@ function compute(){
 
 function render(){
   const d=compute(),K=["low","base","high","max"];
-  const diff=d.aws.base.total-d.price,diffMax=d.aws.max.total-d.price;
+  const diff=d.aws.base.total-d.price;
 
   $("kFee").textContent=d.below?"—":money(d.price);
   $("kFeeSub").textContent=d.below?"Too small for us to price well":"One charge, fixed for the year";
@@ -609,32 +609,29 @@ function render(){
 
   if(!d.below){
     $("hlH").textContent="You get the best answers for "+Math.round(d.price/d.aws.max.total*100)+"% of what they cost on AWS.";
-    $("hlP").textContent="Reaching that same "+ACC.akka+"% on AWS costs "+money(Math.abs(diffMax))+
-      " more a year than it does with us, because getting there means putting every job through the most expensive "+
-      "model three times and paying a fourth time to pick the winner. The Base build, where most teams land without "+
-      "meaning to, still costs "+money(Math.abs(diff))+" more than we do and answers correctly only "+ACC.base+
-      "% of the time.";
   }else{
     $("hlH").textContent="Building this yourself costs you "+money(d.aws.base.total)+" the way most teams do it.";
-    $("hlP").textContent="The same work costs "+money(d.aws.max.total)+" for the best answers. Across the four builds your bill spans "+(d.aws.max.total/d.aws.low.total).toFixed(1)+" times, on identical work.";
   }
 
   const spec=[
-    ["Base models","MiniMax M2.5<br>Qwen3 Coder Next"],
-    ["Adapters", (d.adapters?d.adapters:"0")+" LoRA<br>trained on your traffic"],
-    ["GPU", d.nodes+" \u00d7 p5.48xlarge<br>"+(d.nodes*8)+" \u00d7 H100 80GB"],
-    ["CPU", (d.nodes*192).toLocaleString()+" vCPU<br>"+(d.nodes*2)+" TiB memory"],
-    ["Serving","vLLM<br>multi-LoRA"],
-    ["Orchestration","Kubernetes<br>Amazon EKS"],
-    ["Clustering","Akka cluster<br>sharding and failover"],
-    ["Gateway","agentgateway<br>routing, tools, identity"],
-    ["Agent memory","Event sourced<br>Postgres"],
-    ["Tracing","Object storage<br>full retention"],
-    ["Logging","Object storage<br>full retention"],
-    ["Availability","99.9999%<br>two zones"]
+    "MiniMax M2.5",
+    "Qwen3 Coder Next",
+    d.adapters+" LoRA adapters, trained on your traffic",
+    d.nodes+" \u00d7 p5.48xlarge, reserved 12 months",
+    (d.nodes*8)+" \u00d7 NVIDIA H100 80GB",
+    (d.nodes*192).toLocaleString()+" vCPU",
+    (d.nodes*2)+" TiB memory",
+    "vLLM multi-LoRA serving",
+    "Kubernetes on Amazon EKS",
+    "Akka cluster sharding and failover",
+    "agentgateway routing and identity",
+    "Event-sourced agent memory",
+    "Postgres, replicated across zones",
+    "Object storage tracing",
+    "Object storage logging",
+    "99.9999% availability, two zones"
   ];
-  $("akkaSpec").innerHTML=spec.map(r=>
-    '<div class="sp"><p class="spl">'+r[0]+'</p><p class="spv">'+r[1]+'</p></div>').join("");
+  $("akkaSpec").innerHTML=spec.map(r=>'<p>'+r+'</p>').join("");
 
   const caps=[d.totalB,d.totalB*Y2,d.totalB*Y3],mults=[1,Y2,Y3];
   $("outlookBody").innerHTML=caps.map((c,i)=>
