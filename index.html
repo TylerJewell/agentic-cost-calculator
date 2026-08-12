@@ -151,6 +151,7 @@ details[open] summary::before{content:'▾ ';}
 details summary:hover{color:var(--soft-grey);}
 details .body{margin-top:13px;}
 .note{font-size:11px;color:var(--soft-grey);line-height:1.6;margin-top:11px;max-width:80ch;}
+.note.wide{max-width:none;}
 .note b{color:var(--soft-grey);font-weight:600;}
 .note a{color:var(--blue);text-decoration:none;}
 .note a:hover{text-decoration:underline;}
@@ -330,7 +331,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 
     <h4>What kind of work is it <span class="r" id="alloc">100%</span></h4>
     <div class="grid five" id="mix"></div>
-    <p class="note">The types of AI use cases you expect determines which kinds of models we need and whether any SLMs can be trained from narrow, repetitive work. For example, reading documents looks similar each time, so a small trained model can do it for a fraction of the price. Akka will automatically train the right models for you.</p>
+    <p class="note wide">The types of AI use cases you expect determines which kinds of models we need and whether any SLMs can be trained from narrow, repetitive work. For example, reading documents looks similar each time, so a small trained model can do it for a fraction of the price. Akka will automatically train the right models for you.</p>
   </div>
 
   <div class="mini four">
@@ -368,7 +369,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
         <div class="srow"><span>Machines held</span><b id="c2Nodes">—</b></div>
         <div class="srow"><span>Average in use</span><b id="c2Avg">—</b></div>
         <div class="srow"><span>Idle machine-hours</span><b id="c2Idle">—</b></div>
-        <div class="srow"><span>Room over what training needs</span><b class="good" id="c2Head">—</b></div>
+        <div class="srow"><span>Idle time the training uses</span><b class="good" id="c2Head">—</b></div>
       </div>
     </div>
   </div>
@@ -635,7 +636,7 @@ function render(){
   $("c2Nodes").textContent=d.nodes;
   $("c2Avg").textContent=d.cont.toFixed(2);
   $("c2Idle").textContent=kh(d.idle);
-  $("c2Head").textContent=(d.idle/d.need).toFixed(1)+"×";
+  $("c2Head").textContent=Math.round(d.need/d.idle*100)+"%";
   const shape=[.18,.14,.12,.12,.14,.22,.42,.68,.92,1,.96,.84,.78,.92,1,.94,.82,.62,.44,.34,.30,.26,.22,.20];
   $("dayBar").innerHTML=shape.map(s=>{const h=Math.min(100,(d.cont*PEAK*s/d.nodes)*100);
     return '<div class="dseg"><div class="didle" style="height:'+(100-h)+'%"></div><div class="dfill" style="height:'+h+'%"></div></div>';}).join("");
