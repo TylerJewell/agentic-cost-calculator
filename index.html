@@ -352,7 +352,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 <!-- ============ 1 ============ -->
 <section class="panel on" data-panel="0">
   <div class="form">
-    <h4>How many tokens will you consume in Y1? <span class="r" id="volConv">5.0 trillion</span></h4>
+    <h4>How many tokens will you consume in Y1?</h4>
     <div class="grid">
       <div class="field">
         <label>Billion tokens</label>
@@ -637,7 +637,6 @@ function render(){
   $("kFeeSub").textContent=d.below?"too small for us to price well":"";
   $("kAws").textContent=money(d.aws.base.total);
 
-  $("volConv").textContent=(d.totalB/1000).toFixed(1)+" trillion";
   document.querySelectorAll(".pbtn").forEach(b=>b.classList.toggle("on",+b.dataset.vol===d.totalB));
   const sum=WORKLOADS.reduce((a,w)=>a+mixVals[w.key],0);
   $("alloc").textContent=sum+"%";
