@@ -128,8 +128,10 @@ select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,2
 .srcpick{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap;}
 .srcq{font-size:11.5px;color:var(--soft-grey);}
 .srcpick select{width:auto;height:21px;line-height:21px;font-size:10.5px;font-weight:600;
-  padding:0 6px;border-radius:4px;background:rgba(0,219,221,.06);
-  border:1px solid rgba(0,219,221,.4);}
+  padding:0 6px;border-radius:4px;background:var(--medium-black);color:var(--blue);
+  border:1px solid rgba(0,219,221,.4);color-scheme:dark;}
+.srcpick select option{background:var(--medium-black);color:var(--white);}
+.srcpick select option:checked{color:var(--blue);}
 .srcnote{font-size:10.5px;color:var(--medium-grey);text-align:right;margin-top:7px;line-height:1.5;}
 .srcnote:empty{display:none;}
 @media (max-width:620px){.srcpick{justify-content:flex-start;}.srcnote{text-align:left;}}
@@ -547,10 +549,14 @@ const STO5={low:.08e6,base:.18e6,high:.30e6,max:.30e6};
 const PRE=25000,DEC=3000,GPN=8,HRS=8760,PEAK=2.8;
 // per-node reserved rates by source. The cheaper fleet wins on its own.
 const SRC={
-  aws:      {label:"AWS reserved capacity",  h100:27.52, b200:56.97, vpc:true,  link:0},
-  nebius:   {label:"Nebius, committed",      h100:20.00, b200:28.60, vpc:false, link:35000},
-  lambda:   {label:"Lambda, published",      h100:23.92, b200:44.00, vpc:false, link:35000},
-  coreweave:{label:"CoreWeave, committed",   h100:36.96, b200:39.00, vpc:false, link:35000}
+  aws:       {label:"AWS reserved capacity",   h100:27.52,  b200:56.97,  vpc:true,  link:0},
+  awsod:     {label:"AWS on-demand",           h100:55.04,  b200:113.93, vpc:true,  link:0},
+  lambdalow: {label:"Lambda, $1.49/GPU-hr",    h100:11.92,  b200:44.00,  vpc:false, link:35000},
+  lambda:    {label:"Lambda, $2.99/GPU-hr",    h100:23.92,  b200:44.00,  vpc:false, link:35000},
+  nebiusc:   {label:"Nebius, committed",       h100:20.02,  b200:28.60,  vpc:false, link:35000},
+  nebius:    {label:"Nebius, on-demand",       h100:30.80,  b200:44.00,  vpc:false, link:35000},
+  coreweavec:{label:"CoreWeave, committed",    h100:36.96,  b200:39.00,  vpc:false, link:35000},
+  coreweave: {label:"CoreWeave, on-demand",    h100:49.28,  b200:52.00,  vpc:false, link:35000}
 };
 const fleets=k=>[{node:"p5.48xlarge",     gpu:"NVIDIA H100 80GB",  rate:SRC[k].h100, tp:1.0},
                  {node:"p6-b200.48xlarge",gpu:"NVIDIA B200 180GB", rate:SRC[k].b200, tp:3.0}];
