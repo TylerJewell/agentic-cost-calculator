@@ -108,23 +108,23 @@ h1 .accent{color:var(--yellow);}
 .form{border:1px solid var(--line);border-radius:10px;padding:15px 18px;background:var(--fill);margin:12px 0;}
 .form h4{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.4px;color:var(--soft-grey);margin:0 0 12px;}
 .form h4:not(:first-child){margin-top:15px;padding-top:13px;border-top:1px solid var(--hair);}
-.form h4 .r{float:right;text-transform:none;letter-spacing:.3px;color:var(--soft-grey);}
-.form h4 .r.off{color:var(--yellow);}
+.form h4 .r{float:right;text-transform:none;letter-spacing:.3px;color:var(--blue);}
+.form h4 .r.off{color:var(--red);}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:13px 18px;}
 .grid.three{grid-template-columns:1fr 1fr 1fr;}
 .grid.five{grid-template-columns:repeat(5,1fr);}
 .field label{display:block;font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:1px;color:var(--soft-grey);margin-bottom:5px;font-weight:600;}
-.field label .v{float:right;color:var(--white);letter-spacing:0;font-size:11px;}
+.field label .v{float:right;color:var(--blue);letter-spacing:0;font-size:11px;}
 .field .hint{font-family:var(--mono);color:var(--soft-grey);font-size:10.5px;margin-top:5px;}
 input[type=number]{width:100%;background:var(--medium-black);border:1px solid var(--line);border-radius:6px;color:var(--white);
   font-family:var(--mono);font-size:15px;font-weight:600;padding:9px 11px;font-variant-numeric:tabular-nums;}
 input[type=number]:focus{outline:2px solid rgba(0,219,221,.5);outline-offset:1px;border-color:transparent;}
-input[type=range]{width:100%;accent-color:var(--yellow);height:18px;cursor:pointer;display:block;}
+input[type=range]{width:100%;accent-color:var(--blue);height:18px;cursor:pointer;display:block;}
 .presets{display:flex;gap:5px;flex-wrap:wrap;}
 .pbtn{font-family:var(--mono);font-size:10px;letter-spacing:.4px;padding:7px 11px;border-radius:5px;
   border:1px solid var(--line);background:none;color:var(--soft-grey);cursor:pointer;font-weight:600;}
 .pbtn:hover{border-color:var(--blue);color:var(--blue);}
-.pbtn.on{border-color:var(--yellow);color:var(--yellow);background:rgba(255,206,74,.08);}
+.pbtn.on{border-color:var(--blue);color:var(--blue);background:rgba(0,219,221,.10);}
 
 /* toggle row */
 .tgl{display:flex;align-items:center;gap:11px;padding:8px 0;border-top:1px solid var(--hair);}
@@ -134,8 +134,8 @@ input[type=range]{width:100%;accent-color:var(--yellow);height:18px;cursor:point
 .tgl .td{font-size:10.5px;color:var(--soft-grey);margin-top:2px;line-height:1.4;}
 .sw{position:relative;width:34px;height:19px;border-radius:10px;background:rgba(241,241,241,.05);border:1px solid var(--line);cursor:pointer;flex:none;}
 .sw::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:var(--medium-grey);transition:left .13s,background .13s;}
-.sw.on{background:rgba(255,206,74,.16);border-color:var(--yellow);}
-.sw.on::after{left:17px;background:var(--yellow);}
+.sw.on{background:rgba(0,219,221,.16);border-color:var(--blue);}
+.sw.on::after{left:17px;background:var(--blue);}
 
 /* ---------- tables ---------- */
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;}
@@ -148,9 +148,10 @@ th:not(.n),td:not(.n){padding-right:16px;}
 td.n{font-family:var(--mono);white-space:nowrap;}
 td.nm{color:var(--white);font-weight:500;}
 td.acc{color:var(--yellow);} td.ok{color:var(--green);} td.dim{color:var(--medium-grey);}
+td.mny{color:var(--white);}
 tr.tot td{border-top:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--white);font-weight:600;padding-top:9px;padding-bottom:9px;}
 tr.tot td.n{font-size:14px;}
-tr.tot td.akka{color:var(--yellow);font-size:15px;}
+tr.tot td.akka{color:var(--green);font-size:15px;}
 td.akka,th.akka{background:rgba(255,206,74,.10);box-shadow:inset 3px 0 0 var(--yellow);padding-left:18px;padding-right:16px;}
 th.akka{color:var(--yellow);font-size:10px;}
 td.akka{color:var(--white);}
@@ -674,7 +675,7 @@ function render(){
   $("sizeNote").innerHTML=d.below
     ?'<div class="hl" style="margin:12px 0 0"><p class="h">At this size you are better off on AWS, and we would rather say so.</p><p class="p">Under 1,000 billion tokens a year, keeping the two big models loaded in two data centres costs more than paying AWS by the token. Come back when your volume grows.</p></div>':"";
   const inc='<span class="tag yes">included</span>';
-  const line=(l,f,a)=>"<tr><td>"+l+"</td>"+K.map(k=>'<td class="n" data-l="'+CAP[k]+'">'+money(f(d.aws[k]))+"</td>").join("")+'<td class="n akka" data-l="Akka">'+a+"</td></tr>";
+  const line=(l,f,a)=>"<tr><td>"+l+"</td>"+K.map(k=>'<td class="n mny" data-l="'+CAP[k]+'">'+money(f(d.aws[k]))+"</td>").join("")+'<td class="n akka" data-l="Akka">'+a+"</td></tr>";
   let h="";
   h+=line("Model inference",a=>a.inf,inc);
   h+=line("Durable memory",a=>a.mem,inc);
@@ -723,7 +724,7 @@ function render(){
     '<tr><td class="nm">Year '+(i+1)+'</td>'+
     '<td class="n acc" data-l="Tokens you could consume">'+bn(c)+'</td>'+
     '<td class="n" data-l="Growth on year one">'+(i===0?'\u2014':mults[i].toFixed(1)+'\u00d7')+'</td>'+
-    '<td class="n" data-l="What you pay us">'+(d.below?'\u2014':money(d.price))+'</td>'+
+    '<td class="n ok" data-l="What you pay us">'+(d.below?'\u2014':money(d.price))+'</td>'+
     '<td class="n '+(i===0?'':'ok')+'" data-l="Cost per million tokens">'+
       (d.below?'\u2014':'$'+(d.price/(c*1000)).toFixed(3))+'</td></tr>').join("");
 }
