@@ -353,7 +353,7 @@ table.tight th{padding:0 12px 6px 0;}
     <h2 id="c3Title">Your work, priced five ways</h2>
     <p class="intro">Four of these columns are the same job built four different ways on AWS. The fifth is ours. Every AWS figure is their published list price with no discount applied, so if you have already negotiated rates your own bill will come in under these numbers.</p>
 
-    <div id="floorNote"></div>
+    <div id="sizeNote"></div>
 
     <div class="scroller">
       <table id="tco">
@@ -508,8 +508,8 @@ const HOST={low:{v:1,g:2,w:120,c:20},base:{v:2,g:4,w:300,c:90},high:{v:3,g:6,w:4
 const SVC={low:.15e6,base:.70e6,high:2.5e6,max:2.5e6};
 const STO5={low:.08e6,base:.18e6,high:.30e6,max:.30e6};
 const PRE=25000,DEC=3000,GPN=8,HRS=8760,P5=27.52,PEAK=2.8;
-const MIN_NODES=2,CPU_FLOOR=50000,CPU_PCT=.125,SRE=2500,MISC=10000,MARKUP=2.0;
-const FLOOR_B=1000,Y2=1.6,Y3=2.6;
+const MIN_NODES=2,CPU_MIN=50000,CPU_PCT=.125,SRE=2500,MISC=10000,MARKUP=2.0;
+const MIN_VOLUME_B=1000,Y2=1.6,Y3=2.6;
 const LABELS=["Cheapest","Likeliest","Generous","Best answers"];
 
 const $=id=>document.getElementById(id);
@@ -613,12 +613,12 @@ function compute(){
 
   const cont=gpuHr/GPN/HRS;
   const nodes=Math.max(MIN_NODES,Math.ceil(cont*PEAK)+1);
-  const gpu=nodes*HRS*P5,cpu=Math.max(CPU_FLOOR,gpu*CPU_PCT);
+  const gpu=nodes*HRS*P5,cpu=Math.max(CPU_MIN,gpu*CPU_PCT);
   const price=(gpu+cpu+SRE+MISC)*MARKUP;
   const fleet=nodes*HRS,serve=gpuHr/GPN,idle=fleet-serve,need=4750*(tok/5e12);
 
   return{totalB,tok,inTok,outTok,sessions,parts:rows,aws,nodes,cont,base,gpuHr,
-    removed,adapters,price,fleet,serve,idle,need,below:totalB<FLOOR_B};
+    removed,adapters,price,fleet,serve,idle,need,below:totalB<MIN_VOLUME_B};
 }
 
 function render(){
@@ -626,7 +626,7 @@ function render(){
   const diff=d.aws.base.total-d.price,diffMax=d.aws.max.total-d.price;
 
   $("kFee").textContent=d.below?"—":money(d.price);
-  $("kFeeSub").textContent=d.below?"Your volume is below our floor":"One price, fixed for the year";
+  $("kFeeSub").textContent=d.below?"Too small for us to price well":"One price, fixed for the year";
   $("kAws").textContent=money(d.aws.base.total);
   $("kSave").textContent=d.below?"—":money(Math.abs(diff));
   $("kSaveSub").textContent=d.below?"":Math.round(Math.abs(diff)/d.aws.base.total*100)+"% of what AWS would charge";
@@ -677,7 +677,7 @@ function render(){
 
   /* 3 */
   $("c3Title").textContent="Your "+(d.totalB/1000).toFixed(1)+" trillion tokens, priced five ways";
-  $("floorNote").innerHTML=d.below
+  $("sizeNote").innerHTML=d.below
     ?'<div class="headline" style="margin:0 0 18px"><p class="h">At this size you are better off on AWS, and we would rather say so.</p><p class="p">Below 1,000 billion tokens a year, keeping the two big models loaded and running in two data centres would cost you more than paying AWS by the token. Come back when your volume grows. The figures below are what AWS charges you today.</p></div>':"";
 
   const inc='<span class="tag inc">included</span>';
