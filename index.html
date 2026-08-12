@@ -130,6 +130,7 @@ select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,2
 .srcpick select{width:auto;height:32px;font-size:11.5px;font-weight:600;padding:0 10px;border-radius:6px;
   background:rgba(0,219,221,.06);border:1px solid rgba(0,219,221,.4);}
 .srcnote{font-size:10.5px;color:var(--medium-grey);text-align:right;margin-top:7px;line-height:1.5;}
+.srcnote:empty{display:none;}
 @media (max-width:620px){.srcpick{justify-content:flex-start;}.srcnote{text-align:left;}}
 input[type=number]:focus{outline:none;border-color:var(--blue);background:rgba(0,219,221,.11);
   box-shadow:0 0 0 3px rgba(0,219,221,.16);}
@@ -699,8 +700,7 @@ function render(){
   $("kAws").textContent=money(d.aws.base.total);
 
   document.querySelectorAll(".pbtn").forEach(b=>b.classList.toggle("on",+b.dataset.vol===d.totalB));
-  $("srcNote").innerHTML=d.src.vpc
-    ? "Inference runs on capacity reserved for you inside your own VPC. Nothing crosses the boundary."
+  $("srcNote").innerHTML=d.src.vpc ? ""
     : "Your agents, memory and data stay in your VPC. Prompts and responses cross a private link to "+
       d.src.label.split(",")[0]+", which adds "+money(d.src.link)+" a year of connectivity.";
   const sum=WORKLOADS.reduce((a,w)=>a+mixVals[w.key],0);
