@@ -50,7 +50,7 @@ h1 .accent{color:var(--yellow);}
 .hsub{font-size:13px;color:var(--soft-grey);margin-top:6px;max-width:72ch;line-height:1.5;}
 
 /* ---------- KPI strip ---------- */
-.kpis{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:12px;margin-bottom:12px;}
+.kpis{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:12px;margin:12px 0;}
 .hero,.metric{border:1px solid var(--line);border-radius:10px;background:var(--fill);}
 .hero{padding:14px 18px;border-color:rgba(255,206,74,.45);}
 .hero .lbl,.metric .lbl{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:1.4px;color:var(--soft-grey);font-weight:600;}
@@ -66,7 +66,7 @@ h1 .accent{color:var(--yellow);}
 .mini .metric .sub{font-size:10px;color:var(--soft-grey);margin-top:5px;line-height:1.4;}
 
 /* ---------- tabs ---------- */
-.tabs{display:flex;gap:5px;border-bottom:1px solid var(--line);margin:20px 0 0;overflow-x:auto;scrollbar-width:none;}
+.tabs{display:flex;gap:5px;border-bottom:1px solid var(--line);margin:20px 0 2px;position:relative;z-index:1;overflow-x:auto;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
 .tab{background:var(--medium-black);border:1px solid var(--line);border-bottom:none;color:var(--soft-grey);
   font-family:var(--sans);font-weight:700;font-size:11px;letter-spacing:.6px;text-transform:uppercase;
@@ -128,7 +128,7 @@ td.akka,th.akka{background:rgba(255,206,74,.05);border-left:1px solid var(--line
 .scroller::-webkit-scrollbar-track{background:var(--medium-black);}
 .scroller::-webkit-scrollbar-thumb{background:var(--medium-grey);}
 .scroller::-webkit-scrollbar-thumb:hover{background:var(--blue);}
-.tag{font-family:var(--mono);font-size:8.5px;padding:2px 6px;border-radius:3px;white-space:nowrap;display:inline-block;}
+.tag{font-family:var(--mono);font-size:8.5px;line-height:17px;height:17px;padding:0 7px;border-radius:3px;white-space:nowrap;display:inline-block;vertical-align:top;}
 .tag.yes{color:var(--green);background:rgba(114,211,91,.10);border:1px solid rgba(114,211,91,.4);}
 .tag.no{color:var(--medium-grey);background:rgba(241,241,241,.03);border:1px solid var(--line);}
 
@@ -284,7 +284,6 @@ details .body{margin-top:13px;}
     <div class="form">
       <h4>Techniques we apply</h4>
       <div id="techs"></div>
-      <p class="note">You pay for your machines around the clock and work them hard for about eight hours a day. Turn one off to see what it was worth.</p>
     </div>
 
     <div class="form">
@@ -302,10 +301,18 @@ details .body{margin-top:13px;}
   </div>
 
   <div class="form">
-    <h4>Where it goes</h4>
+    <h4>What we train, and what it takes off your bill</h4>
+    <p class="note" style="margin:0 0 11px">A specialist model only handles the repeating share of a job. Once trained it needs 40% of the question it used to and gives a shorter answer, so the tokens you are billed for drop. We train one wherever at least 40% of a job repeats.</p>
     <div class="scroller">
       <table class="stack">
-        <thead><tr><th>Kind of work</th><th class="n">Volume</th><th class="n">Repeats</th><th>Specialist</th><th class="n">Removed</th></tr></thead>
+        <thead><tr>
+          <th>Kind of work</th>
+          <th class="n">You send</th>
+          <th class="n">Of that, repeats</th>
+          <th>What we do</th>
+          <th class="n">You still pay for</th>
+          <th class="n">You stop paying for</th>
+        </tr></thead>
         <tbody id="trainBody"></tbody>
       </table>
     </div>
@@ -588,10 +595,20 @@ function render(){
   $("c2Cut").textContent=Math.round((1-d.gpuHr/d.base)*100)+"%";
   $("c2Util").textContent=Math.round(d.serve/d.fleet*100)+"% used";
   $("trainBody").innerHTML=d.parts.map(p=>
-    '<tr><td class="nm">'+p.name+'</td><td class="n" data-l="Volume">'+bn(p.tok/1e9)+'</td>'+
-    '<td class="n" data-l="Repeats">'+Math.round(p.repeat*100)+"%</td>"+
-    '<td data-l="Specialist">'+(p.isAd?'<span class="tag yes">we train one</span>':'<span class="tag no">too varied</span>')+"</td>"+
-    '<td class="n '+(p.rm>0?"ok":"dim")+'" data-l="Removed">'+(p.rm>0?bn(p.rm/1e9):"none")+"</td></tr>").join("");
+    '<tr><td class="nm">'+p.name+'</td>'+
+    '<td class="n" data-l="You send">'+bn(p.tok/1e9)+'</td>'+
+    '<td class="n" data-l="Of that, repeats">'+bn(p.tok*p.repeat/1e9)+' <span style="color:var(--soft-grey)">('+Math.round(p.repeat*100)+'%)</span></td>'+
+    '<td data-l="What we do">'+(p.isAd
+        ?'<span class="tag yes">train a specialist</span>'
+        :'<span class="tag no">too varied to train</span>')+'</td>'+
+    '<td class="n" data-l="You still pay for">'+bn((p.tok-p.rm)/1e9)+'</td>'+
+    '<td class="n '+(p.rm>0?"ok":"dim")+'" data-l="You stop paying for">'+(p.rm>0?"−"+bn(p.rm/1e9):"nothing")+'</td></tr>').join("")
+    +'<tr class="tot"><td>All work</td>'+
+     '<td class="n">'+bn(d.tok/1e9)+'</td>'+
+     '<td class="n">'+bn(d.parts.reduce((a,p)=>a+p.tok*p.repeat,0)/1e9)+'</td>'+
+     '<td>'+d.adapters+' specialists</td>'+
+     '<td class="n">'+bn((d.tok-d.removed)/1e9)+'</td>'+
+     '<td class="n ok">−'+bn(d.removed/1e9)+'</td></tr>';
   $("c2Nodes").textContent=d.nodes;
   $("c2Avg").textContent=d.cont.toFixed(2);
   $("c2Idle").textContent=kh(d.idle);
