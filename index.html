@@ -546,7 +546,7 @@ function render(){
   $("c1Gpu").textContent=kh(d.base);
 
   $("c2Rem").textContent=Math.round(d.removed/d.tok*100)+"%";
-  $("c2RemSub").textContent=bn(d.removed/1e9)+" of your "+bn(d.totalB)+" handled by "+d.adapters+" specialist models we train for you";
+  $("c2RemSub").textContent="Up to "+(d.removed/1e12).toFixed(2)+"T tokens can be handled by SLMs we train for you";
   $("c2Cut").textContent=Math.round((1-d.gpuHr/d.base)*100)+"%";
   $("c2Util").textContent=Math.round(d.serve/d.fleet*100)+"% used";
   $("trainBody").innerHTML=d.parts.map(p=>
