@@ -66,6 +66,33 @@ h1 .accent{color:var(--yellow);}
 .mini .metric .val{font-size:clamp(17px,2vw,20px);}
 .mini .metric .sub{font-size:10px;color:var(--soft-grey);margin-top:5px;line-height:1.4;}
 
+/* ---------- headline comparison ---------- */
+.vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:clamp(16px,4vw,44px);
+  border:1px solid var(--line);border-radius:12px;background:var(--fill);
+  padding:clamp(18px,3vw,26px) clamp(18px,4vw,34px);margin:14px 0 0;}
+.vs-side{min-width:0;}
+.vs-aws{text-align:right;}
+.vs-l{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;
+  letter-spacing:2px;color:var(--soft-grey);}
+.vs-akka .vs-l{color:var(--yellow);}
+.vs-v{font-family:var(--mono);font-size:clamp(34px,6.6vw,60px);font-weight:600;line-height:1;
+  letter-spacing:-.035em;margin-top:10px;color:var(--white);font-variant-numeric:tabular-nums;}
+.vs-akka .vs-v{color:var(--yellow);}
+.vs-n{font-family:var(--mono);font-size:10px;color:var(--medium-grey);margin-top:9px;}
+.vs-n:empty{display:none;}
+.vs-akka .vs-n{color:var(--yellow);opacity:.75;}
+.vs-mid{display:flex;flex-direction:column;align-items:center;gap:10px;align-self:stretch;
+  justify-content:center;}
+.vs-mid::before,.vs-mid::after{content:"";flex:1;width:1px;background:var(--line);min-height:14px;}
+.vs-mid span{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:2px;
+  color:var(--medium-grey);}
+@media (max-width:620px){
+  .vs{grid-template-columns:1fr;gap:14px;text-align:left;}
+  .vs-aws{text-align:left;}
+  .vs-mid{flex-direction:row;align-self:auto;gap:12px;}
+  .vs-mid::before,.vs-mid::after{width:auto;height:1px;min-height:0;}
+}
+
 /* ---------- tabs ---------- */
 .tabs{display:flex;gap:5px;border-bottom:1px solid var(--line);margin:20px 0 2px;position:relative;z-index:1;overflow-x:auto;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
@@ -300,14 +327,18 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
   <p class="hsub">Tell us how much AI work you expect next year. We will show you what it costs to build on AWS and what it costs with us.</p>
 </header>
 
-<div class="kpis">
-  <div class="hero">
-    <div class="lbl">Your price with Akka</div>
-    <div class="val" id="kFee">—</div>
-    <div class="sublbl" id="kFeeSub">—</div>
+<div class="vs">
+  <div class="vs-side vs-akka">
+    <p class="vs-l">With Akka</p>
+    <p class="vs-v" id="kFee">—</p>
+    <p class="vs-n" id="kFeeSub"></p>
   </div>
-  <div class="metric"><div class="lbl">Building it on AWS</div><div class="val" id="kAws">—</div></div>
-  <div class="metric"><div class="lbl">What you save</div><div class="val good" id="kSave">—</div></div>
+  <div class="vs-mid"><span>vs</span></div>
+  <div class="vs-side vs-aws">
+    <p class="vs-l">Building it yourself on AWS</p>
+    <p class="vs-v" id="kAws">—</p>
+    <p class="vs-n">a year, at list price</p>
+  </div>
 </div>
 
 <nav class="tabs" id="tabs"></nav>
@@ -597,9 +628,8 @@ function render(){
   const diff=d.aws.base.total-d.price;
 
   $("kFee").textContent=d.below?"—":money(d.price);
-  $("kFeeSub").textContent=d.below?"Too small for us to price well":"";
+  $("kFeeSub").textContent=d.below?"too small for us to price well":"a year, one charge";
   $("kAws").textContent=money(d.aws.base.total);
-  $("kSave").textContent=d.below?"—":money(Math.abs(diff));
 
   $("volConv").textContent=(d.totalB/1000).toFixed(1)+" trillion";
   document.querySelectorAll(".pbtn").forEach(b=>b.classList.toggle("on",+b.dataset.vol===d.totalB));
