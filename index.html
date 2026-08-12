@@ -713,8 +713,8 @@ function render(){
   $("tcoBody").innerHTML=h;
 
   if(!d.below){
-    $("hlH").textContent="Akka gets "+ACC.akka+"% of answers right for "+money(d.price)+
-      ". The only AWS build that does better costs "+money(d.aws.max.total)+".";
+    $("hlH").textContent=money(d.price)+" for "+ACC.akka+"% accuracy. AWS charges "+
+      money(d.aws.max.total)+" to beat it.";
   }else{
     $("hlH").textContent="Building this yourself costs you "+money(d.aws.base.total)+" the way most teams do it.";
   }
