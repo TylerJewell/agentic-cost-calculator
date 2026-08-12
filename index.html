@@ -363,7 +363,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 <!-- ============ 4 ============ -->
 <section class="panel" data-panel="3">
   <div class="form">
-    <h4>How much work the same reserve carries <span class="r" id="o3x">2.6× by year three</span></h4>
+    <h4>How much work the same reserve carries</h4>
     <div class="scroller">
       <table id="outlook">
         <thead><tr>
@@ -377,7 +377,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
       </table>
     </div>
     <h4>Why the same machines carry more work every year</h4>
-    <p class="para">The machines you reserve in year one do not get slower. Everything that runs on them gets faster, and it gets faster quickly. Three things drive that, and none of them require you to buy a single extra chip.</p>
+    <p class="para">The machines you reserve in year one do not get slower. Everything that runs on them gets faster, and it gets faster quickly.</p>
     <p class="para"><b>Better open models keep arriving.</b> Model builders have found that a large model does not need all of itself switched on to answer a question. Qwen3 Coder Next scores 74.2% on a public software benchmark while using only three billion of its parameters for any given word. A model built that way answers as well as one many times its size and costs a fraction as much to run. New ones land every few months, and each is a straight upgrade on hardware you already own.</p>
     <p class="para"><b>The software that serves them keeps improving.</b> The most useful trick in production today has a small, fast model draft the next few words and the large model check the whole draft in one pass. Most drafts are correct, so the expensive model runs far less often. Writing answers is where roughly 60% of the work goes, so this alone lifts throughput meaningfully. Models are also being run on smaller number formats, which fits more of them onto the same chip without a noticeable loss of quality.</p>
     <p class="para"><b>Your own specialist models compound.</b> Every month of production traffic shows us patterns the month before did not. Each pattern that repeats often enough becomes another small trained model that handles that work at a fraction of the tokens. Year two finds work year one could not see, so the share of your workload running on cheap specialists grows on its own.</p>
@@ -609,7 +609,6 @@ function render(){
   }
 
   const caps=[d.totalB,d.totalB*Y2,d.totalB*Y3],mults=[1,Y2,Y3];
-  $("o3x").textContent=Y3.toFixed(1)+"\u00d7 by year three";
   $("outlookBody").innerHTML=caps.map((c,i)=>
     '<tr><td class="nm">Year '+(i+1)+'</td>'+
     '<td class="n acc" data-l="Tokens you could consume">'+bn(c)+'</td>'+
