@@ -617,33 +617,42 @@ function compute(){
     aws[k]={inf,mem,host,obs,sto,cons,sup:support(cons),svc:SVC[k]};
     aws[k].total=cons+aws[k].sup+aws[k].svc;});
   const pH=1/(PRE*3600),dH=1/(DEC*3600);
-  let base=0,trained=0,removed=0,adapters=0;
+  let base=0,adHr=0,tailHr=0,removed=0,adapters=0;
   const rows=parts.map(p=>{
     const use=techOn.adapters,r=use?p.repeat:0,isAd=use&&p.repeat>=.40;
     if(isAd)adapters++;
     base+=p.inTok*pH+p.outTok*dH;
-    trained+=p.inTok*(1-r)*pH+p.inTok*r*.40*pH*.5+p.outTok*(1-r)*dH+p.outTok*r*.60*dH*.5;
+    adHr  += p.inTok*r*.40*pH*.5 + p.outTok*r*.60*dH*.5;
+    tailHr+= p.inTok*(1-r)*pH    + p.outTok*(1-r)*dH;
     const rm=isAd?(p.inTok*r*.60+p.outTok*r*.40):0;removed+=rm;
     return{...p,isAd,rm};});
-  let gpuHr=trained;
-  if(techOn.cache)gpuHr-=inTok*pH*.30;
-  if(techOn.spec)gpuHr*=.82;
-  if(techOn.batch)gpuHr*=.94;
-  gpuHr=Math.max(gpuHr,base*.16);
+  const trained=adHr+tailHr;
+  let f=1;
+  if(techOn.cache)f*=1-(inTok*pH*.30)/trained;
+  if(techOn.spec)f*=.82;
+  if(techOn.batch)f*=.94;
+  let gpuHr=Math.max(trained*f,base*.16);
+  const scale=gpuHr/(trained*f||1);
+  const adEff=adHr*f*scale, tailEff=tailHr*f*scale;
   // size both fleets against the same work and keep whichever costs less
-  const hw=HW.map(h=>{
-    const eff=gpuHr/h.tp;
+  const size=g=>HW.map(h=>{
+    const eff=g/h.tp;
     const nodes=Math.max(MIN_NODES,Math.ceil(eff/GPN/HRS*PEAK)+1);
     const gpu=nodes*HRS*h.rate;
     return{...h,eff,nodes,cost:gpu+Math.max(CPU_MIN,gpu*CPU_PCT)+MISC};
   }).sort((a,b)=>a.cost-b.cost)[0];
 
+  const hw=size(gpuHr);
   const nodes=hw.nodes, cost=hw.cost;
   const margin=marginAt(totalB), price=cost/(1-margin);
+  // the 88% tier runs best-of-three over the work no adapter serves
+  const upHw=size(adEff+tailEff*MAX_MULT);
+  const upPrice=upHw.cost/(1-margin);
   const cont=hw.eff/GPN/HRS;
   const fleet=nodes*HRS,serve=hw.eff/GPN,idle=fleet-serve,need=4750*(tok/5e12);
   return{totalB,tok,inTok,outTok,sessions,parts:rows,aws,nodes,cont,base,gpuHr,hw,cost,
-    removed,adapters,price,fleet,serve,idle,need,below:totalB<MIN_VOLUME_B};
+    removed,adapters,price,fleet,serve,idle,need,upPrice,upNodes:upHw.nodes,
+    below:totalB<MIN_VOLUME_B};
 }
 
 function render(){
@@ -713,8 +722,8 @@ function render(){
   $("tcoBody").innerHTML=h;
 
   if(!d.below){
-    $("hlH").textContent=money(d.price)+" for "+ACC.akka+"% accuracy. AWS charges "+
-      money(d.aws.max.total)+" to beat it.";
+    $("hlH").textContent=money(d.price)+" for "+ACC.akka+"% accuracy. Akka can reach "+ACC.max+
+      "% for an additional "+money(d.upPrice-d.price)+", against "+money(d.aws.max.total)+" on AWS.";
   }else{
     $("hlH").textContent="Building this yourself costs you "+money(d.aws.base.total)+" the way most teams do it.";
   }
