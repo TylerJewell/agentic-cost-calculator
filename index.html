@@ -368,7 +368,6 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
       <span class="srcq">You can save even more with a neocloud</span>
       <select id="src"></select>
     </div>
-    <p class="srcnote" id="srcNote"></p>
   </div>
   <div class="vs-mid"><span>vs</span></div>
   <div class="vs-side vs-aws">
@@ -755,9 +754,6 @@ function render(){
   document.querySelectorAll(".tab").forEach((b,i)=>{if(i===2)b.textContent=TABS[2];});
 
   document.querySelectorAll(".pbtn").forEach(b=>b.classList.toggle("on",+b.dataset.vol===d.totalB));
-  $("srcNote").innerHTML=d.src.vpc ? ""
-    : "Your agents, memory and data stay in your VPC. Prompts and responses cross a private link to "+
-      d.src.label.split(",")[0]+", which adds "+money(d.src.link)+" a year of connectivity.";
   const sum=WORKLOADS.reduce((a,w)=>a+mixVals[w.key],0);
   $("alloc").textContent=sum+"%";
   $("alloc").className="r"+(sum===100?"":" off");
