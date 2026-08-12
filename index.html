@@ -68,13 +68,13 @@ h1 .accent{color:var(--yellow);}
 .mini .metric .sub{font-size:10px;color:var(--soft-grey);margin-top:5px;line-height:1.4;}
 
 /* ---------- headline comparison ---------- */
-.vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:clamp(16px,4vw,44px);
+.vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:clamp(16px,4vw,44px);
   border:1px solid var(--line);border-radius:12px;background:var(--fill);
   padding:clamp(18px,3vw,26px) clamp(18px,4vw,34px);margin:14px 0 0;}
 .vs-side{min-width:0;}
 .vs-aws{text-align:right;}
 .vs-l{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;
-  letter-spacing:2px;color:var(--soft-grey);}
+  letter-spacing:2px;color:var(--soft-grey);min-height:2.6em;}
 
 .vs-v{font-family:var(--mono);font-size:clamp(34px,6.6vw,60px);font-weight:600;line-height:1;
   letter-spacing:-.035em;margin-top:10px;color:var(--white);font-variant-numeric:tabular-nums;}
@@ -134,14 +134,13 @@ select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,2
 .provsel:hover{background-color:rgba(0,219,221,.20);}
 .provsel:focus{outline:none;box-shadow:0 0 0 3px rgba(0,219,221,.20);}
 .provsel option{background:var(--medium-black);color:var(--white);font-weight:400;}
-.vs-foot{grid-column:1 / -1;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-  margin-top:16px;padding-top:13px;border-top:1px solid var(--hair);}
+.srcpick{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px;}
 .srcq{font-size:10.5px;color:var(--soft-grey);}
-.vs-foot select{width:auto;height:18px;line-height:18px;font-size:9.5px;font-weight:600;
+.srcpick select{width:auto;height:18px;line-height:18px;font-size:9.5px;font-weight:600;
   padding:0 5px;border-radius:3px;background:var(--medium-black);color:var(--blue);
   border:1px solid rgba(0,219,221,.4);color-scheme:dark;}
-.vs-foot select option{background:var(--medium-black);color:var(--white);}
-.srcnote{flex-basis:100%;font-size:10px;color:var(--medium-grey);margin-top:2px;line-height:1.45;}
+.srcpick select option{background:var(--medium-black);color:var(--white);}
+.srcnote{font-size:10px;color:var(--medium-grey);margin-top:5px;line-height:1.45;max-width:44ch;}
 .srcnote:empty{display:none;}
 .srcnote:empty{display:none;}
 
@@ -365,16 +364,16 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
     <p class="vs-l">With Akka</p>
     <p class="vs-v" id="kFee">—</p>
     <p class="vs-n" id="kFeeSub"></p>
+    <div class="srcpick">
+      <span class="srcq">You can save even more with a neocloud</span>
+      <select id="src"></select>
+    </div>
+    <p class="srcnote" id="srcNote"></p>
   </div>
   <div class="vs-mid"><span>vs</span></div>
   <div class="vs-side vs-aws">
     <p class="vs-l" id="kAwsLbl">Integrating it yourself on AWS</p>
     <p class="vs-v" id="kAws">—</p>
-  </div>
-  <div class="vs-foot">
-    <span class="srcq">You can save even more with a neocloud</span>
-    <select id="src"></select>
-    <p class="srcnote" id="srcNote"></p>
   </div>
 </div>
 
