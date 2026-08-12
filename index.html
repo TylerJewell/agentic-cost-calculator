@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>What your AI agents cost — Akka</title>
 <meta name="description" content="Estimate what an AI agent workload costs to run on AWS, what it costs with Akka, and where the money goes.">
 <link rel="icon" href="https://akka.io/favicon.ico" type="image/x-icon">
@@ -37,60 +40,60 @@ body{
   background-image:radial-gradient(circle,rgba(255,206,74,.035) 1px,transparent 1px);
   background-size:48px 48px;
 }
-.wrap{max-width:1120px;margin:0 auto;padding:26px 5vw 70px;}
+.wrap{max-width:1120px;margin:0 auto;padding:22px 5vw 48px;}
 
 /* ---------- header ---------- */
-header{display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:16px;}
-.brand{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:4px;color:var(--medium-grey);text-transform:uppercase;}
+header{margin-bottom:14px;}
+.brand{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:4px;color:var(--soft-grey);text-transform:uppercase;}
 h1{font-size:clamp(22px,3.4vw,32px);font-weight:700;letter-spacing:-.028em;line-height:1.1;color:var(--white);margin:6px 0 0;}
 h1 .accent{color:var(--yellow);}
-.hsub{font-size:13px;color:var(--medium-grey);margin-top:7px;}
+.hsub{font-size:13px;color:var(--soft-grey);margin-top:6px;max-width:72ch;line-height:1.5;}
 
 /* ---------- KPI strip ---------- */
 .kpis{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:12px;margin-bottom:12px;}
 .hero,.metric{border:1px solid var(--line);border-radius:10px;background:var(--fill);}
-.hero{padding:17px 20px;border-color:rgba(255,206,74,.45);}
-.hero .lbl,.metric .lbl{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:1.4px;color:var(--medium-grey);font-weight:600;}
+.hero{padding:14px 18px;border-color:rgba(255,206,74,.45);}
+.hero .lbl,.metric .lbl{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:1.4px;color:var(--soft-grey);font-weight:600;}
 .hero .val{font-family:var(--mono);font-size:clamp(30px,4.4vw,42px);color:var(--yellow);margin-top:6px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.03em;font-weight:600;}
-.hero .sublbl{font-size:11.5px;color:var(--medium-grey);margin-top:8px;}
-.metric{padding:17px 19px;}
+.hero .sublbl{font-size:11.5px;color:var(--soft-grey);margin-top:8px;}
+.metric{padding:14px 17px;}
 .metric .val{font-family:var(--mono);font-size:clamp(21px,2.6vw,26px);color:var(--white);margin-top:6px;line-height:1;font-variant-numeric:tabular-nums;font-weight:600;}
 .metric .val.acc{color:var(--yellow);} .metric .val.good{color:var(--green);}
 .mini{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 .mini.four{grid-template-columns:repeat(4,1fr);}
 .mini .metric{padding:12px 15px;}
 .mini .metric .val{font-size:clamp(17px,2vw,20px);}
-.mini .metric .sub{font-size:10px;color:var(--medium-grey);margin-top:5px;line-height:1.4;}
+.mini .metric .sub{font-size:10px;color:var(--soft-grey);margin-top:5px;line-height:1.4;}
 
 /* ---------- tabs ---------- */
 .tabs{display:flex;gap:5px;border-bottom:1px solid var(--line);margin:20px 0 0;overflow-x:auto;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab{background:var(--medium-black);border:1px solid var(--line);border-bottom:none;color:var(--medium-grey);
+.tab{background:var(--medium-black);border:1px solid var(--line);border-bottom:none;color:var(--soft-grey);
   font-family:var(--sans);font-weight:700;font-size:11px;letter-spacing:.6px;text-transform:uppercase;
   padding:9px 16px;cursor:pointer;border-radius:6px 6px 0 0;margin-bottom:-1px;white-space:nowrap;flex:none;}
 .tab:hover{color:var(--soft-grey);border-color:var(--soft-grey);}
 .tab.on{color:var(--black);background:var(--yellow);border-color:var(--yellow);border-radius:0;padding:10px 16px;}
-.panel{display:none;} .panel.on{display:block;}
+.panel{display:none;} .panel.on{display:block;min-height:600px;}
 
 /* ---------- form box ---------- */
-.form{border:1px solid var(--line);border-radius:10px;padding:18px 20px;background:var(--fill);margin:12px 0;}
-.form h4{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.4px;color:var(--medium-grey);margin:0 0 12px;}
-.form h4:not(:first-child){margin-top:18px;padding-top:16px;border-top:1px solid var(--hair);}
+.form{border:1px solid var(--line);border-radius:10px;padding:15px 18px;background:var(--fill);margin:12px 0;}
+.form h4{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.4px;color:var(--soft-grey);margin:0 0 12px;}
+.form h4:not(:first-child){margin-top:15px;padding-top:13px;border-top:1px solid var(--hair);}
 .form h4 .r{float:right;text-transform:none;letter-spacing:.3px;color:var(--soft-grey);}
 .form h4 .r.off{color:var(--yellow);}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:13px 18px;}
 .grid.three{grid-template-columns:1fr 1fr 1fr;}
 .grid.five{grid-template-columns:repeat(5,1fr);}
-.field label{display:block;font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:1px;color:var(--medium-grey);margin-bottom:5px;font-weight:600;}
+.field label{display:block;font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:1px;color:var(--soft-grey);margin-bottom:5px;font-weight:600;}
 .field label .v{float:right;color:var(--white);letter-spacing:0;font-size:11px;}
-.field .hint{font-family:var(--mono);color:var(--medium-grey);font-size:10.5px;margin-top:5px;}
+.field .hint{font-family:var(--mono);color:var(--soft-grey);font-size:10.5px;margin-top:5px;}
 input[type=number]{width:100%;background:var(--medium-black);border:1px solid var(--line);border-radius:6px;color:var(--white);
   font-family:var(--mono);font-size:15px;font-weight:600;padding:9px 11px;font-variant-numeric:tabular-nums;}
 input[type=number]:focus{outline:2px solid rgba(0,219,221,.5);outline-offset:1px;border-color:transparent;}
 input[type=range]{width:100%;accent-color:var(--yellow);height:18px;cursor:pointer;display:block;}
 .presets{display:flex;gap:5px;flex-wrap:wrap;}
 .pbtn{font-family:var(--mono);font-size:10px;letter-spacing:.4px;padding:7px 11px;border-radius:5px;
-  border:1px solid var(--line);background:none;color:var(--medium-grey);cursor:pointer;font-weight:600;}
+  border:1px solid var(--line);background:none;color:var(--soft-grey);cursor:pointer;font-weight:600;}
 .pbtn:hover{border-color:var(--blue);color:var(--blue);}
 .pbtn.on{border-color:var(--yellow);color:var(--yellow);background:rgba(255,206,74,.08);}
 
@@ -99,7 +102,7 @@ input[type=range]{width:100%;accent-color:var(--yellow);height:18px;cursor:point
 .tgl:first-child{border-top:0;padding-top:0;}
 .tgl .tx{flex:1;min-width:0;}
 .tgl .tn{font-size:12px;color:var(--soft-grey);line-height:1.35;}
-.tgl .td{font-size:10.5px;color:var(--medium-grey);margin-top:2px;line-height:1.4;}
+.tgl .td{font-size:10.5px;color:var(--soft-grey);margin-top:2px;line-height:1.4;}
 .sw{position:relative;width:34px;height:19px;border-radius:10px;background:rgba(241,241,241,.05);border:1px solid var(--line);cursor:pointer;flex:none;}
 .sw::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:var(--medium-grey);transition:left .13s,background .13s;}
 .sw.on{background:rgba(255,206,74,.16);border-color:var(--yellow);}
@@ -107,10 +110,12 @@ input[type=range]{width:100%;accent-color:var(--yellow);height:18px;cursor:point
 
 /* ---------- tables ---------- */
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;}
-th{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--medium-grey);font-weight:600;
+th{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--soft-grey);font-weight:600;
   text-align:left;padding:0 12px 7px 0;border-bottom:1px solid var(--line);white-space:nowrap;}
 td{font-size:11.5px;color:var(--soft-grey);padding:6px 12px 6px 0;border-bottom:1px solid var(--hair);vertical-align:top;line-height:1.5;}
-th.n,td.n{text-align:right;padding-right:0;}
+th.n,td.n{text-align:right;padding-right:16px;}
+th.n:last-child,td.n:last-child{padding-right:0;}
+th:not(.n),td:not(.n){padding-right:16px;}
 td.n{font-family:var(--mono);white-space:nowrap;}
 td.nm{color:var(--white);font-weight:500;}
 td.acc{color:var(--yellow);} td.ok{color:var(--green);} td.dim{color:var(--medium-grey);}
@@ -128,37 +133,46 @@ td.akka,th.akka{background:rgba(255,206,74,.05);border-left:1px solid var(--line
 .tag.no{color:var(--medium-grey);background:rgba(241,241,241,.03);border:1px solid var(--line);}
 
 details{border-top:1px solid var(--hair);margin-top:16px;padding-top:14px;}
-details summary{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.4px;color:var(--medium-grey);cursor:pointer;list-style:none;}
+details summary{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.4px;color:var(--soft-grey);cursor:pointer;list-style:none;}
 details summary::-webkit-details-marker{display:none;}
 details summary::before{content:'▸ ';color:var(--yellow);}
 details[open] summary::before{content:'▾ ';}
 details summary:hover{color:var(--soft-grey);}
 details .body{margin-top:13px;}
-.note{font-size:11px;color:var(--medium-grey);line-height:1.6;margin-top:11px;max-width:80ch;}
+.note{font-size:11px;color:var(--soft-grey);line-height:1.6;margin-top:11px;max-width:80ch;}
 .note b{color:var(--soft-grey);font-weight:600;}
 
+/* ---------- two-up split ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
+.split .form{margin:12px 0 0;}
+.srows{margin-top:12px;}
+.srow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:11px;color:var(--soft-grey);padding:5px 0;}
+.srow ~ .srow{border-top:1px solid var(--hair);}
+.srow b{font-family:var(--mono);font-size:11.5px;color:var(--white);font-weight:600;font-variant-numeric:tabular-nums;}
+.srow b.good{color:var(--green);}
+
 /* ---------- day curve ---------- */
-.daybar{display:flex;height:60px;border:1px solid var(--line);border-radius:6px;overflow:hidden;}
+.daybar{display:flex;height:52px;border:1px solid var(--line);border-radius:6px;overflow:hidden;}
 .dseg{flex:1;position:relative;border-right:1px solid rgba(0,0,0,.6);}
 .dseg:last-child{border-right:0;}
 .dfill{position:absolute;left:0;right:0;bottom:0;background:var(--blue);}
 .didle{position:absolute;left:0;right:0;top:0;background:repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(241,241,241,.06) 3px,rgba(241,241,241,.06) 6px);}
-.daxis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--medium-grey);margin-top:5px;}
-.key{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-family:var(--mono);font-size:9.5px;color:var(--medium-grey);}
+.daxis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--soft-grey);margin-top:5px;}
+.key{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-family:var(--mono);font-size:9.5px;color:var(--soft-grey);}
 .key i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:-1px;}
 .key i.serve{background:var(--blue);}
 .key i.idle{background:repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(241,241,241,.25) 2px,rgba(241,241,241,.25) 4px);border:1px solid var(--line);}
 
 /* ---------- bars ---------- */
 .barr{display:grid;grid-template-columns:70px 1fr 128px;gap:11px;align-items:center;padding:5px 0;}
-.barr .c{font-family:var(--mono);font-size:9.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--medium-grey);font-weight:600;}
+.barr .c{font-family:var(--mono);font-size:9.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--soft-grey);font-weight:600;}
 .barr.akka .c{color:var(--yellow);}
 .btrack{height:17px;position:relative;background:rgba(241,241,241,.035);border-radius:3px;overflow:hidden;}
 .bfill{height:100%;background:var(--medium-grey);}
 .bfill.y{background:var(--yellow);}
 .bvar{height:100%;position:absolute;top:0;background:repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(241,241,241,.16) 3px,rgba(241,241,241,.16) 6px);}
 .bval{font-family:var(--mono);font-size:11.5px;text-align:right;color:var(--white);font-variant-numeric:tabular-nums;white-space:nowrap;}
-.bval span{color:var(--medium-grey);font-size:9.5px;margin-left:5px;}
+.bval span{color:var(--soft-grey);font-size:9.5px;margin-left:5px;}
 
 /* ---------- callout ---------- */
 .hl{border:1px solid var(--yellow);border-radius:9px;padding:14px 17px;background:rgba(255,206,74,.06);margin-top:14px;}
@@ -166,7 +180,7 @@ details .body{margin-top:13px;}
 .hl .p{font-size:11.5px;color:var(--soft-grey);margin-top:6px;line-height:1.55;}
 
 /* ---------- nav ---------- */
-.navf{display:flex;justify-content:space-between;gap:10px;margin-top:18px;}
+.navf{display:flex;justify-content:space-between;gap:10px;margin-top:14px;}
 .nbtn{font-family:var(--sans);font-size:12px;font-weight:700;padding:11px 20px;border-radius:7px;
   border:1px solid var(--line);background:none;color:var(--soft-grey);cursor:pointer;}
 .nbtn:hover{border-color:var(--blue);color:var(--blue);}
@@ -175,6 +189,7 @@ details .body{margin-top:13px;}
 .nbtn:disabled{opacity:.3;cursor:default;} .nbtn:disabled:hover{border-color:var(--line);color:var(--soft-grey);}
 
 @media (max-width:900px){
+  .split{grid-template-columns:1fr;}
   .kpis{grid-template-columns:1fr 1fr;}
   .kpis .hero{grid-column:1 / -1;}
   .grid.five{grid-template-columns:1fr 1fr 1fr;}
@@ -193,7 +208,7 @@ details .body{margin-top:13px;}
   table.stack td{display:block;border:0;padding:2px 0;text-align:left;}
   table.stack td.n{text-align:left;}
   table.stack td::before{content:attr(data-l);display:block;font-family:var(--mono);font-size:8.5px;
-    text-transform:uppercase;letter-spacing:1.1px;color:var(--medium-grey);margin-bottom:2px;}
+    text-transform:uppercase;letter-spacing:1.1px;color:var(--soft-grey);margin-bottom:2px;}
   table.stack td:first-child{font-size:12.5px;} table.stack td:first-child::before{display:none;}
 }
 @media (max-width:420px){
@@ -206,11 +221,9 @@ details .body{margin-top:13px;}
 <div class="wrap">
 
 <header>
-  <div>
-    <p class="brand">Akka</p>
-    <h1>What your AI agents <span class="accent">will cost you</span></h1>
-  </div>
-  <p class="hsub">Four ways to build it on AWS. One price from us.</p>
+  <p class="brand">Akka</p>
+  <h1>What your AI agents <span class="accent">will cost you</span></h1>
+  <p class="hsub">Tell us how much AI work you expect next year. We will show you what it costs to build on AWS, what it costs with us, and where every dollar goes.</p>
 </header>
 
 <div class="kpis">
@@ -267,16 +280,28 @@ details .body{margin-top:13px;}
     <div class="metric"><div class="lbl">Training costs you</div><div class="val good">$0</div></div>
   </div>
 
+  <div class="split">
+    <div class="form">
+      <h4>Techniques we apply</h4>
+      <div id="techs"></div>
+      <p class="note">You pay for your machines around the clock and work them hard for about eight hours a day. Turn one off to see what it was worth.</p>
+    </div>
+
+    <div class="form">
+      <h4>How busy your machines are <span class="r" id="c2Util">—</span></h4>
+      <div class="daybar" id="dayBar"></div>
+      <div class="daxis"><span>Midnight</span><span>Noon</span><span>Midnight</span></div>
+      <div class="key"><span><i class="serve"></i>Working for you</span><span><i class="idle"></i>Idle, where we train</span></div>
+      <div class="srows">
+        <div class="srow"><span>Machines held</span><b id="c2Nodes">—</b></div>
+        <div class="srow"><span>Average in use</span><b id="c2Avg">—</b></div>
+        <div class="srow"><span>Idle machine-hours</span><b id="c2Idle">—</b></div>
+        <div class="srow"><span>Room over what training needs</span><b class="good" id="c2Head">—</b></div>
+      </div>
+    </div>
+  </div>
+
   <div class="form">
-    <h4>Techniques we apply</h4>
-    <div class="grid" id="techs"></div>
-    <p class="note">You pay for your machines around the clock and work them hard for about eight hours a day. We spend the quiet hours teaching small specialist models to do your routine jobs, using your own work as the lesson. Turn one off to see what it was worth.</p>
-
-    <h4>How busy your machines are across a day <span class="r" id="c2Util">—</span></h4>
-    <div class="daybar" id="dayBar"></div>
-    <div class="daxis"><span>Midnight</span><span>6am</span><span>Noon</span><span>6pm</span><span>Midnight</span></div>
-    <div class="key"><span><i class="serve"></i>Working for you</span><span><i class="idle"></i>Idle, where we train</span></div>
-
     <h4>Where it goes</h4>
     <div class="scroller">
       <table class="stack">
@@ -284,13 +309,6 @@ details .body{margin-top:13px;}
         <tbody id="trainBody"></tbody>
       </table>
     </div>
-  </div>
-
-  <div class="mini four">
-    <div class="metric"><div class="lbl">Machines held</div><div class="val" id="c2Nodes">—</div><div class="sub">For your busiest hour</div></div>
-    <div class="metric"><div class="lbl">Average in use</div><div class="val" id="c2Avg">—</div><div class="sub">Across the year</div></div>
-    <div class="metric"><div class="lbl">Idle available</div><div class="val" id="c2Idle">—</div><div class="sub">Machine-hours</div></div>
-    <div class="metric"><div class="lbl">Room to spare</div><div class="val good" id="c2Head">—</div><div class="sub">Over what training needs</div></div>
   </div>
 </section>
 
@@ -425,7 +443,7 @@ details .body{margin-top:13px;}
 
 <script>
 "use strict";
-const TABS=["Your workload","The savings","The comparison","Three years"];
+const TABS=["Your workload","Cutting the bill","The comparison","Three years"];
 const PRESETS=[1000,2500,5000,10000,20000];
 const WORKLOADS=[
   {key:"swe",name:"Writing software",short:"Software",inRatio:0.90,repeat:0.15,def:30},
@@ -490,7 +508,7 @@ function go(i){
   document.querySelectorAll(".tab").forEach((b,j)=>b.classList.toggle("on",j===tab));
   document.querySelectorAll(".panel").forEach((p,j)=>p.classList.toggle("on",j===tab));
   $("prev").disabled=tab===0; $("next").disabled=tab===TABS.length-1;
-  $("next").textContent=["Show the savings","Compare prices","Look ahead","Three years"][tab];
+  $("next").textContent=["Cut the bill","Compare prices","Look ahead","Three years"][tab];
   window.scrollTo({top:0,behavior:"smooth"});
 }
 function support(a){const m=a/12;let s=Math.min(m,150000)*.10;
