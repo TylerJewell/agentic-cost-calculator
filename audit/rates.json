@@ -479,5 +479,492 @@
       "lesson": "Price a line on what actually drives it. A coefficient tied to another line inherits that line's variance whether or not the causation exists.",
       "effect": "Compute and storage are now identical on all three clouds. Akka on Google fell from $4.94M to $4.60M at 5T, on Azure from $3.51M to $3.33M, and rose slightly on AWS from $1.65M to $1.67M."
     }
-  ]
+  ],
+  "runtime": {
+    "_note": "AUTHORITATIVE. build/build.js reads this and bakes it into index.html. The generated page carries no rates of its own and never fetches this file. Edit here, run node build/build.js, commit both.",
+    "tabs": [
+      "Your workload",
+      "Cutting the bill",
+      "AWS vs Akka",
+      "Future savings"
+    ],
+    "slugs": [
+      "workload",
+      "savings",
+      "compare",
+      "outlook"
+    ],
+    "presets": [
+      1000,
+      2500,
+      5000,
+      10000,
+      20000
+    ],
+    "workloads": [
+      {
+        "key": "swe",
+        "name": "Writing software",
+        "short": "Software",
+        "inRatio": 0.9,
+        "repeat": 0.15,
+        "def": 30
+      },
+      {
+        "key": "support",
+        "name": "Answering customers",
+        "short": "Customers",
+        "inRatio": 0.8,
+        "repeat": 0.6,
+        "def": 25
+      },
+      {
+        "key": "extract",
+        "name": "Reading documents",
+        "short": "Documents",
+        "inRatio": 0.95,
+        "repeat": 0.85,
+        "def": 20
+      },
+      {
+        "key": "rag",
+        "name": "Search and summary",
+        "short": "Search",
+        "inRatio": 0.92,
+        "repeat": 0.45,
+        "def": 15
+      },
+      {
+        "key": "transform",
+        "name": "Tidying data",
+        "short": "Data",
+        "inRatio": 0.85,
+        "repeat": 0.8,
+        "def": 10
+      }
+    ],
+    "techniques": [
+      {
+        "key": "adapters",
+        "name": "Specialist models for routine work",
+        "on": true,
+        "desc": "A trained job needs 40% of the question and gives a shorter answer, on a model half the size."
+      },
+      {
+        "key": "cache",
+        "name": "Remembering what you asked before",
+        "on": true,
+        "desc": "Agents repeat the same instructions every turn. Reading them back costs a fraction of reading them fresh."
+      },
+      {
+        "key": "spec",
+        "name": "Guessing ahead while writing",
+        "on": true,
+        "desc": "A small fast model guesses the next words and the big model checks them together."
+      },
+      {
+        "key": "batch",
+        "name": "Running unattended work off-peak",
+        "on": false,
+        "desc": "Anything with nobody waiting runs later, on machines that would sit idle."
+      }
+    ],
+    "providers": {
+      "aws": {
+        "label": "AWS",
+        "vpcLabel": "AWS reserved capacity",
+        "vpcH100": 27.52,
+        "vpcB200": 56.97,
+        "mixes": {
+          "low": [
+            {
+              "s": 0.7,
+              "i": 0.1,
+              "o": 0.1
+            },
+            {
+              "s": 0.2,
+              "i": 0.15,
+              "o": 0.15
+            },
+            {
+              "s": 0.1,
+              "i": 0.2,
+              "o": 1.0
+            }
+          ],
+          "base": [
+            {
+              "s": 0.5,
+              "i": 0.15,
+              "o": 0.15
+            },
+            {
+              "s": 0.25,
+              "i": 0.2,
+              "o": 1.0
+            },
+            {
+              "s": 0.15,
+              "i": 0.15,
+              "o": 1.2
+            },
+            {
+              "s": 0.1,
+              "i": 0.4765,
+              "o": 0.4765
+            }
+          ],
+          "high": [
+            {
+              "s": 1.0,
+              "i": 0.2,
+              "o": 1.2
+            }
+          ],
+          "max": [
+            {
+              "s": 1.0,
+              "i": 0.2,
+              "o": 1.2
+            }
+          ]
+        },
+        "maxMult": 3.35,
+        "host": {
+          "v": 0.0895,
+          "g": 0.00945
+        },
+        "mem": {
+          "ev": 0.25,
+          "store": 0.75,
+          "retr": 0.5
+        },
+        "acc": {
+          "low": 10,
+          "base": 22,
+          "high": 80,
+          "max": 88
+        },
+        "lat": {
+          "low": 3.7,
+          "base": 5.0,
+          "high": 3.2,
+          "max": 6.5
+        }
+      },
+      "azure": {
+        "label": "Azure",
+        "vpcLabel": "Azure reserved capacity",
+        "vpcH100": 59.0,
+        "vpcB200": 121.0,
+        "mixes": {
+          "low": [
+            {
+              "s": 0.7,
+              "i": 0.04,
+              "o": 0.04
+            },
+            {
+              "s": 0.2,
+              "i": 0.125,
+              "o": 0.5
+            },
+            {
+              "s": 0.1,
+              "i": 0.2,
+              "o": 0.78
+            }
+          ],
+          "base": [
+            {
+              "s": 0.5,
+              "i": 0.125,
+              "o": 0.5
+            },
+            {
+              "s": 0.25,
+              "i": 0.2,
+              "o": 0.78
+            },
+            {
+              "s": 0.15,
+              "i": 0.4,
+              "o": 2.0
+            },
+            {
+              "s": 0.1,
+              "i": 0.4765,
+              "o": 0.4765
+            }
+          ],
+          "high": [
+            {
+              "s": 1.0,
+              "i": 0.2,
+              "o": 1.2
+            }
+          ],
+          "max": [
+            {
+              "s": 1.0,
+              "i": 0.2,
+              "o": 1.2
+            }
+          ]
+        },
+        "maxMult": 3.35,
+        "host": {
+          "v": 0.0864,
+          "g": 0.0108
+        },
+        "mem": {
+          "flat": 670000
+        },
+        "acc": {
+          "low": 10,
+          "base": 22,
+          "high": 80,
+          "max": 88
+        },
+        "lat": {
+          "low": 3.7,
+          "base": 5.0,
+          "high": 3.2,
+          "max": 6.5
+        }
+      },
+      "gcp": {
+        "label": "Google Cloud",
+        "vpcLabel": "Google reserved capacity",
+        "vpcH100": 83.19,
+        "vpcB200": 128.88,
+        "mixes": {
+          "low": [
+            {
+              "s": 0.7,
+              "i": 0.093,
+              "o": 0.622
+            },
+            {
+              "s": 0.2,
+              "i": 0.093,
+              "o": 0.622
+            },
+            {
+              "s": 0.1,
+              "i": 0.249,
+              "o": 2.391
+            }
+          ],
+          "base": [
+            {
+              "s": 0.5,
+              "i": 0.093,
+              "o": 0.622
+            },
+            {
+              "s": 0.25,
+              "i": 0.249,
+              "o": 2.391
+            },
+            {
+              "s": 0.15,
+              "i": 0.249,
+              "o": 2.391
+            },
+            {
+              "s": 0.1,
+              "i": 0.093,
+              "o": 0.622
+            }
+          ],
+          "high": [
+            {
+              "s": 1.0,
+              "i": 0.373,
+              "o": 4.144
+            }
+          ],
+          "max": [
+            {
+              "s": 1.0,
+              "i": 0.373,
+              "o": 4.144
+            }
+          ]
+        },
+        "maxMult": 3.35,
+        "host": {
+          "v": 0.0864,
+          "g": 0.009
+        },
+        "mem": {
+          "ev": 0.25,
+          "store": 0,
+          "retr": 0.25
+        },
+        "acc": {
+          "low": 10,
+          "base": 22,
+          "high": 73,
+          "max": 81
+        },
+        "lat": {
+          "low": 3.7,
+          "base": 5.0,
+          "high": 7.4,
+          "max": 9.0
+        }
+      }
+    },
+    "akkaAccuracy": 80.2,
+    "akkaLatency": 4.5,
+    "gpuSources": {
+      "aws": {
+        "label": "AWS reserved capacity",
+        "h100": 27.52,
+        "b200": 56.97,
+        "vpc": true,
+        "link": 0
+      },
+      "awsod": {
+        "label": "AWS on-demand",
+        "h100": 55.04,
+        "b200": 113.93,
+        "vpc": true,
+        "link": 0
+      },
+      "lambdalow": {
+        "label": "Lambda, $1.49/GPU-hr",
+        "h100": 11.92,
+        "b200": 44.0,
+        "vpc": false,
+        "link": 35000
+      },
+      "lambda": {
+        "label": "Lambda, $2.99/GPU-hr",
+        "h100": 23.92,
+        "b200": 44.0,
+        "vpc": false,
+        "link": 35000
+      },
+      "nebiusc": {
+        "label": "Nebius, committed",
+        "h100": 20.02,
+        "b200": 28.6,
+        "vpc": false,
+        "link": 35000
+      },
+      "nebius": {
+        "label": "Nebius, on-demand",
+        "h100": 30.8,
+        "b200": 44.0,
+        "vpc": false,
+        "link": 35000
+      },
+      "coreweavec": {
+        "label": "CoreWeave, committed",
+        "h100": 36.96,
+        "b200": 39.0,
+        "vpc": false,
+        "link": 35000
+      },
+      "coreweave": {
+        "label": "CoreWeave, on-demand",
+        "h100": 49.28,
+        "b200": 52.0,
+        "vpc": false,
+        "link": 35000
+      }
+    },
+    "fleets": [
+      {
+        "node": "p5.48xlarge",
+        "gpu": "NVIDIA H100 80GB",
+        "rateKey": "h100",
+        "tp": 1.0
+      },
+      {
+        "node": "p6-b200.48xlarge",
+        "gpu": "NVIDIA B200 180GB",
+        "rateKey": "b200",
+        "tp": 3.0
+      }
+    ],
+    "hostProfiles": {
+      "low": {
+        "v": 1,
+        "g": 2,
+        "w": 120,
+        "c": 20
+      },
+      "base": {
+        "v": 2,
+        "g": 4,
+        "w": 300,
+        "c": 90
+      },
+      "high": {
+        "v": 3,
+        "g": 6,
+        "w": 400,
+        "c": 120
+      },
+      "max": {
+        "v": 3,
+        "g": 6,
+        "w": 400,
+        "c": 120
+      }
+    },
+    "services": {
+      "low": 150000,
+      "base": 700000,
+      "high": 2500000,
+      "max": 2500000
+    },
+    "storageAt5T": {
+      "low": 80000,
+      "base": 180000,
+      "high": 300000,
+      "max": 300000
+    },
+    "akka": {
+      "prefillTokS": 25000,
+      "decodeTokS": 3000,
+      "gpusPerNode": 8,
+      "hoursPerYear": 8760,
+      "peakFactor": 2.8,
+      "minNodes": 2,
+      "misc": 12500,
+      "cpuStorage": {
+        "first": 100000,
+        "floor": 15000,
+        "decay": 0.85,
+        "blockB": 5000,
+        "minimum": 50000
+      },
+      "margin": {
+        "hi": 0.5,
+        "lo": 0.188,
+        "v0": 5000,
+        "v1": 1000000
+      },
+      "minVolumeB": 1000,
+      "capacityY2": 1.6,
+      "capacityY3": 2.6,
+      "adapter": {
+        "inputRetained": 0.4,
+        "outputRetained": 0.6,
+        "computeMultiple": 0.5,
+        "threshold": 0.4
+      },
+      "cacheSaving": 0.3,
+      "specMultiple": 0.82,
+      "batchMultiple": 0.94,
+      "floorFraction": 0.16,
+      "trainingHoursAt5T": 4750
+    }
+  }
 }

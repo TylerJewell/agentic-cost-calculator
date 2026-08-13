@@ -531,42 +531,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 
 <script>
 "use strict";
-// GENERATED from audit/rates.json by build/build.js. Do not edit here.
-// Baseline 2026-08-12. Regenerate with: node build/build.js
-const TABS=["Your workload","Cutting the bill","AWS vs Akka","Future savings"];
-const SLUGS=["workload","savings","compare","outlook"];
-const PRESETS=[1000,2500,5000,10000,20000];
-const WORKLOADS=[{"key":"swe","name":"Writing software","short":"Software","inRatio":0.9,"repeat":0.15,"def":30},{"key":"support","name":"Answering customers","short":"Customers","inRatio":0.8,"repeat":0.6,"def":25},{"key":"extract","name":"Reading documents","short":"Documents","inRatio":0.95,"repeat":0.85,"def":20},{"key":"rag","name":"Search and summary","short":"Search","inRatio":0.92,"repeat":0.45,"def":15},{"key":"transform","name":"Tidying data","short":"Data","inRatio":0.85,"repeat":0.8,"def":10}];
-const TECHS=[{"key":"adapters","name":"Specialist models for routine work","on":true,"desc":"A trained job needs 40% of the question and gives a shorter answer, on a model half the size."},{"key":"cache","name":"Remembering what you asked before","on":true,"desc":"Agents repeat the same instructions every turn. Reading them back costs a fraction of reading them fresh."},{"key":"spec","name":"Guessing ahead while writing","on":true,"desc":"A small fast model guesses the next words and the big model checks them together."},{"key":"batch","name":"Running unattended work off-peak","on":false,"desc":"Anything with nobody waiting runs later, on machines that would sit idle."}];
-const PROV={"aws":{"label":"AWS","vpcLabel":"AWS reserved capacity","vpcH100":27.52,"vpcB200":56.97,"mixes":{"low":[{"s":0.7,"i":0.1,"o":0.1},{"s":0.2,"i":0.15,"o":0.15},{"s":0.1,"i":0.2,"o":1}],"base":[{"s":0.5,"i":0.15,"o":0.15},{"s":0.25,"i":0.2,"o":1},{"s":0.15,"i":0.15,"o":1.2},{"s":0.1,"i":0.4765,"o":0.4765}],"high":[{"s":1,"i":0.2,"o":1.2}],"max":[{"s":1,"i":0.2,"o":1.2}]},"maxMult":3.35,"host":{"v":0.0895,"g":0.00945},"mem":{"ev":0.25,"store":0.75,"retr":0.5},"acc":{"low":10,"base":22,"high":80,"max":88},"lat":{"low":3.7,"base":5,"high":3.2,"max":6.5}},"azure":{"label":"Azure","vpcLabel":"Azure reserved capacity","vpcH100":59,"vpcB200":121,"mixes":{"low":[{"s":0.7,"i":0.04,"o":0.04},{"s":0.2,"i":0.125,"o":0.5},{"s":0.1,"i":0.2,"o":0.78}],"base":[{"s":0.5,"i":0.125,"o":0.5},{"s":0.25,"i":0.2,"o":0.78},{"s":0.15,"i":0.4,"o":2},{"s":0.1,"i":0.4765,"o":0.4765}],"high":[{"s":1,"i":0.2,"o":1.2}],"max":[{"s":1,"i":0.2,"o":1.2}]},"maxMult":3.35,"host":{"v":0.0864,"g":0.0108},"mem":{"flat":670000},"acc":{"low":10,"base":22,"high":80,"max":88},"lat":{"low":3.7,"base":5,"high":3.2,"max":6.5}},"gcp":{"label":"Google Cloud","vpcLabel":"Google reserved capacity","vpcH100":83.19,"vpcB200":128.88,"mixes":{"low":[{"s":0.7,"i":0.093,"o":0.622},{"s":0.2,"i":0.093,"o":0.622},{"s":0.1,"i":0.249,"o":2.391}],"base":[{"s":0.5,"i":0.093,"o":0.622},{"s":0.25,"i":0.249,"o":2.391},{"s":0.15,"i":0.249,"o":2.391},{"s":0.1,"i":0.093,"o":0.622}],"high":[{"s":1,"i":0.373,"o":4.144}],"max":[{"s":1,"i":0.373,"o":4.144}]},"maxMult":3.35,"host":{"v":0.0864,"g":0.009},"mem":{"ev":0.25,"store":0,"retr":0.25},"acc":{"low":10,"base":22,"high":73,"max":81},"lat":{"low":3.7,"base":5,"high":7.4,"max":9}}};
-let MIXES=PROV.aws.mixes;
-const MAX_MULT=3.35;
-const ACC=Object.assign({},PROV.aws.acc,{akka:80.2});
-const LAT=Object.assign({},PROV.aws.lat,{akka:4.5});
-const HOST={"low":{"v":1,"g":2,"w":120,"c":20},"base":{"v":2,"g":4,"w":300,"c":90},"high":{"v":3,"g":6,"w":400,"c":120},"max":{"v":3,"g":6,"w":400,"c":120}};
-const SVC={"low":150000,"base":700000,"high":2500000,"max":2500000};
-const STO5={"low":80000,"base":180000,"high":300000,"max":300000};
-const PRE=25000,DEC=3000,GPN=8,HRS=8760,PEAK=2.8;
-const SRC={"aws":{"label":"AWS reserved capacity","h100":27.52,"b200":56.97,"vpc":true,"link":0},"awsod":{"label":"AWS on-demand","h100":55.04,"b200":113.93,"vpc":true,"link":0},"lambdalow":{"label":"Lambda, $1.49/GPU-hr","h100":11.92,"b200":44,"vpc":false,"link":35000},"lambda":{"label":"Lambda, $2.99/GPU-hr","h100":23.92,"b200":44,"vpc":false,"link":35000},"nebiusc":{"label":"Nebius, committed","h100":20.02,"b200":28.6,"vpc":false,"link":35000},"nebius":{"label":"Nebius, on-demand","h100":30.8,"b200":44,"vpc":false,"link":35000},"coreweavec":{"label":"CoreWeave, committed","h100":36.96,"b200":39,"vpc":false,"link":35000},"coreweave":{"label":"CoreWeave, on-demand","h100":49.28,"b200":52,"vpc":false,"link":35000}};
-const FLEETS=[{"node":"p5.48xlarge","gpu":"NVIDIA H100 80GB","rateKey":"h100","tp":1},{"node":"p6-b200.48xlarge","gpu":"NVIDIA B200 180GB","rateKey":"b200","tp":3}];
-const fleets=k=>FLEETS.map(f=>({node:f.node,gpu:f.gpu,rate:SRC[k][f.rateKey],tp:f.tp}));
-const MIN_NODES=2,CPU_MIN=50000,MISC=12500;
-// compute and storage follow deployed agents and end-user traffic, not GPU spend,
-// so they depend on volume alone and are identical on every cloud
-const CPU_FIRST=100000,CPU_FLOOR=15000,CPU_DECAY=0.85,CPU_BLOCK=5000;
-function cpuStorageFor(volB){
-  const full=Math.ceil(volB/CPU_BLOCK); let t=0;
-  for(let n=0;n<full;n++) t+=CPU_FLOOR+(CPU_FIRST-CPU_FLOOR)*Math.pow(CPU_DECAY,n);
-  const frac=(volB%CPU_BLOCK)||CPU_BLOCK;
-  t-=(CPU_FLOOR+(CPU_FIRST-CPU_FLOOR)*Math.pow(CPU_DECAY,full-1))*(1-frac/CPU_BLOCK);
-  return Math.max(CPU_MIN,t);
-}
-const ADAPT={"inputRetained":0.4,"outputRetained":0.6,"computeMultiple":0.5,"threshold":0.4};
-const CACHE_SAVING=0.3,SPEC_MULT=0.82,BATCH_MULT=0.94,FLOOR_FRAC=0.16;
-const TRAIN_HOURS_5T=4750;
-const MRG_HI=0.5,MRG_LO=0.188,MRG_V0=5000,MRG_V1=1000000;
-const MIN_VOLUME_B=1000,Y2=1.6,Y3=2.6;
-const CAP={low:"Low",base:"Base",high:"High",max:"Max"};
+/*__MODEL__*/
 
 const $=id=>document.getElementById(id);
 const money=n=>n>=1e6?"$"+(n/1e6).toFixed(2)+"M":"$"+Math.round(n/1000)+"K";

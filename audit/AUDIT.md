@@ -6,6 +6,31 @@ whenever a hyperscaler announces pricing changes.
 An agent executing this file needs no prior context. Every figure it must check is listed in
 `rates.json` with its current value, its source and how confident we are in it.
 
+## How a change reaches the page
+
+`audit/rates.json` is the single source of truth. `index.html` is generated from it and is
+never edited directly.
+
+```
+audit/rates.json  →  node build/build.js  →  index.html
+                                             (standalone: every figure baked in,
+                                              nothing fetched at runtime)
+```
+
+`rates.json → runtime` is the authoritative block the generator reads. The sections above it —
+`inference`, `gpu`, `agent_runtime`, `memory` and the rest — carry the sources, dates and
+confidence for those same figures. The build cross-checks the two and **refuses to run if they
+disagree**, so a rate card updated without its runtime counterpart fails loudly rather than
+shipping a stale page.
+
+Then `node build/test.js` runs the generated page's own model and asserts thirty figures,
+including the 5T anchor, the margin curve, the hardware crossover and the rule that compute and
+storage never move with the GPU source. A change that shifts one of those is either intended —
+update the expectation in the same commit and say why — or a regression.
+
+Every run of this audit ends with: edit `rates.json`, `node build/build.js`, `node
+build/test.js`, commit all three.
+
 ---
 
 ## The rules that govern a run
