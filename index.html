@@ -472,7 +472,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
     </div>
 
 
-    <div class="hl"><p class="h" id="hlH">—</p></div>
+    <div class="hl" id="hlBox"><p class="h" id="hlH">—</p></div>
 
     <div class="incl">
       <p class="incl-h">Included in the Akka configuration<span class="dot">•</span><span id="inclVpc">Akka installs in your AWS VPC</span></p>
@@ -821,8 +821,11 @@ function render(){
   $("tcoBody").innerHTML=h;
 
   if(!d.below){
-    $("hlH").textContent="Akka can reach "+ACC.max+"% accuracy for an additional "+money(d.upCost-d.cost)+".";
+    const gap=ACC.max-ACC.akka;
+    $("hlBox").style.display=gap>=5?"":"none";
+    if(gap>=5)$("hlH").textContent="Akka can reach "+ACC.max+"% accuracy for an additional "+money(d.upCost-d.cost)+".";
   }else{
+    $("hlBox").style.display="";
     $("hlH").textContent="Building this yourself costs you "+money(d.aws.base.total)+" the way most teams do it.";
   }
 
