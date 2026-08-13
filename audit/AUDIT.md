@@ -24,6 +24,13 @@ anyone trying to confirm it should be escalated, not carried forward again.
 below lists every place the model currently flatters us. Check those first. A comparison that
 survives adversarial review is worth more than one that wins.
 
+**4. A zero on a line that must consume resources is a signal, not a finding.** When a provider
+advertises no charge for a component, find where the work actually runs before recording it as
+free. Azure Foundry Agent Service charges nothing to run an agent, and that was recorded as $0
+of compute. It is a control plane; the agent's own code runs on Container Apps, billed
+separately and dearer than AgentCore. The error understated Azure by roughly $2.3M at 5T and
+survived until a reviewer asked why a free runtime at that scale made commercial sense.
+
 ---
 
 ## Dimensions to check
@@ -120,6 +127,7 @@ grown.
 | 5 | Peak factor 2.8 measured at pooled scale | Understates Akka's cost | Azure's traces are already smoothed across customers. A single tenant's true peak is higher. |
 | 6 | Professional services fixed per case | Overstates hyperscaler cost at low volume | $700K on the Base case regardless of volume. Negligible above 25T, material at 1T. |
 | 7 | Akka accuracy at 80.2% single-pass | Honest | The published base-model score, not a modelled uplift. Keep it that way. |
+| 8 | Azure memory at $670K | Understates Azure's capability, not its cost | AI Search sizing for 300M vectors is estimated. Confirm partition and replica counts against a real index. |
 
 ---
 
@@ -134,6 +142,9 @@ Write `findings/YYYY-MM-DD.md` containing:
    has carried that status.
 5. **Honesty register** — any bias that grew, and any new one introduced.
 6. **Recommended edits** — specific changes to `rates.json` and `index.html`.
+
+Record any corrected figure in `rates.json → corrections` with what was wrong, why it was
+wrong, how it was found and what it moved. That log is how this file learns.
 
 Update `rates.json` in the same commit. Never edit a figure without updating its `verified`
 date, its `source`, and its `confidence`.

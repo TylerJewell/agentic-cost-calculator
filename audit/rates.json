@@ -157,11 +157,13 @@
       "verified": "2026-08-12"
     },
     "azure_foundry": {
-      "vcpu_hour": 0,
-      "gb_hour": 0,
+      "vcpu_hour": 0.0864,
+      "gb_hour": 0.0108,
+      "request_per_million": 0.4,
       "confidence": "published",
-      "verified": "2026-08-12",
-      "note": "No charge to create or run an agent. Customer brings Storage, Cosmos DB and AI Search."
+      "verified": "2026-08-13",
+      "note": "Foundry Agent Service charges nothing to create or run an agent, but it is a CONTROL PLANE, not a runtime. Microsoft bills model tokens, search services, storage and compute invoked by the agent. Agent code and tools run on Azure Container Apps at $0.000024/vCPU-second and $0.000003/GiB-second. Azure compute is DEARER than AgentCore Runtime, not free.",
+      "corrected_from": "$0/hour on 2026-08-12. See corrections log."
     },
     "google_agent_engine": {
       "vcpu_hour": 0.0864,
@@ -181,15 +183,18 @@
       "note": "Monthly charge against an accumulating balance. This is why the AWS memory line compounds, and it is the largest single driver of our AWS advantage. Check every run."
     },
     "azure_assembled": {
-      "annual_usd": 60000,
+      "annual_usd": 670000,
       "confidence": "estimated",
-      "verified": "2026-08-12",
+      "verified": "2026-08-13",
       "components": [
         "Azure Cosmos DB",
-        "Azure AI Search",
-        "Azure Storage"
+        "Azure AI Search S3",
+        "Azure Storage",
+        "Container Apps request charges"
       ],
-      "note": "Infrastructure comparison only. AgentCore performs extraction and consolidation a customer would build."
+      "sizing": "300M records with vectors needs roughly 12 partitions x 2 replicas of AI Search S3 at $981.12 per search unit per month, about $282K/yr. AI Search bills per unit-hour regardless of query volume.",
+      "note": "Infrastructure comparison only. AgentCore Memory performs extraction and consolidation a customer assembling Cosmos DB and AI Search would build.",
+      "corrected_from": "$60,000 on 2026-08-12. See corrections log."
     },
     "google_agent_engine": {
       "events_per_1000": 0.25,
@@ -463,5 +468,17 @@
       "confidence": "estimated",
       "note": "Published as a commitment. Compounded modelled gain is 3.0x; we publish roughly half."
     }
-  }
+  },
+  "corrections": [
+    {
+      "date": "2026-08-13",
+      "what": "Azure agent hosting and memory were understated by roughly $2.3M at 5T",
+      "was": "hosting $0, memory $60,000",
+      "now": "hosting $0.0864/vCPU-hr and $0.0108/GiB-hr plus $0.40/M requests, memory $670,000",
+      "why_wrong": "Foundry Agent Service advertises no charge to run an agent. That was read as no compute cost. The service is a control plane; the agent's own code and tools run on Azure compute billed separately, and every retrieval hits AI Search which bills per unit-hour whether or not it serves.",
+      "how_found": "A reviewer asked why a free runtime at that scale made commercial sense. It did not.",
+      "lesson": "When a provider advertises no charge for a component, find where the work actually runs before recording a zero. A zero on a line that must consume resources is a signal to look harder, not a finding.",
+      "effect": "Azure High moved from $4.76M to $7.10M at 5T. The AWS-versus-Azure gap narrowed from $3.33M to $985K."
+    }
+  ]
 }
