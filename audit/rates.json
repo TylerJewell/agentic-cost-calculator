@@ -3,9 +3,12 @@
   "baseline": "2026-08-12",
   "reference_unit_cost": {
     "$comment": "Rule 1 in AUDIT.md. These may fall between runs. They may not rise without a written explanation.",
-    "akka_usd_per_million_tokens": { "at_5T": 0.330, "at_25T": 0.152, "at_100T": 0.108 }
+    "akka_usd_per_million_tokens": {
+      "at_5T": 0.33,
+      "at_25T": 0.152,
+      "at_100T": 0.108
+    }
   },
-
   "inference": {
     "aws_bedrock": {
       "billing": "per token, serverless",
@@ -13,16 +16,57 @@
       "source": "https://aws.amazon.com/bedrock/pricing/",
       "confidence": "published",
       "models": {
-        "ministral-3b":      { "in": 0.10,   "out": 0.10 },
-        "ministral-8b":      { "in": 0.15,   "out": 0.15 },
-        "llama-4-scout":     { "in": 0.20,   "out": 1.00 },
-        "qwen3-next-80b":    { "in": 0.15,   "out": 1.20 },
-        "qwen3-coder-next":  { "in": 0.60,   "out": 1.44, "note": "rate card on page understates at 0.50/1.20" },
-        "mistral-large-3":   { "in": 0.50,   "out": 1.50 },
-        "qwen3-vl-235b":     { "in": 0.53,   "out": 2.66 },
-        "deepseek-v3.2":     { "in": 0.62,   "out": 1.85 },
-        "minimax-m2.5":      { "in": 0.30,   "out": 1.20, "confidence": "corroborated", "note": "second rate card shows 0.36/1.44, exactly 20% higher, consistent with a gateway uplift" },
-        "custom-model-import": { "usd_per_cmu_minute": 0.05718, "derived_per_million": 0.4765, "confidence": "estimated", "note": "assumes 2,000 tok/s per unit. AWS directs customers to their account manager rather than publishing it." }
+        "ministral-3b": {
+          "in": 0.1,
+          "out": 0.1
+        },
+        "ministral-8b": {
+          "in": 0.15,
+          "out": 0.15
+        },
+        "llama-4-scout": {
+          "in": 0.2,
+          "out": 1.0
+        },
+        "qwen3-next-80b": {
+          "in": 0.15,
+          "out": 1.2
+        },
+        "qwen3-coder-next": {
+          "in": 0.6,
+          "out": 1.44,
+          "note": "rate card on page understates at 0.50/1.20"
+        },
+        "mistral-large-3": {
+          "in": 0.5,
+          "out": 1.5
+        },
+        "qwen3-vl-235b": {
+          "in": 0.53,
+          "out": 2.66
+        },
+        "deepseek-v3.2": {
+          "in": 0.62,
+          "out": 1.85
+        },
+        "minimax-m2.5": {
+          "in": 0.3,
+          "out": 1.2,
+          "confidence": "corroborated",
+          "note": "second rate card shows 0.36/1.44, exactly 20% higher, consistent with a gateway uplift"
+        },
+        "custom-model-import": {
+          "usd_per_cmu_minute": 0.05718,
+          "derived_per_million": 0.4765,
+          "confidence": "estimated",
+          "note": "assumes 2,000 tok/s per unit. AWS directs customers to their account manager rather than publishing it."
+        },
+        "gpt-5.6-luna": {
+          "in": 0.2,
+          "out": 1.2,
+          "confidence": "published",
+          "note": "GPT-5.6 Luna. Cut 80% from $1.00/$6.00 on 30 July 2026. Proprietary, so no weights, no adapters, no reserved capacity. Bedrock runs it on AWS-managed infrastructure with in-region processing; the model provider has no access to prompts or completions."
+        }
       }
     },
     "azure_ai_foundry": {
@@ -31,16 +75,54 @@
       "source": "aggregator; Azure pricing pages render client-side and return placeholders to a fetch",
       "confidence": "corroborated",
       "models": {
-        "ministral-3b":       { "in": 0.04,  "out": 0.04 },
-        "phi-4":              { "in": 0.125, "out": 0.50 },
-        "llama-4-scout":      { "in": 0.20,  "out": 0.78 },
-        "mistral-medium-2505":{ "in": 0.40,  "out": 2.00 },
-        "mistral-large-3":    { "in": 0.50,  "out": 1.50 },
-        "deepseek-v3.2":      { "in": 0.58,  "out": 1.68 },
-        "deepseek-r1":        { "in": 1.35,  "out": 5.40 },
-        "llama-4-maverick":   { "in": 1.41,  "out": 0.35, "confidence": "unconfirmed", "note": "output below input is almost certainly transposed. Excluded from mixes." }
+        "ministral-3b": {
+          "in": 0.04,
+          "out": 0.04
+        },
+        "phi-4": {
+          "in": 0.125,
+          "out": 0.5
+        },
+        "llama-4-scout": {
+          "in": 0.2,
+          "out": 0.78
+        },
+        "mistral-medium-2505": {
+          "in": 0.4,
+          "out": 2.0
+        },
+        "mistral-large-3": {
+          "in": 0.5,
+          "out": 1.5
+        },
+        "deepseek-v3.2": {
+          "in": 0.58,
+          "out": 1.68
+        },
+        "deepseek-r1": {
+          "in": 1.35,
+          "out": 5.4
+        },
+        "llama-4-maverick": {
+          "in": 1.41,
+          "out": 0.35,
+          "confidence": "unconfirmed",
+          "note": "output below input is almost certainly transposed. Excluded from mixes."
+        },
+        "gpt-5.6-luna": {
+          "in": 0.2,
+          "out": 1.2,
+          "confidence": "published",
+          "note": "GPT-5.6 Luna. Microsoft matched the cut at parity, effective 1 August 2026."
+        }
       },
-      "absent": ["ministral-8b", "qwen3-next-80b", "qwen3-coder-next", "qwen3-vl-235b", "minimax-m2.5"],
+      "absent": [
+        "ministral-8b",
+        "qwen3-next-80b",
+        "qwen3-coder-next",
+        "qwen3-vl-235b",
+        "minimax-m2.5"
+      ],
       "note": "DeepSeek V4 Pro and V4 Flash appear in the catalogue with no published rate. If priced, Azure's ceiling rises above 81%."
     },
     "google_vertex": {
@@ -50,108 +132,336 @@
       "confidence": "derived",
       "derivation": "a4-highgpu-8g at $16.11/GPU-hour, divided by modelled serving throughput, divided again by 40% endpoint utilisation",
       "derived_rates": {
-        "small_model": { "in": 0.093, "out": 0.622 },
-        "mid_model":   { "in": 0.249, "out": 2.391 },
-        "large_model": { "in": 0.373, "out": 4.144 }
+        "small_model": {
+          "in": 0.093,
+          "out": 0.622
+        },
+        "mid_model": {
+          "in": 0.249,
+          "out": 2.391
+        },
+        "large_model": {
+          "in": 0.373,
+          "out": 4.144
+        }
       },
-      "excluded": "per-model container fee, published per Marketplace listing. Google's real cost is higher than shown."
+      "excluded": "per-model container fee, published per Marketplace listing. Google's real cost is higher than shown.",
+      "absent_openai": "Vertex Model Garden carries no OpenAI proprietary models. Google cannot reach the Luna price or accuracy, so its Max case stays on open weights with best-of-three."
     }
   },
-
   "agent_runtime": {
-    "aws_agentcore":   { "vcpu_hour": 0.0895, "gb_hour": 0.00945, "confidence": "published", "verified": "2026-08-12" },
-    "azure_foundry":   { "vcpu_hour": 0,      "gb_hour": 0,       "confidence": "published", "verified": "2026-08-12",
-                         "note": "No charge to create or run an agent. Customer brings Storage, Cosmos DB and AI Search." },
-    "google_agent_engine": { "vcpu_hour": 0.0864, "gb_hour": 0.0090, "confidence": "published", "verified": "2026-08-12" }
+    "aws_agentcore": {
+      "vcpu_hour": 0.0895,
+      "gb_hour": 0.00945,
+      "confidence": "published",
+      "verified": "2026-08-12"
+    },
+    "azure_foundry": {
+      "vcpu_hour": 0,
+      "gb_hour": 0,
+      "confidence": "published",
+      "verified": "2026-08-12",
+      "note": "No charge to create or run an agent. Customer brings Storage, Cosmos DB and AI Search."
+    },
+    "google_agent_engine": {
+      "vcpu_hour": 0.0864,
+      "gb_hour": 0.009,
+      "confidence": "published",
+      "verified": "2026-08-12"
+    }
   },
-
   "memory": {
     "aws_agentcore": {
-      "events_per_1000": 0.25, "longterm_per_1000_per_month": 0.75, "retrieval_per_1000": 0.50,
+      "events_per_1000": 0.25,
+      "longterm_per_1000_per_month": 0.75,
+      "retrieval_per_1000": 0.5,
       "self_managed_per_1000_per_month": 0.25,
-      "confidence": "published", "verified": "2026-08-12",
+      "confidence": "published",
+      "verified": "2026-08-12",
       "note": "Monthly charge against an accumulating balance. This is why the AWS memory line compounds, and it is the largest single driver of our AWS advantage. Check every run."
     },
-    "azure_assembled": { "annual_usd": 60000, "confidence": "estimated", "verified": "2026-08-12",
-      "components": ["Azure Cosmos DB", "Azure AI Search", "Azure Storage"],
-      "note": "Infrastructure comparison only. AgentCore performs extraction and consolidation a customer would build." },
-    "google_agent_engine": { "events_per_1000": 0.25, "longterm_per_1000_per_month": 0, "retrieval_per_1000": 0.25,
-      "confidence": "published", "verified": "2026-08-12", "note": "No monthly accrual, so this line does not compound." }
+    "azure_assembled": {
+      "annual_usd": 60000,
+      "confidence": "estimated",
+      "verified": "2026-08-12",
+      "components": [
+        "Azure Cosmos DB",
+        "Azure AI Search",
+        "Azure Storage"
+      ],
+      "note": "Infrastructure comparison only. AgentCore performs extraction and consolidation a customer would build."
+    },
+    "google_agent_engine": {
+      "events_per_1000": 0.25,
+      "longterm_per_1000_per_month": 0,
+      "retrieval_per_1000": 0.25,
+      "confidence": "published",
+      "verified": "2026-08-12",
+      "note": "No monthly accrual, so this line does not compound."
+    }
   },
-
   "observability": {
-    "aws_cloudwatch": { "ingest_per_gb": 0.50, "storage_per_gb_month": 0.03, "custom_metric_month": 0.30,
-      "confidence": "published", "verified": "2026-08-12",
-      "note": "Volume tiers exist ($0.50 to 10TB, then $0.25, $0.10, $0.05) but apply only to AWS vended logs. Agent payload arrives via PutLogEvents and bills flat." },
-    "google_cloud_logging": { "ingest_per_gib": 0.50, "storage": "30 days included", "confidence": "published", "verified": "2026-08-12" },
-    "azure_monitor": { "confidence": "unconfirmed", "note": "Not yet collected. Carried at AWS figures." }
+    "aws_cloudwatch": {
+      "ingest_per_gb": 0.5,
+      "storage_per_gb_month": 0.03,
+      "custom_metric_month": 0.3,
+      "confidence": "published",
+      "verified": "2026-08-12",
+      "note": "Volume tiers exist ($0.50 to 10TB, then $0.25, $0.10, $0.05) but apply only to AWS vended logs. Agent payload arrives via PutLogEvents and bills flat."
+    },
+    "google_cloud_logging": {
+      "ingest_per_gib": 0.5,
+      "storage": "30 days included",
+      "confidence": "published",
+      "verified": "2026-08-12"
+    },
+    "azure_monitor": {
+      "confidence": "unconfirmed",
+      "note": "Not yet collected. Carried at AWS figures."
+    }
   },
-
   "support": {
-    "aws_enterprise": { "minimum_month": 15000, "tiers": [[150000,0.10],[500000,0.07],[1000000,0.05],[null,0.03]],
-      "confidence": "published", "verified": "2026-08-12" },
-    "google_premium": { "minimum_month": 15000, "tiers": [[150000,0.10],[500000,0.07],[1000000,0.05],[null,0.03]],
-      "confidence": "published", "verified": "2026-08-12", "note": "Identical to AWS Enterprise." },
-    "azure": { "confidence": "unconfirmed", "note": "Not yet collected. Carried at AWS figures." }
+    "aws_enterprise": {
+      "minimum_month": 15000,
+      "tiers": [
+        [
+          150000,
+          0.1
+        ],
+        [
+          500000,
+          0.07
+        ],
+        [
+          1000000,
+          0.05
+        ],
+        [
+          null,
+          0.03
+        ]
+      ],
+      "confidence": "published",
+      "verified": "2026-08-12"
+    },
+    "google_premium": {
+      "minimum_month": 15000,
+      "tiers": [
+        [
+          150000,
+          0.1
+        ],
+        [
+          500000,
+          0.07
+        ],
+        [
+          1000000,
+          0.05
+        ],
+        [
+          null,
+          0.03
+        ]
+      ],
+      "confidence": "published",
+      "verified": "2026-08-12",
+      "note": "Identical to AWS Enterprise."
+    },
+    "azure": {
+      "confidence": "unconfirmed",
+      "note": "Not yet collected. Carried at AWS figures."
+    }
   },
-
-  "professional_services": { "blended_hour": 350, "confidence": "estimated", "verified": "2026-08-12" },
-
+  "professional_services": {
+    "blended_hour": 350,
+    "confidence": "estimated",
+    "verified": "2026-08-12"
+  },
   "gpu": {
     "$comment": "Per node of 8 GPUs unless stated. The committed rates are the weakest figures in the model.",
-    "aws_p5_h100":    { "list_hour": 55.04,  "reserved_hour": 27.52,  "confidence": "unconfirmed",
-                        "note": "50% off list, assumed, never verified. Moves Akka cost by +/-39%. Highest-value figure to confirm." },
-    "aws_p6_b200":    { "list_hour": 113.93, "reserved_hour": 56.97,  "confidence": "unconfirmed" },
-    "azure_nd_h100_v5": { "list_hour": 98.32, "reserved_hour": 59.00, "confidence": "unconfirmed", "note": "40% off list, assumed." },
-    "google_a3_h100": { "list_hour": 88.49,  "reserved_hour": 83.19,  "confidence": "published",
-                        "note": "Three-year CUD is 6%. The only committed rate of the three that is published rather than assumed." },
-    "google_a4_b200": { "list_hour": 128.88, "reserved_hour": 128.88, "confidence": "corroborated",
-                        "note": "$16.11 per GPU-hour. Excluded from CUD; Google routes A4 through AI Hypercomputer reservations." },
-    "lambda_h100_low":     { "per_gpu_hour": 1.49, "confidence": "unconfirmed", "note": "May be spot or promotional. Confirm it holds for a year." },
-    "lambda_h100":         { "per_gpu_hour": 2.99, "confidence": "published" },
-    "lambda_b200":         { "per_gpu_hour": 5.50, "confidence": "published" },
-    "nebius_h100":         { "per_gpu_hour": 3.85, "confidence": "published" },
-    "nebius_h100_committed": { "per_gpu_hour": 2.50, "confidence": "corroborated", "note": "up to 35% off with commitment" },
-    "nebius_b200":         { "per_gpu_hour": 5.50, "confidence": "published" },
-    "coreweave_h100":      { "per_gpu_hour": 6.16, "confidence": "published" },
-    "coreweave_b200":      { "per_gpu_hour": 6.50, "confidence": "estimated", "note": "contract-oriented; no public on-demand page" },
+    "aws_p5_h100": {
+      "list_hour": 55.04,
+      "reserved_hour": 27.52,
+      "confidence": "unconfirmed",
+      "note": "50% off list, assumed, never verified. Moves Akka cost by +/-39%. Highest-value figure to confirm."
+    },
+    "aws_p6_b200": {
+      "list_hour": 113.93,
+      "reserved_hour": 56.97,
+      "confidence": "unconfirmed"
+    },
+    "azure_nd_h100_v5": {
+      "list_hour": 98.32,
+      "reserved_hour": 59.0,
+      "confidence": "unconfirmed",
+      "note": "40% off list, assumed."
+    },
+    "google_a3_h100": {
+      "list_hour": 88.49,
+      "reserved_hour": 83.19,
+      "confidence": "published",
+      "note": "Three-year CUD is 6%. The only committed rate of the three that is published rather than assumed."
+    },
+    "google_a4_b200": {
+      "list_hour": 128.88,
+      "reserved_hour": 128.88,
+      "confidence": "corroborated",
+      "note": "$16.11 per GPU-hour. Excluded from CUD; Google routes A4 through AI Hypercomputer reservations."
+    },
+    "lambda_h100_low": {
+      "per_gpu_hour": 1.49,
+      "confidence": "unconfirmed",
+      "note": "May be spot or promotional. Confirm it holds for a year."
+    },
+    "lambda_h100": {
+      "per_gpu_hour": 2.99,
+      "confidence": "published"
+    },
+    "lambda_b200": {
+      "per_gpu_hour": 5.5,
+      "confidence": "published"
+    },
+    "nebius_h100": {
+      "per_gpu_hour": 3.85,
+      "confidence": "published"
+    },
+    "nebius_h100_committed": {
+      "per_gpu_hour": 2.5,
+      "confidence": "corroborated",
+      "note": "up to 35% off with commitment"
+    },
+    "nebius_b200": {
+      "per_gpu_hour": 5.5,
+      "confidence": "published"
+    },
+    "coreweave_h100": {
+      "per_gpu_hour": 6.16,
+      "confidence": "published"
+    },
+    "coreweave_b200": {
+      "per_gpu_hour": 6.5,
+      "confidence": "estimated",
+      "note": "contract-oriented; no public on-demand page"
+    },
     "market_note": "AWS raised EC2 Capacity Block prices ~15% in January 2026 and ~20% in July 2026. Rates confirmed today should not be assumed to hold."
   },
-
   "accuracy_swebench_verified": {
-    "llama-4-scout":    { "score": 47.3, "confidence": "published" },
-    "deepseek-v3.2":    { "score": 73.1, "confidence": "published" },
-    "qwen3-coder-next": { "score": 74.2, "confidence": "published" },
-    "minimax-m2.5":     { "score": 80.2, "confidence": "published" },
-    "deepseek-v4-pro":  { "score": 80.6, "confidence": "published", "note": "highest verified open weight. Bedrock availability contested." },
-    "qwen3-8b-proxy":   { "score": 8.0,  "confidence": "published", "note": "size-class proxy for models publishing nothing" },
-    "ministral-3b":     { "score": 5,    "confidence": "estimated" },
-    "ministral-8b":     { "score": 8,    "confidence": "estimated" },
-    "qwen3-next-80b":   { "score": 35,   "confidence": "estimated" },
-    "mistral-large-3":  { "score": 40,   "confidence": "estimated" },
-    "qwen3-vl-235b":    { "score": 55,   "confidence": "estimated" },
-    "best_of_three_uplift": { "points": 8, "confidence": "estimated",
-      "note": "anchored on a 77.2% model reaching 90.0% in an engineered scaffold. Never measured on our configuration. Applied to Max only, never to Akka." }
+    "llama-4-scout": {
+      "score": 47.3,
+      "confidence": "published"
+    },
+    "deepseek-v3.2": {
+      "score": 73.1,
+      "confidence": "published"
+    },
+    "qwen3-coder-next": {
+      "score": 74.2,
+      "confidence": "published"
+    },
+    "minimax-m2.5": {
+      "score": 80.2,
+      "confidence": "published"
+    },
+    "deepseek-v4-pro": {
+      "score": 80.6,
+      "confidence": "published",
+      "note": "highest verified open weight. Bedrock availability contested."
+    },
+    "qwen3-8b-proxy": {
+      "score": 8.0,
+      "confidence": "published",
+      "note": "size-class proxy for models publishing nothing"
+    },
+    "ministral-3b": {
+      "score": 5,
+      "confidence": "estimated"
+    },
+    "ministral-8b": {
+      "score": 8,
+      "confidence": "estimated"
+    },
+    "qwen3-next-80b": {
+      "score": 35,
+      "confidence": "estimated"
+    },
+    "mistral-large-3": {
+      "score": 40,
+      "confidence": "estimated"
+    },
+    "qwen3-vl-235b": {
+      "score": 55,
+      "confidence": "estimated"
+    },
+    "best_of_three_uplift": {
+      "points": 8,
+      "confidence": "estimated",
+      "note": "anchored on a 77.2% model reaching 90.0% in an engineered scaffold. Never measured on our configuration. Applied to Max only, never to Akka."
+    },
+    "gpt-5.6-luna": {
+      "score": 88,
+      "confidence": "estimated",
+      "note": "OpenAI published no SWE-bench Verified score for the GPT-5.6 family. Published instead: SWE-bench Pro 62.7%, Terminal-Bench 2.1 84.7%, Coding Agent Index 75, Intelligence Index 51. On SWE-bench Pro, Luna leads DeepSeek V4 Pro at 55.4% and MiniMax M3 at 59.0%, and V4 Pro scores 80.6% on Verified, so 88 is a reasoned placement rather than a measurement. One aggregator returns 96/92/86/67 for Luna on Verified, which is a garbled table and must not be used. Re-attempt every run."
+    }
   },
-
   "serving_throughput": {
-    "h100_prefill_tok_s": 25000, "h100_decode_tok_s": 3000,
+    "h100_prefill_tok_s": 25000,
+    "h100_decode_tok_s": 3000,
     "b200_multiple": 3.0,
     "confidence": "estimated",
     "note": "First-principles from FLOPs and HBM bandwidth. Never benchmarked. Our own analysis warned mixed sequence lengths land 1.5-2x worse. Benchmarking retires the largest single uncertainty in the model."
   },
-
   "akka_model": {
-    "peak_factor": { "value": 2.8, "confidence": "published",
-      "note": "Measured for coding workloads across 44M requests in Microsoft's Azure inference traces. Measured at pooled scale, so a single tenant's true peak is higher." },
-    "min_nodes": 2, "note_min_nodes": "residency floor: both base models resident with HA across two zones",
-    "cpu_storage_tiers": [[5000,0.125],[25000,0.110],[100000,0.095],[500000,0.080],[null,0.070]],
+    "peak_factor": {
+      "value": 2.8,
+      "confidence": "published",
+      "note": "Measured for coding workloads across 44M requests in Microsoft's Azure inference traces. Measured at pooled scale, so a single tenant's true peak is higher."
+    },
+    "min_nodes": 2,
+    "note_min_nodes": "residency floor: both base models resident with HA across two zones",
+    "cpu_storage_tiers": [
+      [
+        5000,
+        0.125
+      ],
+      [
+        25000,
+        0.11
+      ],
+      [
+        100000,
+        0.095
+      ],
+      [
+        500000,
+        0.08
+      ],
+      [
+        null,
+        0.07
+      ]
+    ],
     "cpu_storage_minimum": 50000,
-    "adapter": { "input_retained": 0.40, "output_retained": 0.60, "compute_multiple": 0.5, "threshold": 0.40,
-      "confidence": "estimated", "note": "invented coefficients, no source" },
-    "margin": { "cap": 0.50, "floor": 0.188, "cap_below_volume": 5000, "floor_at_volume": 1000000 },
+    "adapter": {
+      "input_retained": 0.4,
+      "output_retained": 0.6,
+      "compute_multiple": 0.5,
+      "threshold": 0.4,
+      "confidence": "estimated",
+      "note": "invented coefficients, no source"
+    },
+    "margin": {
+      "cap": 0.5,
+      "floor": 0.188,
+      "cap_below_volume": 5000,
+      "floor_at_volume": 1000000
+    },
     "minimum_quotable_volume_billions": 1000,
-    "capacity_projection": { "year_2": 1.6, "year_3": 2.6, "confidence": "estimated",
-      "note": "Published as a commitment. Compounded modelled gain is 3.0x; we publish roughly half." }
+    "capacity_projection": {
+      "year_2": 1.6,
+      "year_3": 2.6,
+      "confidence": "estimated",
+      "note": "Published as a commitment. Compounded modelled gain is 3.0x; we publish roughly half."
+    }
   }
 }
