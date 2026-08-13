@@ -302,6 +302,12 @@
       "confidence": "unconfirmed",
       "note": "40% off list, assumed."
     },
+    "azure_nd_b200": {
+      "list_hour": 201.67,
+      "reserved_hour": 121.0,
+      "confidence": "unconfirmed",
+      "note": "Weakest GPU figure in the register. The reserved rate carries no source; the list rate is it grossed up by the same 40%-off-list assumption used for ND H100 v5. Azure publishes no comparable B200 node rate. Confirm or drop the Azure B200 fleet."
+    },
     "google_a3_h100": {
       "list_hour": 88.49,
       "reserved_hour": 83.19,
@@ -575,6 +581,9 @@
         "vpcLabel": "AWS reserved capacity",
         "vpcH100": 27.52,
         "vpcB200": 56.97,
+        "vpcOdLabel": "AWS on-demand",
+        "vpcOdH100": 55.04,
+        "vpcOdB200": 113.93,
         "mixes": {
           "low": [
             {
@@ -658,6 +667,9 @@
         "vpcLabel": "Azure reserved capacity",
         "vpcH100": 59.0,
         "vpcB200": 121.0,
+        "vpcOdLabel": "Azure on-demand",
+        "vpcOdH100": 98.32,
+        "vpcOdB200": 201.67,
         "mixes": {
           "low": [
             {
@@ -739,6 +751,9 @@
         "vpcLabel": "Google reserved capacity",
         "vpcH100": 83.19,
         "vpcB200": 128.88,
+        "vpcOdLabel": "Google on-demand",
+        "vpcOdH100": 88.49,
+        "vpcOdB200": 128.88,
         "mixes": {
           "low": [
             {

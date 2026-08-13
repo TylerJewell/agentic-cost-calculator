@@ -607,7 +607,10 @@ function compute(){
   const provKey=($("prov")&&$("prov").value)||"aws";
   const P=PROV[provKey];
   MIXES=P.mixes;
+  // the two in-VPC sources are the selected provider's own capacity, so they carry
+  // its label and its rates; only the neoclouds are fixed across providers
   SRC.aws.label=P.vpcLabel; SRC.aws.h100=P.vpcH100; SRC.aws.b200=P.vpcB200;
+  SRC.awsod.label=P.vpcOdLabel; SRC.awsod.h100=P.vpcOdH100; SRC.awsod.b200=P.vpcOdB200;
   ["low","base","high","max"].forEach(k=>{ACC[k]=P.acc[k];LAT[k]=P.lat[k];});
   const rs=WORKLOADS.reduce((a,w)=>a+mixVals[w.key],0)||1;
   const parts=WORKLOADS.map(w=>{const share=mixVals[w.key]/rs,t=tok*share;
@@ -680,6 +683,9 @@ function render(){
   TABS[2]=d.prov.label+" vs Akka";
   $("inclVpc").textContent="Akka installs in your "+d.prov.label+" VPC";
   $("kAwsLbl").textContent="Integrating it yourself on "+d.prov.label;
+  // the in-VPC option text is provider-dependent, so it is written here rather than
+  // once at build of the list
+  document.querySelectorAll("#src option").forEach(o=>{o.textContent=SRC[o.value].label;});
   document.querySelectorAll(".tab").forEach((b,i)=>{if(i===2)b.textContent=TABS[2];});
 
   document.querySelectorAll(".pbtn").forEach(b=>b.classList.toggle("on",+b.dataset.vol===d.totalB));

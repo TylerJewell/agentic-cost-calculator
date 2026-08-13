@@ -98,6 +98,18 @@ near("compute+storage at 1000T", M.cpuStorageFor(1_000_000), 3_566_667);
   eq("900B is below the minimum", d.below, true);
 }
 
+// ---- the in-VPC sources are the selected provider's own capacity ----
+{
+  eq("Azure reserved is labelled Azure", at(5000, "azure", "aws").src.label, "Azure reserved capacity");
+  eq("Azure reserved H100", at(5000, "azure", "aws").src.h100, 59.0);
+  eq("Azure on-demand is labelled Azure", at(5000, "azure", "awsod").src.label, "Azure on-demand");
+  eq("Azure on-demand H100", at(5000, "azure", "awsod").src.h100, 98.32);
+  eq("Google on-demand is labelled Google", at(5000, "gcp", "awsod").src.label, "Google on-demand");
+  eq("Google on-demand H100", at(5000, "gcp", "awsod").src.h100, 88.49);
+  eq("AWS on-demand survives the round trip", at(5000, "aws", "awsod").src.h100, 55.04);
+  eq("A neocloud ignores the provider", at(5000, "gcp", "nebiusc").src.label, "Nebius, committed");
+}
+
 // ---- the neocloud makes the cloud irrelevant to Akka's price ----
 {
   const p = ["aws", "azure", "gcp"].map((x) => Math.round(at(5000, x, "nebiusc").price));

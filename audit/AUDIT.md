@@ -107,6 +107,9 @@ weakest figures in the whole model and the highest value to confirm.
 - AWS reserved p5 and p6: **assumed at 50% off list and never verified.** This single figure
   moves Akka's cost by ±39%. Get it in writing.
 - Azure ND H100 v5 reserved: **assumed at 40% off.**
+- Azure ND B200: **both rates unsourced.** The reserved figure carries no provenance and the
+  list figure is that number grossed up by the same 40% assumption. Azure publishes no
+  comparable B200 node rate. Source it or drop the Azure B200 fleet from the sizer.
 - Google a3: published 3-year CUD of 6% — the only committed rate of the three that is
   published rather than assumed. Confirm it has not moved.
 - Google a4 (B200) is excluded from CUD because Google routes A4 through AI Hypercomputer
