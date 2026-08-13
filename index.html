@@ -756,11 +756,11 @@ function compute(){
 
 function render(){
   const d=compute(),K=["low","base","high","max"];
-  const diff=d.aws.base.total-d.price;
+  const diff=d.aws.high.total-d.price;
 
   $("kFee").textContent=d.below?"—":money(d.price);
   $("kFeeSub").textContent=d.below?"too small for us to price well":"";
-  $("kAws").textContent=money(d.aws.base.total);
+  $("kAws").textContent=money(d.aws.high.total);
   TABS[2]=d.prov.label+" vs Akka";
   $("inclVpc").textContent="Akka installs in your "+d.prov.label+" VPC";
   $("kAwsLbl").textContent="Integrating it yourself on "+d.prov.label;
@@ -830,7 +830,7 @@ function render(){
     if(gap>=5)$("hlH").textContent="Akka can reach "+ACC.max+"% accuracy for an additional "+money(d.upCost-d.cost)+".";
   }else{
     $("hlBox").style.display="";
-    $("hlH").textContent="Building this yourself costs you "+money(d.aws.base.total)+" the way most teams do it.";
+    $("hlH").textContent="Building this yourself costs you "+money(d.aws.high.total)+" at the same accuracy.";
   }
 
   $("inclLede").innerHTML="Reserved for you and run around the clock, at <b>99.9999% availability across two zones</b>.";
