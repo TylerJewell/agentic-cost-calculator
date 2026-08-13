@@ -8,7 +8,7 @@ An agent executing this file needs no prior context. Every figure it must check 
 
 ---
 
-## The three rules that govern a run
+## The rules that govern a run
 
 **1. Unit cost may not rise.** The tracked metric is Akka's cost per million tokens at 5T, 25T
 and 100T — not absolute cost, which grows with the customer. A run that produces a higher unit
@@ -59,8 +59,10 @@ Tolerance: **any change** is recorded. A change above 10% is flagged.
 These diverge by billing model, not just by rate, and that is where the largest errors have
 been. For each provider confirm:
 
-- Is there a charge to run an agent at all? (Azure: no. AWS and Google: yes, per vCPU-hour and
-  GB-hour.)
+- Where does the agent's code actually run, and who bills for it? AWS and Google charge per
+  vCPU-hour and GB-hour through AgentCore Runtime and Agent Engine. Azure charges nothing for
+  Foundry Agent Service but bills the same work through Container Apps. Never record a zero
+  without answering this question.
 - Is memory metered per event, or monthly against an accumulating balance? (AWS: monthly, which
   compounds. Google: per event, which does not. Azure: customer-assembled.)
 - If AWS drops the monthly memory accrual, a large part of our AWS advantage disappears.
@@ -121,13 +123,12 @@ grown.
 | # | Where | Direction | Note |
 |---|---|---|---|
 | 1 | Vertex per-model container fee excluded | Understates Google | Published per Marketplace listing, not centrally. Google's real cost is higher than shown. |
-| 2 | Azure memory at $60K | Understates Azure's capability, not its cost | AgentCore performs extraction and consolidation a customer assembling Cosmos DB would build themselves. Infrastructure comparison only. |
 | 3 | AWS reserved discount assumed at 50% | Understates Akka's cost | At list price the 5T deal is break-even. This is the single largest exposure. |
 | 4 | Adapter coefficients invented | Overstates Akka's savings | 40% of input, 60% of output, half the compute. No source. |
 | 5 | Peak factor 2.8 measured at pooled scale | Understates Akka's cost | Azure's traces are already smoothed across customers. A single tenant's true peak is higher. |
 | 6 | Professional services fixed per case | Overstates hyperscaler cost at low volume | $700K on the Base case regardless of volume. Negligible above 25T, material at 1T. |
 | 7 | Akka accuracy at 80.2% single-pass | Honest | The published base-model score, not a modelled uplift. Keep it that way. |
-| 8 | Azure memory at $670K | Understates Azure's capability, not its cost | AI Search sizing for 300M vectors is estimated. Confirm partition and replica counts against a real index. |
+| 2 | Azure memory at $670K | Understates Azure's capability, not its cost | AI Search sizing for 300M vectors is estimated. Confirm partition and replica counts against a real index. |
 
 ---
 
