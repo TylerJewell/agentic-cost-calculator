@@ -123,12 +123,12 @@ grown.
 | # | Where | Direction | Note |
 |---|---|---|---|
 | 1 | Vertex per-model container fee excluded | Understates Google | Published per Marketplace listing, not centrally. Google's real cost is higher than shown. |
+| 2 | Azure memory at $670K | Understates Azure's capability, not its cost | AI Search sizing for 300M vectors is estimated. Confirm partition and replica counts against a real index. |
 | 3 | AWS reserved discount assumed at 50% | Understates Akka's cost | At list price the 5T deal is break-even. This is the single largest exposure. |
 | 4 | Adapter coefficients invented | Overstates Akka's savings | 40% of input, 60% of output, half the compute. No source. |
 | 5 | Peak factor 2.8 measured at pooled scale | Understates Akka's cost | Azure's traces are already smoothed across customers. A single tenant's true peak is higher. |
 | 6 | Professional services fixed per case | Overstates hyperscaler cost at low volume | $700K on the Base case regardless of volume. Negligible above 25T, material at 1T. |
 | 7 | Akka accuracy at 80.2% single-pass | Honest | The published base-model score, not a modelled uplift. Keep it that way. |
-| 2 | Azure memory at $670K | Understates Azure's capability, not its cost | AI Search sizing for 300M vectors is estimated. Confirm partition and replica counts against a real index. |
 
 ---
 
