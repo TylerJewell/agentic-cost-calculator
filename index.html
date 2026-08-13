@@ -69,8 +69,17 @@ h1 .accent{color:var(--yellow);}
 
 /* ---------- headline comparison ---------- */
 .vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:clamp(16px,4vw,44px);
-  border:1px solid var(--line);border-radius:12px;background:var(--fill);
-  padding:clamp(18px,3vw,26px) clamp(18px,4vw,34px);margin:14px 0 0;}
+  margin:16px calc(50% - 50vw) 0;
+  padding:clamp(22px,3.4vw,32px) calc(50vw - 50%);
+  border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0;
+  background:
+    radial-gradient(620px 300px at 22% 30%,rgba(255,206,74,.055),transparent 62%),
+    linear-gradient(180deg,rgba(241,241,241,.035),rgba(241,241,241,.005));
+  position:relative;}
+.vs::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(255,206,74,.05) 1px,transparent 1px);
+  background-size:42px 42px;}
+.vs>*{position:relative;z-index:1;}
 .vs-side{min-width:0;}
 .vs-aws{text-align:right;}
 .vs-l{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;
@@ -817,7 +826,7 @@ function render(){
   h+=line("Storage and transfer",a=>a.sto,inc);
   h+=line("Enterprise Support Plan",a=>a.sup,inc);
   h+=line("Consultants",a=>a.svc,inc);
-  h+='<tr class="tot"><td>Your first year</td>'+K.map(k=>'<td class="n">'+money(d.aws[k].total)+"</td>").join("")+
+  h+='<tr class="tot"><td></td>'+K.map(k=>'<td class="n">'+money(d.aws[k].total)+"</td>").join("")+
      '<td class="n akka">'+(d.below?"—":money(d.price))+"</td></tr>";
   h+='<tr><td>Accuracy</td>'+K.map(k=>'<td class="n acc">'+ACC[k]+"%</td>").join("")+'<td class="n akka acc">'+ACC.akka+"%</td></tr>";
   h+='<tr><td>Latency</td>'+K.map(k=>'<td class="n">'+LAT[k].toFixed(1)+"s</td>").join("")+'<td class="n akka">'+LAT.akka.toFixed(1)+"s</td></tr>";
