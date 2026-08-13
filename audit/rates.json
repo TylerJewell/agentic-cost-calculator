@@ -424,29 +424,6 @@
     },
     "min_nodes": 2,
     "note_min_nodes": "residency floor: both base models resident with HA across two zones",
-    "cpu_storage_tiers": [
-      [
-        5000,
-        0.125
-      ],
-      [
-        25000,
-        0.11
-      ],
-      [
-        100000,
-        0.095
-      ],
-      [
-        500000,
-        0.08
-      ],
-      [
-        null,
-        0.07
-      ]
-    ],
-    "cpu_storage_minimum": 50000,
     "adapter": {
       "input_retained": 0.4,
       "output_retained": 0.6,
@@ -467,6 +444,18 @@
       "year_3": 2.6,
       "confidence": "estimated",
       "note": "Published as a commitment. Compounded modelled gain is 3.0x; we publish roughly half."
+    },
+    "cpu_storage": {
+      "model": "declining per 5T block, independent of GPU spend and identical on every cloud",
+      "first_block_usd": 100000,
+      "floor_per_block_usd": 15000,
+      "decay": 0.85,
+      "block_tokens_billions": 5000,
+      "minimum_usd": 50000,
+      "confidence": "estimated",
+      "verified": "2026-08-13",
+      "note": "Follows deployed agents and end-user traffic, not GPU spend. Marginal cost per block: $100K, $87K, $76K, $67K, $59K, reaching the $15K floor around the fortieth block.",
+      "corrected_from": "12.5% of GPU spend tapering to 7%. See corrections log."
     }
   },
   "corrections": [
@@ -479,6 +468,16 @@
       "how_found": "A reviewer asked why a free runtime at that scale made commercial sense. It did not.",
       "lesson": "When a provider advertises no charge for a component, find where the work actually runs before recording a zero. A zero on a line that must consume resources is a signal to look harder, not a finding.",
       "effect": "Azure High moved from $4.76M to $7.10M at 5T. The AWS-versus-Azure gap narrowed from $3.33M to $985K."
+    },
+    {
+      "date": "2026-08-13",
+      "what": "Compute and storage were priced as a share of GPU spend",
+      "was": "12.5% of the GPU line, tapering to 7% with volume",
+      "now": "a declining schedule per 5T block: $100K for the first, decaying toward a $15K floor, with a $50K minimum",
+      "why_wrong": "Tying the line to GPU spend made it rise on clouds with dearer GPUs. At 5T it read $90K on AWS but $273K on Google for identical work, which inflated Google by $173K for no reason other than its GPU rate.",
+      "how_found": "A per-provider cost decomposition showed compute and storage moving with the GPU rate when they depend on agents and traffic.",
+      "lesson": "Price a line on what actually drives it. A coefficient tied to another line inherits that line's variance whether or not the causation exists.",
+      "effect": "Compute and storage are now identical on all three clouds. Akka on Google fell from $4.94M to $4.60M at 5T, on Azure from $3.51M to $3.33M, and rose slightly on AWS from $1.65M to $1.67M."
     }
   ]
 }

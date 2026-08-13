@@ -606,10 +606,17 @@ const SRC={
 };
 const fleets=k=>[{node:"p5.48xlarge",     gpu:"NVIDIA H100 80GB",  rate:SRC[k].h100, tp:1.0},
                  {node:"p6-b200.48xlarge",gpu:"NVIDIA B200 180GB", rate:SRC[k].b200, tp:3.0}];
-// compute and storage track deployed agents and user traffic, so they anchor to the
-// AWS reference spend and ease with scale rather than following the GPU source
-const CPU_TIERS=[[5000,.125],[25000,.110],[100000,.095],[500000,.080],[Infinity,.070]];
-const cpuPctFor=v=>CPU_TIERS.find(t=>v<=t[0])[1];
+// compute and storage follow deployed agents and end-user traffic, not GPU spend,
+// so they are a function of volume alone and identical on every cloud. The first
+// 5T block costs $100K and each further block costs less, decaying toward $15K.
+const CPU_FIRST=100000,CPU_FLOOR=15000,CPU_DECAY=0.85,CPU_BLOCK=5000;
+function cpuStorageFor(volB){
+  const full=Math.ceil(volB/CPU_BLOCK); let t=0;
+  for(let n=0;n<full;n++) t+=CPU_FLOOR+(CPU_FIRST-CPU_FLOOR)*Math.pow(CPU_DECAY,n);
+  const frac=(volB%CPU_BLOCK)||CPU_BLOCK;
+  t-=(CPU_FLOOR+(CPU_FIRST-CPU_FLOOR)*Math.pow(CPU_DECAY,full-1))*(1-frac/CPU_BLOCK);
+  return Math.max(CPU_MIN,t);
+}
 const MIN_NODES=2,CPU_MIN=50000,MISC=12500;
 // margin is capped at 50% and thins with committed volume
 const MRG_HI=.50,MRG_LO=.188,MRG_V0=5000,MRG_V1=1000000;
@@ -737,9 +744,8 @@ function compute(){
     return{...h,eff,nodes,gpu:nodes*HRS*h.rate};
   }).sort((a,b)=>a.gpu-b.gpu)[0];
 
-  // compute and storage are priced off the AWS reference, whatever the GPU source
-  const ref=size(gpuHr,"aws");
-  const cpu=Math.max(CPU_MIN,ref.gpu*cpuPctFor(totalB));
+  // compute and storage depend on volume only, so the GPU source cannot move them
+  const cpu=cpuStorageFor(totalB);
 
   const src=SRC[srcKey], hw=size(gpuHr,srcKey);
   const nodes=hw.nodes, cost=hw.gpu+cpu+MISC+src.link;
