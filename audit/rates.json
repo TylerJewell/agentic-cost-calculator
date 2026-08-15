@@ -747,7 +747,7 @@
         }
       },
       "gcp": {
-        "label": "Google Cloud",
+        "label": "GCP",
         "vpcLabel": "Google reserved capacity",
         "vpcH100": 83.19,
         "vpcB200": 128.88,
