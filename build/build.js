@@ -25,6 +25,62 @@ if (!r) fail("rates.json has no `runtime` block");
 const j = (v) => JSON.stringify(v);
 const a = r.akka;
 
+
+// ---- break-even tab: provider list and base-model map ----
+// Open-weight API models are self-hosted as themselves. Proprietary ones take the
+// nearest open weight by capability class. N is dense-equivalent ACTIVE parameters,
+// which is what throughput scales on for a mixture-of-experts model.
+const BE_BASE = {
+  "claude-haiku-4-5":    ["Qwen3 Coder Next", 3],
+  "claude-sonnet-5":     ["Kimi K2.6", 32],
+  "claude-opus-5":       ["DeepSeek V4-Pro", 49],
+  "claude-fable-5":      ["Kimi K3", 104],
+  "Claude Cowork":            ["Kimi K3", 104],
+  "Microsoft Copilot Studio": ["Qwen3 Coder Next", 3],
+  "Salesforce Agentforce":    ["Qwen3 Coder Next", 3],
+  "HubSpot Breeze":           ["MiniMax M2.5", 10],
+  "Aissist.io":               ["MiniMax M2.5", 10],
+  "Gorgias AI Agent":         ["MiniMax M2.5", 10],
+  "Intercom Fin":             ["MiniMax M2.5", 10],
+  "Zendesk AI Agents":        ["MiniMax M2.5", 10],
+  "gpt-5.6-luna":        ["MiniMax M2.5", 10],
+  "gpt-5.6-terra":       ["GLM-5.2", 40],
+  "gpt-5.6-sol":         ["DeepSeek V4-Pro", 49],
+  "deepseek-v4-flash":   ["DeepSeek V4-Flash", 15],
+  "deepseek-v4-pro":     ["DeepSeek V4-Pro", 49],
+  "ministral-3b":        ["Ministral 3B", 3],
+  "ministral-8b":        ["Ministral 8B", 8],
+  "llama-4-scout":       ["Llama 4 Scout", 17],
+  "llama-4-maverick":    ["Llama 4 Maverick", 17],
+  "qwen3-next-80b":      ["Qwen3 Next 80B", 3],
+  "qwen3-coder-next":    ["Qwen3 Coder Next", 3],
+  "mistral-large-3":     ["Mistral Large 3", 123],
+  "mistral-medium-2505": ["Mistral Medium", 24],
+  "qwen3-vl-235b":       ["Qwen3 VL 235B", 22],
+  "minimax-m2.5":        ["MiniMax M2.5", 10],
+  "deepseek-v3.2":       ["DeepSeek V3.2", 37],
+  "deepseek-r1":         ["DeepSeek R1", 37],
+  "phi-4":               ["Phi-4", 14],
+};
+const BE_GROUPS = [
+  ["anthropic_direct", "Anthropic"], ["openai_direct", "OpenAI"],
+  ["deepseek_direct", "DeepSeek"], ["aws_bedrock", "AWS Bedrock"],
+  ["azure_ai_foundry", "Azure AI Foundry"], ["per_task", "Per outcome"],
+];
+const beApis = [];
+for (const [key, label] of BE_GROUPS) {
+  const p = rates.inference[key];
+  if (!p || !p.models) continue;
+  for (const [m, v] of Object.entries(p.models)) {
+    const b = BE_BASE[m];
+    if (!b) continue;
+    if (v.usd_per_task !== undefined)
+      beApis.push({ g: label, m, task: v.usd_per_task, tpt: v.tokens_per_task || p.tokens_per_task, u: v.unit, b: b[0], n: b[1] });
+    else if (v.in !== undefined)
+      beApis.push({ g: label, m, i: v.in, o: v.out, b: b[0], n: b[1] });
+  }
+}
+
 const model = `// GENERATED from audit/rates.json by build/build.js. Do not edit here.
 // Baseline ${rates.baseline}. Regenerate with: node build/build.js
 const TABS=${j(r.tabs)};
@@ -40,7 +96,8 @@ const LAT=Object.assign({},PROV.aws.lat,{akka:${r.akkaLatency}});
 const HOST=${j(r.hostProfiles)};
 const SVC=${j(r.services)};
 const STO5=${j(r.storageAt5T)};
-const PRE=${a.prefillTokS},DEC=${a.decodeTokS},GPN=${a.gpusPerNode},HRS=${a.hoursPerYear},PEAK=${a.peakFactor};
+let PRE=${a.prefillTokS},DEC=${a.decodeTokS};const PRE0=PRE,DEC0=DEC,N0=12;
+const GPN=${a.gpusPerNode},HRS=${a.hoursPerYear},PEAK=${a.peakFactor};
 const SRC=${j(r.gpuSources)};
 const FLEETS=${j(r.fleets)};
 const fleets=k=>FLEETS.map(f=>({node:f.node,gpu:f.gpu,rate:SRC[k][f.rateKey],tp:f.tp}));
@@ -60,7 +117,10 @@ const CACHE_SAVING=${a.cacheSaving},SPEC_MULT=${a.specMultiple},BATCH_MULT=${a.b
 const TRAIN_HOURS_5T=${a.trainingHoursAt5T};
 const MRG_HI=${a.margin.hi},MRG_LO=${a.margin.lo},MRG_V0=${a.margin.v0},MRG_V1=${a.margin.v1};
 const MIN_VOLUME_B=${a.minVolumeB},Y2=${a.capacityY2},Y3=${a.capacityY3};
-const CAP={low:"Low",base:"Base",high:"High",max:"Max"};`;
+const CAP={low:"Low",base:"Base",high:"High",max:"Max"};
+const BE_APIS=${j(beApis)};
+const BE_CACHE=${rates.inference.prompt_cache.effective_input_multiple};
+const BE_HAIRCUT=${rates.serving_throughput.mixed_length_haircut};`;
 
 // ---- integrity checks: the mixes must agree with the documented rate cards ----
 const checks = [

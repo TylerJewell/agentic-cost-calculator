@@ -49,8 +49,10 @@ const patches = [
 ];
 
 for (const [from, to] of patches) {
-  const n = html.split(from).length - 1;
-  if (n !== 1) fail("expected 1 match, found " + n + ": " + from.trim().slice(0, 60));
+  const n = from instanceof RegExp
+    ? (html.match(new RegExp(from.source, "g")) || []).length
+    : html.split(from).length - 1;
+  if (n !== 1) fail("expected 1 match, found " + n + ": " + String(from).trim().slice(0, 60));
   html = html.replace(from, to);
 }
 

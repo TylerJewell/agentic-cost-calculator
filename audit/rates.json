@@ -125,6 +125,127 @@
       ],
       "note": "DeepSeek V4 Pro and V4 Flash appear in the catalogue with no published rate. If priced, Azure's ceiling rises above 81%."
     },
+    "anthropic_direct": {
+      "billing": "per token, first-party API",
+      "verified": "2026-08-16",
+      "source": "Anthropic platform pricing",
+      "confidence": "published",
+      "note": "Proprietary. No weights, no adapters, so a workload that is fine-tuned cannot move here at any price.",
+      "models": {
+        "claude-haiku-4-5": { "in": 1.0, "out": 5.0 },
+        "claude-sonnet-5": {
+          "in": 3.0,
+          "out": 15.0,
+          "note": "introductory 2.00/10.00 through 2026-08-31"
+        },
+        "claude-opus-5": { "in": 5.0, "out": 25.0 },
+        "claude-fable-5": { "in": 10.0, "out": 50.0 }
+      }
+    },
+    "openai_direct": {
+      "billing": "per token, first-party API",
+      "verified": "2026-08-16",
+      "source": "aggregator; OpenAI publishes rates on a client-rendered page",
+      "confidence": "corroborated",
+      "note": "Luna matches the Bedrock and Foundry rate exactly, which corroborates all three.",
+      "models": {
+        "gpt-5.6-luna": { "in": 0.2, "out": 1.2 },
+        "gpt-5.6-terra": { "in": 2.0, "out": 12.0 },
+        "gpt-5.6-sol": { "in": 5.0, "out": 30.0 }
+      }
+    },
+    "deepseek_direct": {
+      "billing": "per token, first-party API",
+      "verified": "2026-08-16",
+      "source": "aggregator",
+      "confidence": "corroborated",
+      "note": "Cache-miss input. Peak and off-peak pricing was announced for 16:00 UTC on 2026-08-16, so these rates are the flat-rate era and should be re-checked.",
+      "models": {
+        "deepseek-v4-flash": { "in": 0.14, "out": 0.28 },
+        "deepseek-v4-pro": { "in": 0.435, "out": 0.87 }
+      }
+    },
+    "prompt_cache": {
+      "$comment": "Applied to the input side of per-token rates only. A per-outcome product bills a completed unit of work, so the buyer's price does not move with cacheability.",
+      "verified": "2026-08-16",
+      "confidence": "corroborated",
+      "read_share": 0.982,
+      "write_share": 0.018,
+      "fresh_share": 0.0,
+      "read_multiple": 0.1,
+      "write_multiple": 1.25,
+      "effective_input_multiple": 0.1207,
+      "basis": "measured across 969 local Claude Code transcripts and 50,279 API calls: 98.2% of context tokens were served from cache, 1.8% written to it, and a negligible share billed fresh. Cache reads bill at a tenth of the input rate and writes at 1.25 times it, so input costs 12.07% of the list rate.",
+      "not_applied": "Batch processing at 50% and committed-spend discounts, reported to average 28% on negotiated enterprise agreements, are available on several of these providers and are not applied."
+    },
+    "per_task": {
+      "billing": "per unit of work completed, not per token",
+      "verified": "2026-08-16",
+      "confidence": "corroborated",
+      "tokens_per_task": 985000,
+      "tokens_per_task_basis": "median session measured across 969 local Claude Code transcripts and 50,279 API calls: 981,000 context tokens and 4,000 output tokens. Sessions run 349:1 input to output, and 98.2% of context is cache reads.",
+      "note": "These products price a completed unit of work rather than a token. Each is converted to a per-million-token equivalent by dividing its rate by its tokens_per_task. Where a vendor publishes a range, the lowest figure is used, and each tokens_per_task is set at the generous end of the plausible range, so every equivalent rate here is the cheapest defensible reading.",
+      "models": {
+        "Microsoft Copilot Studio": {
+          "usd_per_task": 0.02,
+          "tokens_per_task": 5000,
+          "unit": "generative answer",
+          "confidence": "published",
+          "note": "2 Copilot Credits per generative answer at $0.01 a credit pay-as-you-go. Prepaid packs reach $0.008 a credit at $200 for 25,000."
+        },
+        "HubSpot Breeze": {
+          "usd_per_task": 0.5,
+          "tokens_per_task": 50000,
+          "unit": "resolved conversation",
+          "confidence": "published",
+          "note": "Reduced from $1.00 a conversation in April 2026."
+        },
+        "Aissist.io": {
+          "usd_per_task": 0.6,
+          "tokens_per_task": 50000,
+          "unit": "resolution",
+          "confidence": "corroborated"
+        },
+        "Gorgias AI Agent": {
+          "usd_per_task": 0.9,
+          "tokens_per_task": 50000,
+          "unit": "resolution",
+          "confidence": "corroborated",
+          "note": "Published as a $0.90 to $1.00 range; the lower bound is used."
+        },
+        "Intercom Fin": {
+          "usd_per_task": 0.99,
+          "tokens_per_task": 50000,
+          "unit": "resolution",
+          "confidence": "published",
+          "note": "Billed only where the agent resolves a conversation without human handoff."
+        },
+        "Salesforce Agentforce": {
+          "usd_per_task": 0.1,
+          "tokens_per_task": 5000,
+          "unit": "action",
+          "confidence": "published",
+          "note": "Flex Credits at $500 per 100,000 credits and 20 credits an action. The alternative conversation model is $2.00 a conversation, which is dearer below 20 actions; the action rate is used."
+        },
+        "Zendesk AI Agents": {
+          "usd_per_task": 1.5,
+          "tokens_per_task": 50000,
+          "unit": "resolution",
+          "confidence": "corroborated",
+          "note": "Published as a $1.50 to $2.00 range; the lower bound is used."
+        },
+        "Claude Cowork": {
+          "usd_per_task": 13.57,
+          "unit": "task",
+          "confidence": "corroborated",
+          "source": "Creative Strategies, Diligence Stack Agent Bench, financial analysis and research v1.0",
+          "note": "Reported as 'Claude 5 Fable High (Claude Cowork)' at a benchmark score of 70.5. A figure of $1.84 circulates on social media attributed to a Glean benchmark; that benchmark publishes no dollar amounts and the figure has no source."
+        }
+      },
+      "unpriced": {
+        "note": "Sierra, Decagon and Ada advertise per-outcome pricing without publishing a rate; contracts are reported at $50,000 to $600,000 a year. ServiceNow Now Assist bills per assist, 25 for a small generative task and 150 for a large agentic action, with no published price per assist. Workday Illuminate includes Flex Credits in the subscription with no published per-agent rate."
+      }
+    },
     "google_vertex": {
       "billing": "per endpoint instance hour plus a per-model container fee. No per-token tier for open weights.",
       "verified": "2026-08-12",
@@ -419,6 +540,8 @@
     "h100_prefill_tok_s": 25000,
     "h100_decode_tok_s": 3000,
     "b200_multiple": 3.0,
+    "mixed_length_haircut": 1.75,
+    "mixed_length_haircut_note": "Midpoint of the 1.5x to 2x degradation this block's own note warns of for mixed sequence lengths. Applied to the Akka side of the API vs Akka comparison so the modelled throughput is not the optimistic figure. Not applied to the other tabs, whose figures predate it.",
     "confidence": "estimated",
     "note": "First-principles from FLOPs and HBM bandwidth. Never benchmarked. Our own analysis warned mixed sequence lengths land 1.5-2x worse. Benchmarking retires the largest single uncertainty in the model."
   },
@@ -490,14 +613,16 @@
     "_note": "AUTHORITATIVE. build/build.js reads this and bakes it into index.html. The generated page carries no rates of its own and never fetches this file. Edit here, run node build/build.js, commit both.",
     "tabs": [
       "Your workload",
-      "Cutting the bill",
+      "SLM savings",
       "AWS vs Akka",
+      "API vs Akka",
       "Future savings"
     ],
     "slugs": [
       "workload",
       "savings",
       "compare",
+      "apivsakka",
       "outlook"
     ],
     "presets": [

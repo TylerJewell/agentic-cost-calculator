@@ -104,6 +104,30 @@ h1 .accent{color:var(--yellow);}
 .tab:hover{color:var(--soft-grey);border-color:var(--soft-grey);}
 .tab.on{color:var(--black);background:var(--yellow);border-color:var(--yellow);border-radius:6px 6px 0 0;padding:10px 16px;}
 .panel{display:none;} .panel.on{display:block;}
+.grid.bectl{grid-template-columns:.8fr 1.1fr 1.1fr auto;}
+[data-panel="3"] select,[data-panel="3"] .tglbox{height:40px;font-size:12.5px;}
+[data-panel="3"] input[type=number]{height:40px;font-size:15px;letter-spacing:0;padding:0 12px;}
+[data-panel="3"] select{padding:0 12px;}
+.tglbox{height:var(--ctl-h);display:flex;align-items:center;gap:10px;cursor:pointer;white-space:nowrap;}
+.tglbox:focus-visible{outline:1px solid var(--blue);outline-offset:3px;border-radius:6px;}
+.tglstate{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--blue);}
+.behero{border:1px solid var(--yellow);border-radius:10px;background:rgba(255,206,74,.06);
+  padding:clamp(18px,3vw,26px) clamp(18px,4vw,34px);margin:12px 0 0;text-align:center;}
+.behero .lbl{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1.4px;color:var(--soft-grey);}
+.behero .val{font-family:var(--mono);font-size:clamp(34px,6.4vw,54px);color:var(--yellow);line-height:1;
+  margin-top:10px;font-variant-numeric:tabular-nums;letter-spacing:-.035em;font-weight:600;}
+.behero.none .val{font-size:clamp(24px,4vw,32px);}
+.behero .bsub{font-size:12px;color:var(--soft-grey);margin-top:10px;line-height:1.5;max-width:76ch;margin-left:auto;margin-right:auto;}
+.behero .bsub:empty{display:none;}
+#beTbl{table-layout:fixed;width:100%;min-width:600px;}
+#beTbl th,#beTbl td{overflow:hidden;text-overflow:ellipsis;}
+#beTbl th.akka{padding-top:18px;padding-bottom:18px;vertical-align:middle;}
+#beTbl thead th:not(.akka){vertical-align:bottom;}
+#beTbl col.c1{width:22%;} #beTbl col.c2{width:26%;} #beTbl col.c3{width:26%;} #beTbl col.c4{width:26%;}
+#beTbl tr.cross td:not(.akka){background:rgba(255,206,74,.09);}
+#beTbl tr.cross td.n{color:var(--yellow);font-weight:600;}
+#beTbl td.pos{color:var(--green);} #beTbl td.neg{color:var(--red);}
+
 
 /* ---------- form box ---------- */
 .form{border:1px solid var(--line);border-radius:10px;padding:15px 18px;background:var(--fill);margin:12px 0;}
@@ -125,6 +149,8 @@ select{width:100%;height:var(--ctl-h);background:rgba(0,219,221,.06);border:1px 
   border-radius:8px;color:var(--blue);font-family:var(--mono);font-size:14px;font-weight:600;
   padding:0 14px;cursor:pointer;}
 select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,219,221,.16);}
+select option{background:var(--medium-black);color:var(--white);font-weight:400;}
+select optgroup{background:var(--black);color:var(--yellow);font-weight:600;}
 .provsel{width:auto;height:17px;font-family:var(--sans);font-size:11.5px;font-weight:700;
   padding:0 18px 0 6px;border:1px solid var(--blue);border-radius:3px;
   background-color:rgba(0,219,221,.12);color:var(--blue);cursor:pointer;color-scheme:dark;
@@ -368,7 +394,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 
 <div class="vs">
   <div class="vs-side vs-akka">
-    <p class="vs-l">With Akka</p>
+    <p class="vs-l" id="kFeeLbl">With Akka</p>
     <p class="vs-v" id="kFee">—</p>
     <p class="vs-n" id="kFeeSub"></p>
     <div class="srcpick">
@@ -429,7 +455,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 
   <div class="split">
     <div class="form">
-      <h4>Techniques we apply</h4>
+      <h4>Specialist models and inference techniques</h4>
       <div id="techs"></div>
     </div>
 
@@ -495,6 +521,36 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 <!-- ============ 4 ============ -->
 <section class="panel" data-panel="3">
   <div class="form">
+    <div class="grid bectl">
+      <div class="field">
+        <label>Billion tokens</label>
+        <input type="number" id="beVol" min="1" step="500">
+        <div class="hint" id="beUnits"></div>
+      </div>
+      <div class="field">
+        <label>vs. AI provided via API</label>
+        <select id="beApi"></select>
+      </div>
+      <div class="field">
+        <label>For this use case</label>
+        <select id="beUc"></select>
+      </div>
+      <div class="field">
+        <label>Train an SLM</label>
+        <div class="tglbox" id="beSlm" role="switch" aria-checked="false" tabindex="0">
+          <div class="sw" id="beSw"></div>
+          <span class="tglstate" id="beState">No</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form">
+    <div class="scroller"><table id="beTbl"></table></div>
+  </div>
+</section>
+<section class="panel" data-panel="4">
+  <div class="form">
     <h4>How much work the same reserve carries</h4>
     <div class="scroller">
       <table id="outlook" class="stack">
@@ -513,6 +569,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 </div>
 </section>
 
+
 <div class="navf">
   <button class="nbtn" id="prev">Back</button>
   <button class="nbtn pri" id="next">Continue</button>
@@ -522,6 +579,7 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
 
 <footer class="legal">
   <p class="lh">Basis of estimate, sources and definitions</p>
+  <div id="legalMain">
   <p><b>What each case runs.</b> <b>Low</b> — the smallest models available (Ministral 3B 70%, Ministral 8B 20%, Llama 4 Scout 10%), memory held on self-managed storage, 5% of payload sampled to logging; approx. 10% accuracy, 3.7s latency. <b>Base</b> — a middle mix (Ministral 8B 50%, Llama 4 Scout 25%, Qwen3 Next 80B 15%, imported SLM 10%) on the managed memory service, 5% sampled; approx. 22% accuracy, 5.0s. <b>High</b> — GPT-5.6 Luna at $0.20/$1.20 per million tokens, asked once, full payload capture; 80% accuracy, 3.2s. <b>Max</b> — the same model asked three times per task with a fourth pass reading all three candidates and picking the winner, which multiplies tokens by 3.35 and raises accuracy by roughly 8 points to 88%, at 6.5s because the three samples run in parallel and only the verifier is serial. High and Max therefore differ in method rather than in model, and the same is true of Akka: 80.2% asking once, 88% asking three times. OpenAI cut Luna 80% from $1.00/$6.00 on 30 July 2026, AWS passed it through on Bedrock the same day and Microsoft matched it at parity on Azure from 1 August. Google Vertex carries no OpenAI proprietary models, so both tiers there run its strongest open weight instead, reaching 73% asked once and 81% asked three times. OpenAI published no SWE-bench Verified score for the GPT-5.6 family; published figures are SWE-bench Pro 62.7%, Terminal-Bench 2.1 84.7% and a Coding Agent Index of 75. On SWE-bench Pro, Luna leads DeepSeek V4 Pro at 55.4%, and V4 Pro scores 80.6% on Verified, so the 80% single-pass placement is reasoned rather than measured. Luna runs on AWS-managed infrastructure with in-region processing and the model provider has no access to prompts or completions, so its data-residency posture matches an open-weight model on the same platform; what a proprietary model cannot do is carry a trained adapter, run on capacity you reserve, or get cheaper as your own traffic accumulates.</p>
   <p><b>Akka</b> — MiniMax M2.5 and Qwen3 Coder Next with customer-trained LoRA adapters, served in a single pass on reserved capacity; 80.2% accuracy, 4.5s. Best-of-three sampling is not applied, so the Akka figure is the published score of the base model rather than a modelled uplift.</p>
   <p><b>Model inference.</b> Input tokens × input rate plus output tokens × output rate, summed across each mix. Rates per million tokens, Amazon Bedrock public list, on-demand, US East: Ministral 3B $0.10/$0.10; Ministral 8B $0.15/$0.15; Llama 4 Scout $0.20/$1.00; Qwen3 Next 80B $0.15/$1.20; Mistral Large 3 $0.50/$1.50; Qwen3 VL 235B $0.53/$2.66; DeepSeek V3.2 $0.62/$1.85; MiniMax M2.5 $0.30/$1.20, corroborated by one published rate card, with a second showing $0.36/$1.44, exactly 20% higher, which is consistent with a gateway uplift rather than a differing Bedrock rate. The Amazon Bedrock model card for MiniMax M2.5 records a launch date of 12 February 2026, a 196K context window and an 8K maximum output, and refers pricing to the Bedrock pricing page. <b>Best-of-three sampling</b> applies a 3.35× multiplier: each attempt re-reads the full context, tripling both input and output, plus one verifier pass reading the context and all three candidates. <b>Customer-trained models on Bedrock</b> bill through Custom Model Import at $0.05718 per Custom Model Unit-minute, divided by 120,000 tokens per minute at an assumed 2,000 tokens per second per unit, giving $0.4765 per million. Amazon Bedrock documentation states that a model unit specifies the input and output tokens it can process in one minute, and directs customers to their AWS account manager for the figure rather than publishing it. The 2,000 tokens per second assumption is therefore ours, and it decides whether an imported-model strategy has a cost basis at all.</p>
@@ -534,14 +592,30 @@ th.akka .akka-mark{height:11px;position:relative;top:-1px;}
   <p><b>Accuracy.</b> SWE-bench Verified, a public benchmark scoring resolution of real software defects, weighted by each mix. Published results: Llama 4 Scout 47.3%; DeepSeek V3.2 73.1%; Qwen3 Coder Next 74.2%; MiniMax M2.5 80.2%. Estimated where no result is published: Ministral 3B 5%; Ministral 8B and customer-trained models 8%; Qwen3 Next 80B 35%; Mistral Large 3 40%; Qwen3 VL 235B 55%. The 8% estimate uses Qwen3-8B, measured at 8.0%, as a size-class proxy; neither Ministral variant publishes a SWE-bench result. Best-of-three sampling with a verifier rerank is modelled as adding approximately 8 percentage points, anchored on a published result in which a 77.2% model reached 90.0% within an engineered agent scaffold. That uplift is applied only to the Max case, which pays for three samples and a verifier pass. It is not applied to Akka. Adapters trained on repeating work raise reliability on those tasks, and that gain is not claimed here because SWE-bench Verified measures general software engineering rather than the narrow tasks an adapter serves. <b>Latency.</b> Blended time to first token plus 500 output tokens at blended output speed, from Artificial Analysis: Ministral 3B 188.4 tokens/second at 0.64s; Ministral 8B 113.6 at 0.73s; Llama 4 Scout 119.9 at 0.83s; Qwen3 Next 80B 187.5 at 2.20s; Mistral Large 3 40.3 at 1.37s; DeepSeek V3.2 108.8 on Bedrock at 0.92s.</p>
   <p><b>Three-year projection.</b> Throughput per GPU-hour is projected to rise 1.6× in year two and 2.6× cumulatively in year three on unchanged hardware, from speculative decoding (1.30×), four-bit quantisation on tolerant traffic (1.25×), newer open-weight models activating fewer parameters (1.40×), inference engine improvements (1.15×) and additional trained adapters (1.15×), which compound to 3.00×; the published projection takes approximately half. Independently observed open-weight inference cost decline runs 30% to 50% annually.</p>
   <p><b>General.</b> All AWS amounts are public list price at on-demand rates, US East, as of August 2026. No Enterprise Discount Program, Private Pricing Agreement, Reserved Instance, Savings Plan, Capacity Block or other committed-use discount is applied; rates already held with AWS reduce these amounts. Amounts exclude customer personnel, third-party software and non-AWS infrastructure. This estimate is a planning aid. It is not a quotation and it commits neither Akka nor Amazon Web Services. Sources: Amazon Bedrock, Bedrock AgentCore, AWS Support and Amazon CloudWatch pricing pages; Amazon EC2 instance pricing; the Amazon Bedrock Service Level Agreement; Artificial Analysis; the Microsoft Azure LLM inference traces; Epoch AI inference price trends.</p>
+  </div>
+  <div id="legalApi" style="display:none">
+  <p><b>Scope.</b> One use case carries the entire volume entered above. Inference and specialist training are both directed at that use case. Amounts are annual.</p>
+  <p><b>Base model.</b> Each API model is matched to a base model. Where the API model is open weight, the base model is that same model, self-hosted. Where it is proprietary, the base model is the nearest open weight by capability class: Claude Fable 5 and Claude Cowork take Kimi K3 at 2.8 trillion total and 104 billion active parameters, the largest open-weight model; Claude Opus 5 and GPT-5.6 Sol take DeepSeek V4-Pro at 1.6 trillion total and 49 billion active; Claude Sonnet 5 takes Kimi K2.6 at 1 trillion total and 32 billion active; GPT-5.6 Terra takes GLM-5.2 at 744 billion total and 40 billion active; GPT-5.6 Luna takes MiniMax M2.5; Claude Haiku 4.5 takes Qwen3 Coder Next.</p>
+  <p><b>Parameter counts.</b> Throughput scales on active parameters rather than total, since a mixture-of-experts model activates a subset of its weights per token. Qwen3 Coder Next activates three billion parameters. Kimi K3, DeepSeek V4-Pro, Kimi K2.6 and GLM-5.2 carry the active counts stated above. Ministral 3B, Ministral 8B, Phi-4 and Mistral Large 3 are dense, so active and total are the same.</p>
+  <p><b>Accuracy.</b> A trained specialist model reaches approximately 90% on the task it is trained for. That figure applies where the use case is narrow. Breadth of the use case, rather than its subject, determines whether it is reached.</p>
+  <p><b>Training.</b> With training off, the base model is self-hosted and served as published, and the comparison is the cost of running that model against the cost of calling an API. With training on, a specialist model is trained on the use case: it consumes 40% of the prior input tokens and produces 60% of the prior output tokens, on a model requiring half the compute per token. Prompt caching and speculative decoding apply in both cases. Off-peak batching applies in neither.</p>
+  <p><b>Token split by use case.</b> Writing software 90% input, answering customers 80%, reading documents 95%, search and summary 92%, tidying data 85%. The API rate applied is the blend of that provider's input and output rates at this split, not its headline rate.</p>
+  <p><b>Fleet sizing.</b> Continuous demand multiplied by 2.8 for peak, plus one spare node, and never below two nodes. The 2.8 peak-to-average factor is the measured figure for coding workloads across 44 million requests in the published Microsoft Azure LLM inference traces. Hyperscalers bill whole nodes of eight GPUs; neoclouds bill per GPU. The compute is the one selected in the provider list and the capacity picker above.</p>
+  <p><b>Akka fee.</b> The Akka figure is the fee, which carries margin. Margin is 50% at or below five trillion tokens a year and declines on a logarithmic curve to 18.8% at one thousand trillion. Compute and storage follow a declining schedule per five trillion tokens: $100,000 for the first block, decaying toward a $15,000 floor, subject to a $50,000 annual minimum. Network and licence costs add $12,500 a year, plus $35,000 a year for private connectivity where Akka runs outside the customer's own cloud.</p>
+  <p><b>Per-token rates.</b> Anthropic, OpenAI and DeepSeek first-party rates verified 16 August 2026. AWS Bedrock rates verified 12 August 2026 from the published pricing page. Azure AI Foundry rates verified 12 August 2026 from an aggregator; Azure renders its pricing pages client-side. DeepSeek rates are cache-miss input; peak and off-peak pricing was announced for 16:00 UTC on 16 August 2026. Anthropic and OpenAI models are proprietary: weights and adapters are not distributed, so a fine-tuned workload runs only on open-weight models.</p>
+  <p><b>Serving throughput.</b> 25,000 tokens per second prefill and 3,000 tokens per second decode per H100 at a 12B dense equivalent, both scaling as 1/N with active parameter count, derived from floating-point throughput and memory bandwidth. Those figures are first-principles rather than benchmarked, and mixed sequence lengths are expected to reach only half to two-thirds of them, so a factor of 1.75 is applied to the Akka side throughout this tab.</p>
+  <p><b>Prompt caching.</b> The input side of every per-token rate is charged at 12.07% of list. That figure is measured across 969 Claude Code transcripts and 50,279 API calls: 98.2% of context tokens were served from cache, 1.8% written to it, and a negligible share billed fresh, with cache reads billing at a tenth of the input rate and writes at 1.25 times it. Output is charged in full. Batch processing at 50% and committed-spend discounts, reported to average 28% on negotiated enterprise agreements, are available on several of these providers and are not applied. Per-outcome products bill a completed unit of work, so their price does not move with how cacheable a workload is and no cache discount is applied to them.</p>
+  <p><b>Per-outcome rates.</b> Some products price a completed unit of work rather than a token. Each is converted to a per-million-token equivalent by dividing its rate by the tokens that unit consumes. Microsoft Copilot Studio bills 2 Copilot Credits a generative answer at $0.01 a credit. Salesforce Agentforce bills 20 Flex Credits an action at $500 per 100,000 credits, which is $0.10 an action; its alternative conversation model is $2.00. HubSpot Breeze bills $0.50 a resolved conversation, Aissist $0.60 a resolution, Gorgias $0.90, Intercom Fin $0.99 and Zendesk AI Agents $1.50. Claude Cowork bills $13.57 a task, reported as Claude 5 Fable High in the Creative Strategies Diligence Stack Agent Bench for financial analysis and research. Where a vendor publishes a range the lower bound is used. A resolution or conversation is converted at 50,000 tokens, an action or generative answer at 5,000, and a Cowork task at 985,000 &mdash; the median session measured across 969 Claude Code transcripts and 50,279 API calls, at 981,000 context tokens and 4,000 output tokens, running 349 input tokens to every output token with 98.2% of context served from cache. Sierra, Decagon and Ada advertise per-outcome pricing without publishing a rate. ServiceNow Now Assist bills per assist, 25 for a small generative task and 150 for a large agentic action, without a published price per assist. Workday Illuminate includes credits in the subscription without a published per-agent rate.</p>
+  <p><b>General.</b> All amounts are in US dollars at list price. No enterprise discount, private pricing agreement, reserved instance, savings plan, capacity block or other committed-use discount is applied beyond those stated in the reserved capacity rates. Amounts exclude customer personnel, third-party software and infrastructure outside the fleet described. Sources: Amazon Bedrock and Amazon EC2 pricing; Azure AI Foundry and Azure Virtual Machines pricing; Google Cloud Vertex AI and Compute Engine pricing; Anthropic, OpenAI and DeepSeek platform pricing; Creative Strategies Diligence Stack Agent Bench; the Microsoft Azure LLM inference traces; Artificial Analysis.</p>
+  </div>
 </footer>
 
 <script>
 "use strict";
 // GENERATED from audit/rates.json by build/build.js. Do not edit here.
 // Baseline 2026-08-12. Regenerate with: node build/build.js
-const TABS=["Your workload","Cutting the bill","AWS vs Akka","Future savings"];
-const SLUGS=["workload","savings","compare","outlook"];
+const TABS=["Your workload","SLM savings","AWS vs Akka","API vs Akka","Future savings"];
+const SLUGS=["workload","savings","compare","apivsakka","outlook"];
 const PRESETS=[1000,2500,5000,10000,20000];
 const WORKLOADS=[{"key":"swe","name":"Writing software","short":"Software","inRatio":0.9,"repeat":0.15,"def":30},{"key":"support","name":"Answering customers","short":"Customers","inRatio":0.8,"repeat":0.6,"def":25},{"key":"extract","name":"Reading documents","short":"Documents","inRatio":0.95,"repeat":0.85,"def":20},{"key":"rag","name":"Search and summary","short":"Search","inRatio":0.92,"repeat":0.45,"def":15},{"key":"transform","name":"Tidying data","short":"Data","inRatio":0.85,"repeat":0.8,"def":10}];
 const TECHS=[{"key":"adapters","name":"Specialist models for routine work","on":true,"desc":"A trained job needs 40% of the question and gives a shorter answer, on a model half the size."},{"key":"cache","name":"Remembering what you asked before","on":true,"desc":"Agents repeat the same instructions every turn. Reading them back costs a fraction of reading them fresh."},{"key":"spec","name":"Guessing ahead while writing","on":true,"desc":"A small fast model guesses the next words and the big model checks them together."},{"key":"batch","name":"Running unattended work off-peak","on":false,"desc":"Anything with nobody waiting runs later, on machines that would sit idle."}];
@@ -553,7 +627,8 @@ const LAT=Object.assign({},PROV.aws.lat,{akka:4.5});
 const HOST={"low":{"v":1,"g":2,"w":120,"c":20},"base":{"v":2,"g":4,"w":300,"c":90},"high":{"v":3,"g":6,"w":400,"c":120},"max":{"v":3,"g":6,"w":400,"c":120}};
 const SVC={"low":150000,"base":700000,"high":2500000,"max":2500000};
 const STO5={"low":80000,"base":180000,"high":300000,"max":300000};
-const PRE=25000,DEC=3000,GPN=8,HRS=8760,PEAK=2.8;
+let PRE=25000,DEC=3000;const PRE0=PRE,DEC0=DEC,N0=12;
+const GPN=8,HRS=8760,PEAK=2.8;
 const SRC={"aws":{"label":"AWS reserved capacity","h100":27.52,"b200":56.97,"vpc":true,"link":0},"awsod":{"label":"AWS on-demand","h100":55.04,"b200":113.93,"vpc":true,"link":0},"lambdalow":{"label":"Lambda, $1.49/GPU-hr","h100":11.92,"b200":44,"vpc":false,"link":35000},"lambda":{"label":"Lambda, $2.99/GPU-hr","h100":23.92,"b200":44,"vpc":false,"link":35000},"nebiusc":{"label":"Nebius, committed","h100":20.02,"b200":28.6,"vpc":false,"link":35000},"nebius":{"label":"Nebius, on-demand","h100":30.8,"b200":44,"vpc":false,"link":35000},"coreweavec":{"label":"CoreWeave, committed","h100":36.96,"b200":39,"vpc":false,"link":35000},"coreweave":{"label":"CoreWeave, on-demand","h100":49.28,"b200":52,"vpc":false,"link":35000}};
 const FLEETS=[{"node":"p5.48xlarge","gpu":"NVIDIA H100 80GB","rateKey":"h100","tp":1},{"node":"p6-b200.48xlarge","gpu":"NVIDIA B200 180GB","rateKey":"b200","tp":3}];
 const fleets=k=>FLEETS.map(f=>({node:f.node,gpu:f.gpu,rate:SRC[k][f.rateKey],tp:f.tp}));
@@ -574,6 +649,9 @@ const TRAIN_HOURS_5T=4750;
 const MRG_HI=0.5,MRG_LO=0.188,MRG_V0=5000,MRG_V1=1000000;
 const MIN_VOLUME_B=1000,Y2=1.6,Y3=2.6;
 const CAP={low:"Low",base:"Base",high:"High",max:"Max"};
+const BE_APIS=[{"g":"Anthropic","m":"claude-haiku-4-5","i":1,"o":5,"b":"Qwen3 Coder Next","n":3},{"g":"Anthropic","m":"claude-sonnet-5","i":3,"o":15,"b":"Kimi K2.6","n":32},{"g":"Anthropic","m":"claude-opus-5","i":5,"o":25,"b":"DeepSeek V4-Pro","n":49},{"g":"Anthropic","m":"claude-fable-5","i":10,"o":50,"b":"Kimi K3","n":104},{"g":"OpenAI","m":"gpt-5.6-luna","i":0.2,"o":1.2,"b":"MiniMax M2.5","n":10},{"g":"OpenAI","m":"gpt-5.6-terra","i":2,"o":12,"b":"GLM-5.2","n":40},{"g":"OpenAI","m":"gpt-5.6-sol","i":5,"o":30,"b":"DeepSeek V4-Pro","n":49},{"g":"DeepSeek","m":"deepseek-v4-flash","i":0.14,"o":0.28,"b":"DeepSeek V4-Flash","n":15},{"g":"DeepSeek","m":"deepseek-v4-pro","i":0.435,"o":0.87,"b":"DeepSeek V4-Pro","n":49},{"g":"AWS Bedrock","m":"ministral-3b","i":0.1,"o":0.1,"b":"Ministral 3B","n":3},{"g":"AWS Bedrock","m":"ministral-8b","i":0.15,"o":0.15,"b":"Ministral 8B","n":8},{"g":"AWS Bedrock","m":"llama-4-scout","i":0.2,"o":1,"b":"Llama 4 Scout","n":17},{"g":"AWS Bedrock","m":"qwen3-next-80b","i":0.15,"o":1.2,"b":"Qwen3 Next 80B","n":3},{"g":"AWS Bedrock","m":"qwen3-coder-next","i":0.6,"o":1.44,"b":"Qwen3 Coder Next","n":3},{"g":"AWS Bedrock","m":"mistral-large-3","i":0.5,"o":1.5,"b":"Mistral Large 3","n":123},{"g":"AWS Bedrock","m":"qwen3-vl-235b","i":0.53,"o":2.66,"b":"Qwen3 VL 235B","n":22},{"g":"AWS Bedrock","m":"deepseek-v3.2","i":0.62,"o":1.85,"b":"DeepSeek V3.2","n":37},{"g":"AWS Bedrock","m":"minimax-m2.5","i":0.3,"o":1.2,"b":"MiniMax M2.5","n":10},{"g":"AWS Bedrock","m":"gpt-5.6-luna","i":0.2,"o":1.2,"b":"MiniMax M2.5","n":10},{"g":"Azure AI Foundry","m":"ministral-3b","i":0.04,"o":0.04,"b":"Ministral 3B","n":3},{"g":"Azure AI Foundry","m":"phi-4","i":0.125,"o":0.5,"b":"Phi-4","n":14},{"g":"Azure AI Foundry","m":"llama-4-scout","i":0.2,"o":0.78,"b":"Llama 4 Scout","n":17},{"g":"Azure AI Foundry","m":"mistral-medium-2505","i":0.4,"o":2,"b":"Mistral Medium","n":24},{"g":"Azure AI Foundry","m":"mistral-large-3","i":0.5,"o":1.5,"b":"Mistral Large 3","n":123},{"g":"Azure AI Foundry","m":"deepseek-v3.2","i":0.58,"o":1.68,"b":"DeepSeek V3.2","n":37},{"g":"Azure AI Foundry","m":"deepseek-r1","i":1.35,"o":5.4,"b":"DeepSeek R1","n":37},{"g":"Azure AI Foundry","m":"llama-4-maverick","i":1.41,"o":0.35,"b":"Llama 4 Maverick","n":17},{"g":"Azure AI Foundry","m":"gpt-5.6-luna","i":0.2,"o":1.2,"b":"MiniMax M2.5","n":10},{"g":"Per outcome","m":"Microsoft Copilot Studio","task":0.02,"tpt":5000,"u":"generative answer","b":"Qwen3 Coder Next","n":3},{"g":"Per outcome","m":"HubSpot Breeze","task":0.5,"tpt":50000,"u":"resolved conversation","b":"MiniMax M2.5","n":10},{"g":"Per outcome","m":"Aissist.io","task":0.6,"tpt":50000,"u":"resolution","b":"MiniMax M2.5","n":10},{"g":"Per outcome","m":"Gorgias AI Agent","task":0.9,"tpt":50000,"u":"resolution","b":"MiniMax M2.5","n":10},{"g":"Per outcome","m":"Intercom Fin","task":0.99,"tpt":50000,"u":"resolution","b":"MiniMax M2.5","n":10},{"g":"Per outcome","m":"Salesforce Agentforce","task":0.1,"tpt":5000,"u":"action","b":"Qwen3 Coder Next","n":3},{"g":"Per outcome","m":"Zendesk AI Agents","task":1.5,"tpt":50000,"u":"resolution","b":"MiniMax M2.5","n":10},{"g":"Per outcome","m":"Claude Cowork","task":13.57,"tpt":985000,"u":"task","b":"Kimi K3","n":104}];
+const BE_CACHE=0.1207;
+const BE_HAIRCUT=1.75;
 
 const $=id=>document.getElementById(id);
 const money=n=>n>=1e6?"$"+(n/1e6).toFixed(2)+"M":"$"+Math.round(n/1000)+"K";
@@ -615,12 +693,17 @@ function go(i,quiet){
   document.querySelectorAll(".tab").forEach((b,j)=>b.classList.toggle("on",j===tab));
   document.querySelectorAll(".panel").forEach((p,j)=>p.classList.toggle("on",j===tab));
   $("prev").disabled=tab===0; $("next").disabled=tab===TABS.length-1;
-  $("next").textContent=["Cut the bill","Compare prices","Future savings","Future savings"][tab];
-  const want="#"+SLUGS[tab];
-  if(location.hash!==want){
-    try{history.replaceState(null,"",want);}catch(e){location.hash=SLUGS[tab];}
+  $("next").textContent=["SLM savings","Compare prices","API vs Akka","Future savings","Future savings"][tab];
+  if(tab===0){
+    if(location.hash){try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}}
+  }else{
+    const want="#"+SLUGS[tab];
+    if(location.hash!==want){
+      try{history.replaceState(null,"",want);}catch(e){location.hash=SLUGS[tab];}
+    }
   }
   if(!quiet)window.scrollTo({top:0,behavior:"smooth"});
+  render();
 }
 
 function tabFromHash(){
@@ -724,6 +807,7 @@ function render(){
   $("kAws").textContent=money(d.aws.high.total);
   TABS[2]=d.prov.label+" vs Akka";
   $("inclVpc").textContent="Akka installs in your "+d.prov.label+" VPC";
+  $("kFeeLbl").textContent="With Akka";
   $("kAwsLbl").textContent="Integrating it yourself on "+d.prov.label;
   // the in-VPC option text is provider-dependent, so it is written here rather than
   // once at build of the list
@@ -826,7 +910,107 @@ function render(){
     '<td class="n ok" data-l="What you pay us">'+(d.below?'\u2014':money(d.price))+'</td>'+
     '<td class="n '+(i===0?'':'ok')+'" data-l="Cost per million tokens">'+
       (d.below?'\u2014':'$'+(d.price/(c*1000)).toFixed(3))+'</td></tr>').join("");
+  beRender();
 }
+
+/* ---------- break even ---------- */
+// Priced without touching compute()'s inputs: the other four tabs read the volume,
+// source and technique switches from the DOM, and this tab must not disturb them.
+// N is the base model's active parameter count; throughput scales 1/N from N0.
+function bePrice(volB,srcKey,ucKey,slm,N){
+  const tok=volB*1e9, w=WORKLOADS.find(x=>x.key===ucKey);
+  const inTok=tok*w.inRatio, outTok=tok*(1-w.inRatio);
+  // Throughput carries the register's own 1.5-2x mixed-sequence-length haircut, so the
+  // Akka side is not modelled at the optimistic figure.
+  const Ne=N*BE_HAIRCUT;
+  const pH=1/(PRE0*N0/Ne*3600), dH=1/(DEC0*N0/Ne*3600);
+  const r=slm?w.repeat:0;
+  const base=inTok*pH+outTok*dH;
+  const adHr=inTok*r*ADAPT.inputRetained*pH*ADAPT.computeMultiple
+            +outTok*r*ADAPT.outputRetained*dH*ADAPT.computeMultiple;
+  const tailHr=inTok*(1-r)*pH+outTok*(1-r)*dH;
+  const trained=adHr+tailHr;
+  let f=(1-(inTok*pH*CACHE_SAVING)/trained)*SPEC_MULT;   // caching and speculative
+  const gpuHr=Math.max(trained*f,base*FLOOR_FRAC);       // decoding apply either way
+  const hw=FLEETS.map(fl=>{
+    const eff=gpuHr/fl.tp, rate=SRC[srcKey][fl.rateKey];
+    return Math.max(MIN_NODES,Math.ceil(eff/GPN/HRS*PEAK)+1)*HRS*rate;
+  }).sort((a,b)=>a-b)[0];
+  const cost=hw+cpuStorageFor(volB)+MISC+SRC[srcKey].link;
+  return cost/(1-marginAt(volB));
+}
+const BE_TAB=SLUGS.indexOf("apivsakka");
+const BE_MARK=document.querySelector("#tco th.akka .akka-mark").outerHTML;
+let beApiI=BE_APIS.findIndex(a=>a.m==="claude-fable-5"), beUcK="support", beSlm=false;
+const beRate=()=>{const a=BE_APIS[beApiI],w=WORKLOADS.find(x=>x.key===beUcK);
+  // a per-task rate covers a whole session, so it converts without an input split
+  // Input is discounted for prompt caching. A per-outcome product bills a completed
+  // unit of work, so its price does not move with how cacheable the workload is.
+  return a.task!==undefined?a.task*1e6/a.tpt:w.inRatio*a.i*BE_CACHE+(1-w.inRatio)*a.o;};
+const beApiBill=v=>v*1000*beRate();
+const beAkka=v=>bePrice(v,($("src")&&$("src").value)||"aws",beUcK,beSlm,BE_APIS[beApiI].n);
+function beSolve(){
+  const lo0=1,hi0=4e6;
+  if(beAkka(hi0)>beApiBill(hi0))return null;
+  if(beAkka(lo0)<beApiBill(lo0))return lo0;
+  let lo=lo0,hi=hi0;
+  for(let i=0;i<80;i++){const m=(lo+hi)/2; if(beAkka(m)>beApiBill(m))lo=m; else hi=m;}
+  return hi;
+}
+const beVol=v=>v>=1000?(v/1000).toFixed(v>=10000?0:1)+"T":Math.round(v)+"B";
+function beInit(){
+  let og="",last="";
+  BE_APIS.forEach((a,i)=>{ if(a.g!==last){ if(last)og+="</optgroup>"; og+='<optgroup label="'+a.g+'">'; last=a.g; }
+    og+='<option value="'+i+'">'+a.m+'</option>'; });
+  $("beApi").innerHTML=og+"</optgroup>"; $("beApi").value=beApiI;
+  $("beUc").innerHTML=WORKLOADS.map(w=>'<option value="'+w.key+'">'+w.name+'</option>').join("");
+  $("beUc").value=beUcK;
+  $("beVol").value=$("vol").value;   // starts where Your workload is, then diverges
+  $("beVol").addEventListener("input",beRender);
+  $("beApi").addEventListener("change",e=>{beApiI=+e.target.value;beRender();});
+  $("beUc").addEventListener("change",e=>{beUcK=e.target.value;beRender();});
+  const flip=()=>{beSlm=!beSlm;$("beSw").classList.toggle("on",beSlm);
+    $("beState").textContent=beSlm?"Yes":"No";$("beSlm").setAttribute("aria-checked",String(beSlm));beRender();};
+  $("beSlm").addEventListener("click",flip);
+  $("beSlm").addEventListener("keydown",e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();flip();}});
+}
+function beRender(){
+  const a=BE_APIS[beApiI], rate=beRate();
+  const volB=Math.max(1,+$("beVol").value||0);
+  const ak=beAkka(volB), pc=beApiBill(volB);
+  // The top box is shared with every other tab, so it is only retitled and
+  // overwritten while this one is showing; render() restores it otherwise.
+  const onBe=tab===BE_TAB;
+  $("legalMain").style.display=onBe?"none":"";
+  $("legalApi").style.display=onBe?"":"none";
+  if(onBe){
+    $("kFeeLbl").textContent="Self-hosted on Akka * "+a.b+" · "+a.n+"B active";
+    $("kFee").textContent=money(ak);
+    $("kFeeSub").textContent="";
+    $("kAwsLbl").textContent="Integrating with an AI API";
+    $("kAws").textContent=money(pc);
+  }
+  if(a.task!==undefined){
+    const n=volB*1e9/a.tpt;
+    const c=n>=1e9?(n/1e9).toFixed(1)+"bn":n>=1e6?Math.round(n/1e6)+"M":n>=1e3?Math.round(n/1e3)+"K":Math.round(n);
+    $("beUnits").textContent="= "+c+" "+a.u+"s a year";
+  }else $("beUnits").textContent="";
+  const marks=[1000,2500,5000,10000,25000,100000];
+  if(!marks.includes(volB))marks.push(volB);
+  marks.sort((x,y)=>x-y);
+  $("beTbl").innerHTML=
+    "<colgroup><col class='c1'><col class='c2'><col class='c3'><col class='c4'></colgroup>"+
+    "<thead><tr><th>Tokens a year</th><th class='n' title='"+a.m+"'>AI API</th>"+
+    "<th class='n akka'>"+BE_MARK+"</th><th class='n'>Savings</th></tr></thead><tbody>"+
+    marks.map(v=>{
+      const c=beAkka(v),b=beApiBill(v),d=b-c;
+      return '<tr'+(v===volB?' class="cross"':'')+'><td>'+beVol(v)+'</td>'+
+        '<td class="n">'+money(b)+'</td><td class="n akka">'+money(c)+'</td>'+
+        '<td class="n '+(d>0?'pos':'neg')+'">'+money(d)+'</td></tr>';
+    }).join("")+"</tbody>";
+}
+beInit();
+
 go(tabFromHash(),true);render();
 </script>
 </body>
