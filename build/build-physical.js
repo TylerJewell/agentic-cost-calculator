@@ -37,6 +37,15 @@ const patches = [
    "const price=cost;"],
   ["upPrice=upCost/(1-margin);",
    "upPrice=upCost;"],
+
+  // the first-year figure is now infrastructure alone, so it is annotated with what
+  // sits on top of it. Right alignment is inherited from the cell.
+  [".tag.no{color:var(--medium-grey);background:rgba(241,241,241,.03);border:1px solid var(--line);}",
+   ".tag.no{color:var(--medium-grey);background:rgba(241,241,241,.03);border:1px solid var(--line);}\n" +
+   "tr.tot td.akka .mrgn{display:block;font-family:var(--mono);font-size:8px;font-weight:400;\n" +
+   "  line-height:1;letter-spacing:.2px;color:var(--soft-grey);margin-top:-1px;}"],
+  ['\'<td class="n akka">\'+(d.below?"—":money(d.price))+"</td></tr>";',
+   '\'<td class="n akka">\'+(d.below?"—":money(d.price)+\'<span class="mrgn">+ our margin</span>\')+"</td></tr>";'],
 ];
 
 for (const [from, to] of patches) {

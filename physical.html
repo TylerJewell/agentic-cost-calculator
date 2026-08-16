@@ -195,6 +195,8 @@ td.akka{color:var(--white);}
 #tco tr.tot td.akka{font-size:17px;}
 #tco th.akka,#tco td.akka{padding-left:18px;padding-right:16px;}
 #tco th.akka{padding-top:10px;vertical-align:middle;}
+/* squared so the badge's right edge reads flush with the mark above it */
+#tco td.akka .tag{border-radius:0;}
 th.akka .akka-mark{height:12px;position:static;}
 .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--medium-grey) var(--medium-black);}
 .scroller::-webkit-scrollbar{height:9px;}
@@ -204,6 +206,8 @@ th.akka .akka-mark{height:12px;position:static;}
 .tag{font-family:var(--mono);font-size:8.5px;line-height:17px;height:17px;padding:0 7px;border-radius:3px;white-space:nowrap;display:inline-block;vertical-align:top;}
 .tag.yes{color:var(--green);background:rgba(114,211,91,.20);border:1px solid rgba(114,211,91,.75);font-weight:600;}
 .tag.no{color:var(--medium-grey);background:rgba(241,241,241,.03);border:1px solid var(--line);}
+tr.tot td.akka .mrgn{display:block;font-family:var(--mono);font-size:8px;font-weight:400;
+  line-height:1;letter-spacing:.2px;color:var(--soft-grey);margin-top:-1px;}
 
 details{border-top:1px solid var(--hair);margin-top:16px;padding-top:14px;}
 details summary{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.4px;color:var(--soft-grey);cursor:pointer;list-style:none;}
@@ -776,7 +780,7 @@ function render(){
   h+=line("Logging",a=>a.obs,inc);
   h+=line("Storage and transfer",a=>a.sto,inc);
   h+='<tr class="tot"><td>Your first year</td>'+K.map(k=>'<td class="n">'+money(d.aws[k].total)+"</td>").join("")+
-     '<td class="n akka">'+(d.below?"—":money(d.price))+"</td></tr>";
+     '<td class="n akka">'+(d.below?"—":money(d.price)+'<span class="mrgn">+ our margin</span>')+"</td></tr>";
   h+='<tr><td>Accuracy</td>'+K.map(k=>'<td class="n acc">'+ACC[k]+"%</td>").join("")+'<td class="n akka acc">'+ACC.akka+"%</td></tr>";
   h+='<tr><td>Latency</td>'+K.map(k=>'<td class="n">'+LAT[k].toFixed(1)+"s</td>").join("")+'<td class="n akka">'+LAT.akka.toFixed(1)+"s</td></tr>";
   h+='<tr><td>Availability SLA</td>'+K.map(()=>'<td class="n">99.9%</td>').join("")+'<td class="n akka acc">99.9999%</td></tr>';
