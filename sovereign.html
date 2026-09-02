@@ -797,17 +797,17 @@ function computeBreakEven(baseM){
 // Days: 230 = 260 weekdays less holidays and PTO. Support runs 250.
 const BE_PROXIES=[
   {role:"Power user", perDay:200e6, days:230,
-   alloc:"5 concurrent agents driven 6h, plus unattended overnight loops: test repair, refactor sweeps, eval harnesses"},
+   alloc:"5 concurrent agents for 6h, plus unattended overnight loops"},
   {role:"Engineer", perDay:20e6, days:230,
-   alloc:"7 agentic tasks (~25 turns each replaying full repo context), 8 code reviews, trace debugging, background agents"},
+   alloc:"7 agentic tasks (~25 turns, full repo context), reviews, background agents"},
   {role:"Support agent", perDay:12e6, days:250,
-   alloc:"40 RAG tickets, each a draft/critique/revise loop over KB chunks and full customer history, live chat copilot"},
+   alloc:"40 RAG tickets, each a draft/critique/revise loop over KB and history"},
   {role:"Data analyst", perDay:12e6, days:230,
-   alloc:"12 text-to-SQL cycles over full warehouse schema, 3 drafted reports, an hour of notebook agent work, dashboard Q&amp;A"},
+   alloc:"12 text-to-SQL cycles over warehouse schema, 3 reports, notebook agents"},
   {role:"Executive", perDay:7e6, days:230,
-   alloc:"4 long-document sessions with follow-ups, 2 deep-research runs across 20&ndash;40 sources, meeting transcript summaries"},
+   alloc:"4 long-doc sessions, 2 deep-research runs across 20&ndash;40 sources"},
   {role:"Document", unit:350e3, unitLabel:"350k each",
-   alloc:"50-page contract end to end: ingest, 8 targeted extraction passes, clause classification, risk scoring, summary + QA"}
+   alloc:"50-page contract: ingest, 8 extraction passes, classification, QA"}
 ];
 
 function proxyYear(p){ return p.unit !== undefined ? p.unit : p.perDay * p.days; }
