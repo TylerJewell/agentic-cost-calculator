@@ -89,8 +89,9 @@ h1 .accent{color:var(--yellow);}
   font-variant-numeric:tabular-nums;font-size:14.5px;}
 /* headcount table: the audit table's type scale, tightened a step. The
    allocation column cannot wrap, so a narrow window scrolls the table rather
-   than losing the right-hand columns to body overflow-x:hidden. */
-.be-scroll{overflow-x:auto;margin-top:9px;}
+   than losing the right-hand columns to body overflow-x:hidden; the scrolling
+   itself comes from .scroller. */
+.be-scroll{margin-top:9px;}
 .be-tbl{min-width:640px;}
 .be-tbl th{padding-bottom:5px;}
 .be-tbl td{font-size:10.5px;padding:4px 10px 4px 0;}
@@ -186,6 +187,11 @@ select optgroup{background:var(--black);color:var(--yellow);font-weight:600;}
 @media (max-width:900px){.split{grid-template-columns:1fr;}}
 
 /* tables + audit */
+.scroller{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--medium-grey) var(--medium-black);}
+.scroller::-webkit-scrollbar{height:9px;}
+.scroller::-webkit-scrollbar-track{background:var(--medium-black);}
+.scroller::-webkit-scrollbar-thumb{background:var(--medium-grey);}
+.scroller::-webkit-scrollbar-thumb:hover{background:var(--blue);}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;}
 th{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--soft-grey);font-weight:600;
   text-align:left;padding:0 12px 7px 0;border-bottom:1px solid var(--line);white-space:nowrap;}
@@ -805,7 +811,7 @@ function renderProxyTable(tokens){
       `<td class="n">${one ? "&mdash;" : tokLabel(p.perDay)}</td>`+
       `<td class="n">${one ? p.unitLabel : tokLabel(proxyYear(p))}</td></tr>`;
   }).join("");
-  return `<div class="be-scroll"><table class="be-tbl"><thead><tr><th class="eq">Equivalent</th>`+
+  return `<div class="scroller be-scroll"><table class="be-tbl"><thead><tr><th class="eq">Equivalent</th>`+
     `<th>Day allocation</th>`+
     `<th class="n">Tokens/day</th><th class="n">Tokens/yr</th>`+
     `</tr></thead><tbody>${rows}</tbody></table></div>`;
