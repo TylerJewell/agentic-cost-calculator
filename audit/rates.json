@@ -144,14 +144,14 @@
     },
     "openai_direct": {
       "billing": "per token, first-party API",
-      "verified": "2026-08-16",
+      "verified": "2026-08-17",
       "source": "aggregator; OpenAI publishes rates on a client-rendered page",
       "confidence": "corroborated",
-      "note": "Luna matches the Bedrock and Foundry rate exactly, which corroborates all three.",
+      "note": "Luna matches the Bedrock and Foundry rate exactly, which corroborates all three. Sol is listed at half its $5.00/$30.00 standard rate under a 50% discount; if that discount lapses the rate doubles.",
       "models": {
         "gpt-5.6-luna": { "in": 0.2, "out": 1.2 },
         "gpt-5.6-terra": { "in": 2.0, "out": 12.0 },
-        "gpt-5.6-sol": { "in": 5.0, "out": 30.0 }
+        "gpt-5.6-sol": { "in": 2.5, "out": 15.0 }
       }
     },
     "deepseek_direct": {
