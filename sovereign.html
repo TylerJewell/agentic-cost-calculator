@@ -421,12 +421,16 @@ function hostMultiplier(){
 
 function renderHostSource(){
   const opts = hostSourceOptions();
-  // rates.json values are per-8-GPU-node (matching main calc's fleet math).
-  // Divide by 8 for an honest per-GPU-hour display.
+  // $/throughput-hour is the honest per-token-normalised cost: it accounts
+  // for B200 delivering ~3× the tokens/hour that H100 does, so a customer
+  // comparing two options is looking at a like-for-like figure rather than
+  // the raw per-GPU-hour which favours whichever card runs slower.
   const GPUS_PER_NODE = 8;
-  $("hostSource").innerHTML = opts.map(o =>
-    `<option value="${o.key}">${o.label} — $${(o.hourly/GPUS_PER_NODE).toFixed(2)}/GPU-hr</option>`
-  ).join("");
+  $("hostSource").innerHTML = opts.map(o => {
+    const perGpuHr = o.hourly / GPUS_PER_NODE;
+    const perThroughputHr = perGpuHr / o.throughput;
+    return `<option value="${o.key}">${o.label} — $${perThroughputHr.toFixed(2)}/throughput-hr</option>`;
+  }).join("");
   // Preserve existing choice if still valid; otherwise fall back to first option.
   if(opts.some(o => o.key === hostConfig.source)){
     $("hostSource").value = hostConfig.source;
