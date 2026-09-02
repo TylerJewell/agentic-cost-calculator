@@ -67,17 +67,19 @@ const MIDTIER = collectModels(MIDTIER_KEYS);
 if (!FRONTIER.length) fail("no frontier models resolved from rates.json");
 if (!MIDTIER.length) fail("no mid-tier models resolved from rates.json");
 
-// ---- Akka self-hosted effective per-million-token rates ----
-// The main calc computes an Akka cost from the GPU fleet + margin. For the
-// sovereign calc we need a per-million-token rate the router can apply as a
-// destination rate. We derive it from the runtime block: the effective serving
-// throughput divided into the fleet cost, then apply the base margin.
-// This is an approximation; the audit panel cites its assumptions.
-const AKKA_INPUT_PER_M  = a.akkaInputRatePerM  || 0.09;
-const AKKA_OUTPUT_PER_M = a.akkaOutputRatePerM || 0.62;
-// If these aren't in rates.json yet, the defaults above are the GCP-derived
-// figures from the reference-methodology paragraph in the main calc; a future
-// rates.json refresh should land canonical values here.
+// ---- Akka self-hosted effective per-million-token rates by size class ----
+// Rates come from the main calc's methodology paragraph, calibrated against
+// GCP reserved B200 at $16.11/GPU-hr (128.88/node-hr) with 40% endpoint
+// utilisation and the modelled serving throughput. The three tiers use the
+// same values the main calc's SLM Savings tab uses. hostMultiplier() then
+// scales these rates by (chosen source / GCP reserved B200 reference), so
+// picking AWS reserved B200 lowers them proportionally.
+const AKKA_SMALL_IN  = 0.09,  AKKA_SMALL_OUT  = 0.62;
+const AKKA_MID_IN    = 0.25,  AKKA_MID_OUT    = 2.39;
+const AKKA_LARGE_IN  = 0.37,  AKKA_LARGE_OUT  = 4.14;
+// AKKA_IN/AKKA_OUT retained as backwards-compat aliases (small tier).
+const AKKA_INPUT_PER_M  = AKKA_SMALL_IN;
+const AKKA_OUTPUT_PER_M = AKKA_SMALL_OUT;
 
 // ---- prompt cache multiplier (right-side #3), batch multiplier (right-side #4) ----
 const PROMPT_CACHE_MULT = rates.inference.prompt_cache
@@ -107,27 +109,27 @@ const CATALOG = [
   // API mid-tier
   ...MIDTIER.map(m => ({key:m.p+":"+m.m, name:m.p+" "+m.m, cls:"mid",
                         clsLabel:"API mid-tier", api:true, in:m.in, out:m.out})),
-  // Self-hosted small
+  // Self-hosted small (3–10B active params)
   {key:"sh:qwen3-coder-next", name:"Qwen3 Coder Next 3B", cls:"small",
     clsLabel:"Self-hosted small (3–10B)", api:false,
-    in:AKKA_INPUT_PER_M*0.5, out:AKKA_OUTPUT_PER_M*0.5},
+    in:AKKA_SMALL_IN, out:AKKA_SMALL_OUT},
   {key:"sh:ministral-8b", name:"Ministral 8B", cls:"small",
     clsLabel:"Self-hosted small (3–10B)", api:false,
-    in:AKKA_INPUT_PER_M*0.5, out:AKKA_OUTPUT_PER_M*0.5},
-  // Self-hosted mid
+    in:AKKA_SMALL_IN, out:AKKA_SMALL_OUT},
+  // Self-hosted mid (30–50B active params)
   {key:"sh:kimi-k2-6", name:"Kimi K2.6 32B", cls:"mid_sh",
     clsLabel:"Self-hosted mid (30–50B)", api:false,
-    in:AKKA_INPUT_PER_M, out:AKKA_OUTPUT_PER_M},
+    in:AKKA_MID_IN, out:AKKA_MID_OUT},
   {key:"sh:deepseek-v4-pro", name:"DeepSeek V4-Pro 49B (self-hosted)", cls:"mid_sh",
     clsLabel:"Self-hosted mid (30–50B)", api:false,
-    in:AKKA_INPUT_PER_M, out:AKKA_OUTPUT_PER_M},
-  // Self-hosted large
+    in:AKKA_MID_IN, out:AKKA_MID_OUT},
+  // Self-hosted large (100B+ active params)
   {key:"sh:kimi-k3", name:"Kimi K3 104B", cls:"large_sh",
     clsLabel:"Self-hosted large (100B+)", api:false,
-    in:AKKA_INPUT_PER_M*2.0, out:AKKA_OUTPUT_PER_M*2.0},
+    in:AKKA_LARGE_IN, out:AKKA_LARGE_OUT},
   {key:"sh:qwen3-vl-235b", name:"Qwen3 VL 235B", cls:"large_sh",
     clsLabel:"Self-hosted large (100B+)", api:false,
-    in:AKKA_INPUT_PER_M*2.0, out:AKKA_OUTPUT_PER_M*2.0},
+    in:AKKA_LARGE_IN, out:AKKA_LARGE_OUT},
 ];
 
 // GPU sources: hourly rates per GPU by (cloud VPC reserved / cloud VPC on-demand)

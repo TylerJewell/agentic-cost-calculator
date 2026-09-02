@@ -374,8 +374,12 @@ function currentHostSource(){
 }
 
 function hostMultiplier(){
-  // Reference: AWS reserved B200 (matches the AKKA_IN/AKKA_OUT calibration).
-  const ref = PROVIDERS.aws;
+  // Reference: GCP reserved B200 at $128.88/node-hr (= $16.11/GPU-hr) — this
+  // is the calibration point the main calc's methodology paragraph uses to
+  // derive the $0.09/$0.62 small, $0.25/$2.39 mid, $0.37/$4.14 large rates.
+  // Picking a cheaper source lowers the multiplier below 1.0; picking a more
+  // expensive one raises it above.
+  const ref = PROVIDERS.gcp;
   if(!ref) return 1;
   const refCost = ref.vpcB200 / 3;
   const s = currentHostSource();
@@ -386,8 +390,11 @@ function hostMultiplier(){
 
 function renderHostSource(){
   const opts = hostSourceOptions();
+  // rates.json values are per-8-GPU-node (matching main calc's fleet math).
+  // Divide by 8 for an honest per-GPU-hour display.
+  const GPUS_PER_NODE = 8;
   $("hostSource").innerHTML = opts.map(o =>
-    `<option value="${o.key}">${o.label} — $${o.hourly.toFixed(2)}/GPU-hr</option>`
+    `<option value="${o.key}">${o.label} — $${(o.hourly/GPUS_PER_NODE).toFixed(2)}/GPU-hr</option>`
   ).join("");
   // Preserve existing choice if still valid; otherwise fall back to first option.
   if(opts.some(o => o.key === hostConfig.source)){
