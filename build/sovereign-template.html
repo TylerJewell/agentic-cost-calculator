@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>What sovereign AI can save you — Akka</title>
+<meta name="description" content="Quantify the cost savings from multi-model routing, intelligent session routing, self-hosting open weight models, and training SLMs.">
+<link rel="icon" href="https://akka.io/favicon.ico" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=optional" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --black:#000000; --medium-black:#141414; --white:#F1F1F1;
+  --yellow:#FFCE4A; --blue:#00DBDD; --red:#FF5400; --green:#72D35B;
+  --soft-grey:#A6A6A6; --medium-grey:#4E4E4E;
+  --line:rgba(78,78,78,.5); --hair:rgba(78,78,78,.24);
+  --fill:linear-gradient(180deg,#101010,#080808);
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --sans:'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --ctl-h:60px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  background:var(--black);color:var(--soft-grey);
+  font-family:var(--sans);font-size:13px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  background-image:radial-gradient(circle,rgba(255,206,74,.035) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:22px 5vw 48px;}
+header{margin-bottom:14px;}
+.brand{color:var(--white);line-height:1;margin-bottom:2px;}
+h1{font-size:clamp(22px,3.4vw,32px);font-weight:700;letter-spacing:-.028em;line-height:1.1;color:var(--white);margin:6px 0 0;}
+h1 .accent{color:var(--yellow);}
+.hsub{font-size:13px;color:var(--soft-grey);margin-top:6px;max-width:82ch;line-height:1.5;}
+
+/* headline comparison */
+.vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:clamp(16px,4vw,44px);
+  border:1px solid var(--line);border-radius:12px;background:var(--fill);
+  padding:clamp(18px,3vw,26px) clamp(18px,4vw,34px);margin:14px 0 0;}
+.vs-side{min-width:0;}
+.vs-aws{text-align:right;}
+.vs-l{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;
+  letter-spacing:2px;color:var(--soft-grey);min-height:2.6em;}
+.vs-v{font-family:var(--mono);font-size:clamp(34px,6.6vw,60px);font-weight:600;line-height:1;
+  letter-spacing:-.035em;margin-top:10px;color:var(--white);font-variant-numeric:tabular-nums;}
+.vs-akka .vs-v{color:var(--green);}
+.vs-aws .vs-v{color:var(--red);}
+.vs-n{font-family:var(--mono);font-size:10px;color:var(--medium-grey);margin-top:9px;}
+.vs-n:empty{display:none;}
+.vs-akka .vs-n{color:var(--yellow);}
+.vs-mid{display:flex;flex-direction:column;align-items:center;gap:10px;align-self:stretch;
+  justify-content:center;}
+.vs-mid::before,.vs-mid::after{content:"";flex:1;width:1px;background:var(--line);min-height:14px;}
+.vs-mid span{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:2px;
+  color:var(--medium-grey);}
+@media (max-width:620px){
+  .vs{grid-template-columns:1fr;gap:14px;text-align:left;}
+  .vs-aws{text-align:left;}
+  .vs-mid{flex-direction:row;align-self:auto;gap:12px;}
+  .vs-mid::before,.vs-mid::after{width:auto;height:1px;min-height:0;}
+}
+.srcpick{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-top:9px;justify-content:flex-end;min-width:0;}
+.vs-akka .srcpick{justify-content:flex-start;}
+.srcpick > *{flex-shrink:0;}
+.srcpick #hostSource{flex-shrink:1;min-width:0;max-width:100%;text-overflow:ellipsis;}
+.srcq{font-size:10.5px;color:var(--soft-grey);white-space:nowrap;}
+.srcpick select{width:auto;height:18px;line-height:18px;font-size:9.5px;font-weight:600;
+  padding:0 5px;border-radius:3px;background:var(--medium-black);color:var(--blue);
+  border:1px solid rgba(0,219,221,.4);color-scheme:dark;
+  min-width:0;text-overflow:ellipsis;}
+.srcpick select option{background:var(--medium-black);color:var(--white);}
+
+/* break-even box under the VS bar */
+.be-box{text-align:center;margin:12px 0 0;padding:11px 18px;
+  border:1px solid var(--hair);border-radius:8px;background:rgba(255,206,74,.03);
+  font-size:12.5px;color:var(--soft-grey);line-height:1.4;}
+.be-box:empty{display:none;}
+.be-box b{font-family:var(--mono);color:var(--yellow);font-weight:600;
+  font-variant-numeric:tabular-nums;font-size:14.5px;}
+
+/* form box */
+.form{border:1px solid var(--line);border-radius:10px;padding:15px 18px;background:var(--fill);margin:12px 0;}
+.form h4{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.4px;color:var(--soft-grey);margin:0 0 12px;}
+.form h4 .r{float:right;text-transform:none;letter-spacing:.3px;color:var(--yellow);}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px 18px;}
+.grid.three{grid-template-columns:1fr 1fr 1fr;}
+.grid.five{grid-template-columns:repeat(5,1fr);}
+.field label{display:block;font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:1px;color:var(--soft-grey);margin-bottom:5px;font-weight:600;}
+.field label .v{float:right;color:var(--blue);letter-spacing:0;font-size:11px;}
+.field .hint{font-family:var(--mono);color:var(--soft-grey);font-size:10.5px;margin-top:5px;}
+.note.wide{max-width:none;}
+.form h4 .r.off{color:var(--red);}
+input[type=range]{width:100%;accent-color:var(--blue);height:18px;cursor:pointer;display:block;}
+@media (max-width:900px){.grid.five{grid-template-columns:1fr 1fr 1fr;}}
+@media (max-width:620px){.grid,.grid.three,.grid.five{grid-template-columns:1fr 1fr;}}
+.field .hint{font-family:var(--mono);color:var(--soft-grey);font-size:10.5px;margin-top:5px;}
+input[type=number]{width:100%;height:var(--ctl-h);background:rgba(0,219,221,.06);
+  border:1px solid rgba(0,219,221,.45);border-radius:8px;color:var(--blue);caret-color:var(--blue);
+  font-family:var(--mono);font-size:clamp(24px,3.1vw,31px);font-weight:600;letter-spacing:-.02em;
+  padding:0 16px;font-variant-numeric:tabular-nums;}
+input[type=number]:focus{outline:none;border-color:var(--blue);background:rgba(0,219,221,.11);
+  box-shadow:0 0 0 3px rgba(0,219,221,.16);}
+select{width:100%;height:var(--ctl-h);background:rgba(0,219,221,.06);border:1px solid rgba(0,219,221,.45);
+  border-radius:8px;color:var(--blue);font-family:var(--mono);font-size:14px;font-weight:600;
+  padding:0 14px;cursor:pointer;}
+select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,219,221,.16);}
+select option{background:var(--medium-black);color:var(--white);font-weight:400;}
+select optgroup{background:var(--black);color:var(--yellow);font-weight:600;}
+.presets{display:flex;gap:6px;}
+.pbtn{flex:1;min-width:0;height:var(--ctl-h);font-family:var(--mono);font-size:14px;letter-spacing:.3px;
+  padding:0;border-radius:8px;border:1px solid var(--line);background:none;color:var(--soft-grey);
+  cursor:pointer;font-weight:600;}
+.pbtn:hover{border-color:var(--blue);color:var(--blue);}
+.pbtn.on{border-color:var(--blue);color:var(--blue);background:rgba(0,219,221,.10);}
+
+/* model catalog rows — tight, two-column: API on the left, self-hosted on the right */
+#modelCatalog{display:grid;grid-template-columns:1fr 1fr;gap:40px;}
+#modelCatalog .cat-col:nth-child(2){padding-left:30px;}
+@media (max-width:620px){#modelCatalog{grid-template-columns:1fr;gap:12px;}
+  #modelCatalog .cat-col:nth-child(2){padding-left:0;}}
+.catgroup{margin-bottom:6px;}
+.catgroup-h{font-family:var(--mono);font-size:8.5px;text-transform:uppercase;letter-spacing:1.2px;
+  color:var(--yellow);font-weight:600;margin:5px 0 1px;padding-bottom:1px;}
+.catrow{display:grid;grid-template-columns:16px 1fr auto;gap:8px;align-items:center;padding:1px 0;line-height:1.1;}
+.catrow input[type=checkbox]{width:14px;height:14px;margin:0;accent-color:var(--blue);cursor:pointer;}
+.catrow .cat-name{font-size:11px;color:var(--white);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.catrow .cat-rate{font-family:var(--mono);font-size:9.5px;color:var(--soft-grey);white-space:nowrap;}
+
+/* lever rows */
+.lever{border-top:1px solid var(--hair);padding:12px 0;}
+.lever:first-child{border-top:0;padding-top:0;}
+.lever-h{display:flex;align-items:flex-start;gap:11px;}
+.lever-tx{flex:1;min-width:0;}
+.lever-tn{font-size:12.5px;color:var(--white);font-weight:600;line-height:1.35;}
+.lever-td{font-size:10.5px;color:var(--soft-grey);margin-top:3px;line-height:1.45;}
+.lever-td .ex{color:var(--medium-grey);display:block;margin-top:2px;font-style:italic;}
+.sw{position:relative;width:34px;height:19px;border-radius:10px;background:rgba(241,241,241,.05);border:1px solid var(--line);cursor:pointer;flex:none;margin-top:2px;}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:var(--medium-grey);transition:left .13s,background .13s;}
+.sw.on{background:rgba(0,219,221,.16);border-color:var(--blue);}
+.sw.on::after{left:17px;background:var(--blue);}
+.lever-c{margin-top:9px;padding-left:0;transition:opacity .15s;}
+.lever:not(.on) .lever-c{opacity:0.4;pointer-events:none;}
+.lever:not(.on) .lever-c input,.lever:not(.on) .lever-c select{color:var(--medium-grey);border-color:var(--line);background:rgba(78,78,78,.08);}
+.lever:not(.on) .lever-c label{color:var(--medium-grey);}
+.lever:not(.on) .lever-c label span{color:var(--medium-grey)!important;}
+.lever-c .row{display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap;}
+.lever-c .row label{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:1px;color:var(--soft-grey);min-width:0;}
+.lever-c .row input[type=number]{width:80px;height:34px;font-size:14px;padding:0 8px;}
+.lever-c .row select{width:auto;min-width:120px;height:34px;font-size:11.5px;padding:0 8px;}
+
+/* two-up split — left is the wider column (routing configuration), right is
+   the thinner acknowledgement column. minmax(0,...) prevents wide children
+   in the left column (long selects, long lever descriptions) from pushing
+   the column wider and squeezing the right. */
+.split{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px;align-items:start;}
+.split .form{margin:12px 0 0;min-width:0;}
+.split .form select,.split .form input{max-width:100%;}
+@media (max-width:900px){.split{grid-template-columns:1fr;}}
+
+/* tables + audit */
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;}
+th{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--soft-grey);font-weight:600;
+  text-align:left;padding:0 12px 7px 0;border-bottom:1px solid var(--line);white-space:nowrap;}
+td{font-size:11.5px;color:var(--soft-grey);padding:6px 12px 6px 0;border-bottom:1px solid var(--hair);vertical-align:top;line-height:1.5;}
+th.n,td.n{text-align:right;padding-right:16px;font-family:var(--mono);white-space:nowrap;}
+td.nm{color:var(--white);font-weight:500;}
+tr.tot td{border-top:3px double var(--line);color:var(--white);font-weight:600;padding-top:9px;padding-bottom:9px;}
+tr.tot td.n{font-size:14px;color:var(--green);}
+
+details{border-top:1px solid var(--hair);margin-top:16px;padding-top:14px;}
+details summary{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.4px;color:var(--soft-grey);cursor:pointer;list-style:none;}
+details summary::-webkit-details-marker{display:none;}
+details summary::before{content:'▸ ';color:var(--yellow);}
+details[open] summary::before{content:'▾ ';}
+details .body{margin-top:13px;}
+
+.note{font-size:11px;color:var(--soft-grey);line-height:1.6;margin-top:11px;max-width:80ch;}
+.akka-mark{display:inline-block;width:auto;fill:currentColor;vertical-align:middle;}
+.brand .akka-mark{height:16px;}
+
+/* footer legalese */
+.legal{max-width:1120px;margin:24px auto 0;padding:15px 5vw 30px;border-top:1px solid var(--line);}
+.legal .lh{font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.6px;color:var(--soft-grey);margin-bottom:9px;}
+.legal p{font-size:9.5px;line-height:1.55;color:var(--medium-grey);margin:0 0 7px;text-align:justify;hyphens:auto;}
+.legal p b{color:var(--soft-grey);font-weight:600;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="brand"><svg class="akka-mark" viewBox="0 0 780 178" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Akka"><polygon points="324.67856 .12152 259.48772 72.62656 259.48772 0 216.25386 0 216.25386 177.95226 259.48772 177.95226 259.48772 105.32551 324.67856 177.83055 381.64294 177.83055 301.75157 88.97603 381.64294 .12152 324.67856 .12152"/><polygon points="516.96368 .12152 451.77284 72.62656 451.77284 0 408.53899 0 408.53899 177.95226 451.77284 177.95226 451.77284 105.32551 516.96368 177.83055 573.92807 177.83055 494.0367 88.97603 573.92807 .12152 516.96368 .12152"/><path d="M114.05281.12191h-32.65812L0,177.83094h45.97063l11.10147-25.74347h82.39016l11.10147,25.74347h45.97063L115.13967.12191h-1.08685ZM72.87776,115.43539l25.38942-58.87581,25.38942,58.87581h-50.77884Z"/><path d="M697.67508.12191h-33.74498l-81.39469,177.70903h45.97063l11.10147-25.74347h82.39016l11.10147,25.74347h45.97063L697.67508.12191ZM655.41317,115.43539l25.38942-58.87581,25.38942,58.87581h-50.77884Z"/></svg></p>
+  <h1>What <span class="accent">sovereign AI</span> can save you</h1>
+  <p class="hsub">A calculator for quantifying the cost savings from multi-model routing, intelligent session routing, self-hosting open weight models, and training SLMs.</p>
+</header>
+
+<div class="vs">
+  <div class="vs-side vs-akka">
+    <p class="vs-l">Optimized</p>
+    <p class="vs-v" id="kOpt">—</p>
+    <div class="srcpick">
+      <span class="srcq">Akka Platform running on</span>
+      <select id="hostCloud"></select>
+      <span class="srcq">with</span>
+      <select id="hostSource"></select>
+    </div>
+  </div>
+  <div class="vs-mid"><span>vs</span></div>
+  <div class="vs-side vs-aws">
+    <p class="vs-l">Not optimized</p>
+    <p class="vs-v" id="kBase">—</p>
+    <div class="srcpick">
+      <span class="srcq">Assuming 100% of AI traffic against</span>
+      <select id="baseModel"></select>
+    </div>
+  </div>
+</div>
+
+<div class="be-box" id="breakEvenBox"></div>
+
+
+<div class="form">
+  <h4>How many tokens will you consume in Y1?</h4>
+  <div class="grid">
+    <div class="field">
+      <label>Billion tokens</label>
+      <input type="number" id="vol" value="5000" min="100" max="50000" step="100" aria-label="Billion tokens a year">
+    </div>
+    <div class="field">
+      <label>Or pick a size</label>
+      <div class="presets" id="presets"></div>
+      <div class="hint">Most mid-size firms run 2,000–8,000B</div>
+    </div>
+  </div>
+
+  <h4>What is your AI use case split? <span class="r" id="alloc">100%</span></h4>
+  <div class="grid five" id="mix"></div>
+  <p class="note wide">The types of AI use cases you expect determines which kinds of models are needed and whether any of the work is a candidate for a specialist SLM. For example, reading documents looks similar each time, so a small trained model can do it for a fraction of the price.</p>
+</div>
+
+<div class="split">
+  <div class="form">
+    <h4>Optimized</h4>
+    <p class="note" style="margin:0 0 10px">Pick up to 6 models to route across. We will split the traffic evenly across them. The routing techniques below will use the cheapest selection as the "cheap tier" and your most expensive as "frontier".</p>
+    <div id="modelCatalog"></div>
+
+    <h4 style="margin-top:25px">Routing techniques</h4>
+    <div id="optLevers"></div>
+  </div>
+  <div class="form">
+    <h4>Not optimized</h4>
+    <div id="baseLevers"></div>
+  </div>
+</div>
+
+<details id="auditPanel">
+  <summary>Show calculation trail</summary>
+  <div class="body">
+    <p class="note">Starts with the not-optimized total on the right. Each active lever's marginal contribution to the reduction appears below it. The final row is the optimized total on the left. Bridging line explains the jump from "not-optimized reality" to "100% frontier baseline" — Akka's routing infrastructure replaces the right-side reductions rather than stacking with them.</p>
+    <table id="auditTbl">
+      <thead><tr><th>Step</th><th class="n">Change</th><th class="n">Running total</th></tr></thead>
+      <tbody id="auditBody"></tbody>
+    </table>
+    <p class="note" style="margin-top:14px"><b style="color:var(--soft-grey)">GPU and location assumption.</b> Akka's self-hosted per-million-token rate is currently a single derived pair — $0.09 input / $0.62 output for a mid-class open-weight model, before size-class scaling — taken from the main calculator's GCP methodology (NVIDIA B200 on a Google <code>a4-highgpu-8g</code> endpoint at reserved-capacity rate, divided by the modelled serving throughput). It does not model AWS vs Azure vs GCP, H100 vs B200, or reserved vs on-demand — all of which are 2×–6× levers on the same workload in the main calculator. If a customer wants a real quote, the main calc is where the fleet math lives. A future version of this calculator should surface those pickers directly.</p>
+  </div>
+</details>
+
+</div>
+
+<div class="legal">
+  <div class="lh">Basis of estimate, sources and definitions</div>
+
+  <p><b>Scope.</b> The customer enters annual token volume and picks up to six destinations. The not-optimized figure prices 100% of that volume against a single frontier model on the right, adjusted for a small set of real-world concessions the customer would already apply without Akka. The optimized figure prices the same volume against the selected destinations, then applies each active routing technique on top. Amounts are annual, in US dollars, at list price. This estimate is a planning aid; it is not a quotation and it commits neither Akka nor any provider.</p>
+
+  <p><b>Model selection.</b> Traffic is split evenly across the selected destinations, so a selection of four models gives each 25% of tokens. The cheapest selection sets the cheap tier and the most expensive sets the frontier for the routing techniques below; the middle selections take the base distribution rate and nothing more. Selecting one model collapses cascade and planner/worker to no-ops, since neither has a distinct cheap tier or frontier to route between. Mixing API and self-hosted destinations is supported and expected.</p>
+
+  <p><b>Per-token API rates.</b> First-party direct-API rates from Anthropic, OpenAI and DeepSeek, verified 16&nbsp;August&nbsp;2026 and stored in <code>audit/rates.json</code>. GPT-5.6 Sol is listed at half its $5.00/$30.00 standard rate under a 50% discount; if that discount lapses the rate doubles. DeepSeek rates are cache-miss input; peak and off-peak pricing was announced for 16:00 UTC on 16&nbsp;August&nbsp;2026, so these rates are the flat-rate era and should be re-checked. Anthropic and OpenAI models are proprietary: weights and adapters are not distributed, so a routing decision that would send traffic to a self-hosted equivalent runs against an open-weight model rather than the API one.</p>
+
+  <p><b>Self-hosted rates.</b> Self-hosted destinations do not have a per-token rate card. Their effective per-million-token cost is the chosen GPU hourly rate divided by serving throughput, further divided by 40% endpoint utilisation because a reserved node bills whether or not it is serving. The baseline calibration is $0.09 input and $0.62 output per million tokens on a mid-class 30–50B open-weight model, derived from a Google a4-highgpu-8g endpoint carrying eight NVIDIA B200 at $16.11 per GPU-hour and the throughput model described below. Small open-weight is modelled at half that rate and large open-weight at twice, on the basis that per-token cost scales roughly with active parameter count. A future rates.json refresh should carry canonical per-model-class per-million-token rates rather than a scalar multiplier.</p>
+
+  <p><b>GPU source and cloud.</b> Akka Platform is priced against the customer's chosen cloud for platform services and against the chosen GPU source for self-hosted inference. In-VPC options are the reserved and on-demand rates published by the chosen cloud. Neocloud options run outside the cloud VPC and are enumerated in full regardless of cloud choice: Lambda at $1.49 and $2.99 per GPU-hour, Nebius committed and on-demand, and CoreWeave committed and on-demand. AWS reserved figures are $27.52 per H100-hour and $56.97 per B200-hour; AWS on-demand doubles to $55.04 and $113.93. Azure reserved is $59.00 and $121.00, on-demand $98.32 and $201.67. Google reserved is $83.19 and $128.88, on-demand $88.49 and $128.88; the Google reserved B200 rate uses the three-year committed-use discount published for a3, since a4 is routed through the AI Hypercomputer reservation system rather than the committed-use machinery.</p>
+
+  <p><b>Serving throughput.</b> Per-GPU serving throughput is modelled at 25,000 tokens per second prefill and 3,000 tokens per second decode on an H100 at a 12B dense equivalent, scaling as 1/N with active parameter count. B200 is modelled at three times H100 throughput on prefill and decode, matching the ratio used in the reserved-capacity table of the main calculator. Prefill is compute-bound and decode is bound by memory bandwidth. These figures are first-principles rather than benchmarked, and mixed sequence lengths are expected to reach only half to two-thirds of them; the derived per-million-token rate above already incorporates that assumption.</p>
+
+  <p><b>Not-optimized side.</b> Starts at the chosen frontier model's blended rate. <b>Some traffic already goes to a cheaper model</b> replaces the configured share with a mid-tier or small-tier API selection at its published rate. <b>Annual vendor volume commit</b> applies a flat discount to the remainder at published enterprise schedules: 5% at $50k a year, 10% at $250k, 15% at $1M, 22% at $5M. These figures are corroborated against OpenAI and Anthropic enterprise disclosures and should be verified per customer. <b>Provider prompt-cache discount</b> reduces the input-token share of cost by the configured prefix hit rate times (1&nbsp;−&nbsp;12.07%), matching the effective input rate measured across 969 Claude Code transcripts and 50,279 API calls. <b>Batch API pricing</b> applies a 50% discount to the configured async share; Anthropic and OpenAI both publish 50% off for up-to-24-hour turnaround.</p>
+
+  <p><b>Semantic response cache.</b> The hit share of tokens pays nothing. A hit is a nearest-neighbour lookup against previously served responses in an embedding index; the hit rate depends on how much of the workload is recurring and is a customer-specific figure. Reference implementations include GPTCache (MIT) and aurelio-labs/semantic-router (MIT); Akka's shipped semantic-router embedder is the natural substrate. The current design assumes a customer-specific hit rate rather than a modelled default across workloads.</p>
+
+  <p><b>Cascade / escalation.</b> Cascade is not a routing consumer; it is a policy applied to frontier calls. For the configured share of frontier-bound traffic, the effective per-token rate is the cheapest selection's blended rate plus the escalation rate times the frontier blended rate. That fraction replaces the frontier contribution to the base distribution cost. Output-shape triggers (refusal, empty answer, format violation) provide the free-floor escalation signal; a small critic model or log-prob confidence tightens it further. Reference implementations include FrugalGPT (Apache-2.0) and AutoMix (Apache-2.0).</p>
+
+  <p><b>Planner / worker role binding.</b> Modern coding harnesses (Claude Code, Aider, Cursor, LangGraph, DSPy, CrewAI) already expose distinct planner and worker slots. For the configured agentic share of traffic, the planner-side takes the most expensive selected model and the worker-side takes the cheapest, with the worker turn ratio setting the split. The gateway does not decide the split — the customer configures their own harness — but the resulting cost ratio is legible in the routing capture and priced here. Coding trajectories are 80–95% worker turns in published measurements.</p>
+
+  <p><b>Sticky session routing.</b> Multi-turn conversations get a prompt-cache discount on the repeated prefix only when every turn goes to the same provider. Cost is scaled by (1&nbsp;−&nbsp;multi-turn share × cached-prefix share × input weight × prompt-cache saving). Cached-prefix share within a multi-turn session is modelled at 70%, input weight at 50% (input tokens are roughly half the blended cost for typical rate cards), and the prompt-cache saving is (1&nbsp;−&nbsp;12.07%) matching the effective input rate above.</p>
+
+  <p><b>Prompt compression.</b> A small model rewrites verbose prompts to preserve meaning while cutting the token count on the eligible share. Cost is scaled by (1&nbsp;−&nbsp;eligible share × compression ratio × input weight). Input weight is 50% as above; the compression ratio is a customer-specific figure since it depends on prompt shape. Reference implementation is LLMLingua and LLMLingua-2 (MIT). Aggressive compression carries a measurable quality drop and is best used on retrieval-heavy workloads with long stuffed context.</p>
+
+  <p><b>SLM training.</b> A trained specialist model consumes approximately 40% of the prior input tokens and produces 60% of the prior output tokens on a model requiring half the compute per token, giving roughly a 75% cost reduction on the eligible slice. Cost is scaled by (1&nbsp;−&nbsp;eligible share × 0.75). Only enabled when at least one self-hosted model is in the selection, because the trained specialist has nowhere to run without hosting infrastructure. Adapters are served as LoRA weights on a shared base model, adding under 1 GB of GPU memory each; training executes against idle reserved capacity and carries no incremental charge in the Akka figure.</p>
+
+  <p><b>Rate multipliers on self-hosted destinations.</b> The GPU source picker sets a multiplier applied to every self-hosted per-million-token rate in the compute. The reference is AWS reserved B200 at $56.97 per GPU-hour divided by throughput factor 3, giving $18.99 per throughput-normalised hour. Chosen&nbsp;/&nbsp;reference gives the multiplier: AWS reserved B200 lands at 1.00, on-demand at 2.00, Nebius committed B200 at 0.50, CoreWeave on-demand H100 at 2.60, GCP reserved B200 at 2.26. Cloud choice affects the multiplier when an in-VPC source is picked; a neocloud source is independent of the cloud choice.</p>
+
+  <p><b>Akka Platform overhead and break-even.</b> The optimised figure applies a variable margin on the compute cost and adds a single fixed annual platform floor that covers compute, storage, network, licence and connectivity together. Margin is 50% at or below five trillion tokens a year and declines log-scale to 18.8% at one thousand trillion. The fixed floor is $100,000 a year. Break-even solves for the token volume where not-optimised equals optimised: V*&nbsp;=&nbsp;fixed&nbsp;/&nbsp;(rate_notopt&nbsp;−&nbsp;rate_opt_after_margin). Below V* the platform floor outweighs the routing savings and the customer pays less by staying on the not-optimised path; above V* the per-token savings dominate.</p>
+
+  <p><b>General.</b> All amounts are in US dollars at list price. No enterprise discount, private pricing agreement, reserved instance, savings plan, capacity block or other committed-use discount is applied beyond those stated in the volume-commit checkbox on the not-optimized side and the reserved rates on the GPU source picker. Amounts exclude customer personnel, third-party software and infrastructure outside the fleet described. Sources: Amazon Bedrock and Amazon EC2 pricing; Azure AI Foundry and Azure Virtual Machines pricing; Google Cloud Vertex AI and Compute Engine pricing; Anthropic, OpenAI and DeepSeek platform pricing; the Microsoft Azure LLM inference traces; Artificial Analysis; RouteLLM, GPTCache, FrugalGPT, AutoMix and LLMLingua published references for the routing-technique multipliers.</p>
+</div>
+
+<script>
+/*__MODEL__*/
+
+const $=(id)=>document.getElementById(id);
+const OUT_RATIO=1-IN_RATIO;
+
+// Workload mix state — five sliders in the intake box, tracked as percentages.
+const mixVals={};
+WORKLOADS.forEach(w=>mixVals[w.key]=w.def);
+
+// Model selection state: Set<catalogKey>. Every selected model gets an equal
+// share (1/N) of the traffic — no per-model share slider.
+const selected = new Set();
+function defaultSelection(){
+  selected.clear();
+  selected.add("Anthropic:claude-opus-5");
+  selected.add("Anthropic:claude-haiku-4-5");
+  selected.add("sh:kimi-k3");
+  selected.add("sh:qwen3-coder-next");
+}
+defaultSelection();
+
+const CATALOG_BY_KEY = Object.fromEntries(CATALOG.map(m => [m.key, m]));
+function selectedList(){
+  // Returns [{model, share}] with equal shares summing to 1.0.
+  if(selected.size === 0) return [];
+  const share = 1 / selected.size;
+  return [...selected].map(k => ({model:CATALOG_BY_KEY[k], share}));
+}
+
+// Self-host infrastructure configuration. Cloud drives Akka Platform costs
+// (like the main calc), and source picks the GPU rate that self-hosted models
+// serve tokens against.
+const hostConfig = {cloud:"aws", source:"vpc_reserved_b200"};
+// H100 has ~1x throughput; B200 has ~3x (main calc's serving-throughput ratio).
+const GPU_THROUGHPUT = {h100:1, b200:3};
+
+// Enumerate the source options for the current cloud choice: in-VPC reserved,
+// in-VPC on-demand, plus every neocloud — each × H100/B200. Returns
+// [{key, label, hourly, gpu, throughput}].
+function hostSourceOptions(){
+  const opts = [];
+  const p = PROVIDERS[hostConfig.cloud];
+  if(p){
+    opts.push({key:"vpc_reserved_b200",  label:p.label+" reserved B200",  hourly:p.vpcB200,   gpu:"b200", throughput:3});
+    opts.push({key:"vpc_reserved_h100",  label:p.label+" reserved H100",  hourly:p.vpcH100,   gpu:"h100", throughput:1});
+    opts.push({key:"vpc_ondemand_b200",  label:p.label+" on-demand B200", hourly:p.vpcOdB200, gpu:"b200", throughput:3});
+    opts.push({key:"vpc_ondemand_h100",  label:p.label+" on-demand H100", hourly:p.vpcOdH100, gpu:"h100", throughput:1});
+  }
+  for(const [nk, nv] of Object.entries(NEOCLOUDS)){
+    // Strip the ", $X.XX/GPU-hr" tag that some neocloud labels carry —
+    // we already append the actual hourly at render time.
+    const short = nv.label.replace(/,\s*\$[\d.]+\/GPU-hr/, "");
+    opts.push({key:nk+"_b200", label:short+" B200", hourly:nv.b200, gpu:"b200", throughput:3});
+    opts.push({key:nk+"_h100", label:short+" H100", hourly:nv.h100, gpu:"h100", throughput:1});
+  }
+  return opts;
+}
+
+function currentHostSource(){
+  return hostSourceOptions().find(o => o.key === hostConfig.source) || hostSourceOptions()[0];
+}
+
+function hostMultiplier(){
+  // Reference: AWS reserved B200 (matches the AKKA_IN/AKKA_OUT calibration).
+  const ref = PROVIDERS.aws;
+  if(!ref) return 1;
+  const refCost = ref.vpcB200 / 3;
+  const s = currentHostSource();
+  if(!s) return 1;
+  const chosenCost = s.hourly / s.throughput;
+  return chosenCost / refCost;
+}
+
+function renderHostSource(){
+  const opts = hostSourceOptions();
+  $("hostSource").innerHTML = opts.map(o =>
+    `<option value="${o.key}">${o.label} — $${o.hourly.toFixed(2)}/GPU-hr</option>`
+  ).join("");
+  // Preserve existing choice if still valid; otherwise fall back to first option.
+  if(opts.some(o => o.key === hostConfig.source)){
+    $("hostSource").value = hostConfig.source;
+  } else {
+    hostConfig.source = opts[0].key;
+    $("hostSource").value = opts[0].key;
+  }
+}
+function hasSelfHosted(list){ return list.some(s => !s.model.api); }
+function cheapestSelected(list){
+  return list.slice().sort((a,b) => blendedPerM(a.model) - blendedPerM(b.model))[0];
+}
+function frontierSelected(list){
+  return list.slice().sort((a,b) => blendedPerM(b.model) - blendedPerM(a.model))[0];
+}
+function cheapestSelfHostedSelected(list){
+  const sh = list.filter(s => !s.model.api);
+  return sh.length ? sh.sort((a,b) => blendedPerM(a.model) - blendedPerM(b.model))[0] : null;
+}
+
+// ---- lever definitions ----
+// Each optimized lever is a residual-composition step. `defaults` are the
+// citations-supported starting values. See docs/sovereign-ai-calculator-design.md
+// for each lever's plain-language explanation and simple example.
+const OPT_LEVERS=[
+  {k:"semCache", n:"Semantic response cache", on:true,
+   d:"Recognizes when two requests are asking the same thing in different words and hands back the earlier answer at zero cost.",
+   ex:"Two different agents ask the same return-policy question in different wording — the cache returns yesterday's answer instantly.",
+   cfg:[{k:"hit", label:"cache-hit rate %", val:20, min:0, max:80, step:1}]},
+  {k:"cascade", n:"Cascade / escalation", on:true,
+   d:"For requests that would otherwise hit a frontier model, try a cheap model first and escalate to frontier only when the cheap answer looks obviously bad. Reduces what frontier destinations cost across the board. Cheap tier is whichever destination you configured in the Self-hosting section above.",
+   ex:"Small model answers 'capital of France' correctly for free; escalates the SQL-proof to a frontier model.",
+   cfg:[
+     {k:"share", label:"frontier calls cascaded %", val:40, min:0, max:100, step:1},
+     {k:"esc", label:"escalation rate %", val:30, min:5, max:70, step:1}
+   ]},
+  {k:"pw", n:"Planner / worker role binding", on:true,
+   d:"Coding agents run like a manager and a worker: the manager decides what, the worker does the mechanical edits. Worker turns go to your configured Self-hosting destination.",
+   ex:"Claude Code's planning turn runs on Opus; its twenty file-edit turns run on Haiku or a self-hosted small model.",
+   cfg:[
+     {k:"agentic", label:"agentic share %", val:60, min:0, max:100, step:1},
+     {k:"worker", label:"worker turn %", val:85, min:50, max:98, step:1}
+   ]},
+  {k:"sticky", n:"Sticky session routing", on:true,
+   d:"Multi-turn conversations get a big prompt-cache discount on the repeated prefix — only if every turn goes to the same provider.",
+   ex:"An 8-turn support conversation stays with Anthropic; turns 2–8 pay ~10% of normal input rate on the repeated system prompt.",
+   cfg:[{k:"share", label:"multi-turn share %", val:50, min:0, max:100, step:1}]},
+  {k:"compress", n:"Prompt compression", on:true,
+   d:"A small model rewrites verbose prompts to preserve the meaning while cutting the token count. Best on RAG-heavy workloads with long retrieved context. Turn off if your prompts are already lean or if quality drift shows up in your evals.",
+   ex:"15,000 tokens of retrieved RAG documents compressed to 4,000 tokens with the same answer quality.",
+   cfg:[
+     {k:"ratio", label:"compression %", val:25, min:0, max:60, step:1},
+     {k:"share", label:"eligible traffic %", val:50, min:0, max:100, step:1}
+   ]},
+  {k:"slm", n:"Train SLMs for repeating tasks", on:true,
+   d:"For work that repeats often, a trained specialist model takes ~40% of prior input tokens and returns ~60% shorter output on a model half the size.",
+   ex:"Reading standardized invoices repeats often — a trained SLM handles the whole workload at a fraction of the frontier rate.",
+   cfg:[{k:"eligible", label:"eligible traffic %", val:40, min:0, max:100, step:1}]}
+];
+
+const BASE_LEVERS=[
+  {k:"cheaper", n:"Some traffic already goes to a cheaper model", on:true,
+   d:"Most teams already use a mid-tier or small-tier model for the obvious easy stuff.",
+   ex:"Marketing drafts blog posts on Gemini Flash; engineering hits Opus for the hard stuff — 15% is already on the cheap side.",
+   cfg:[
+     {k:"share", label:"% of traffic", val:15, min:0, max:100, step:1},
+     {k:"model", label:"cheaper model", type:"select", options:"MIDTIER", val:0}
+   ]},
+  {k:"commit", n:"Annual vendor volume commit", on:false,
+   d:"A committed annual spend earns a discount off list rates — like any enterprise SaaS deal.",
+   ex:"A $1M/yr commit with Anthropic knocks 15% off the list rate on all Anthropic-served traffic.",
+   cfg:[{k:"tier", label:"commit tier", type:"select", options:"COMMIT_TIERS", val:0}]},
+  {k:"pcache", n:"Provider prompt-cache discount", on:true,
+   d:"Anthropic and OpenAI both auto-cache the repeated prefix of your prompts within a session. Free — no routing decision.",
+   ex:"A support bot's 3,000-token system prompt costs ~10% of normal after the first turn.",
+   cfg:[{k:"hit", label:"prefix hit rate %", val:25, min:0, max:60, step:1}]},
+  {k:"batch", n:"Batch API pricing", on:false,
+   d:"Providers offer roughly 50% off for requests you're willing to wait up to 24 hours for.",
+   ex:"Overnight categorization of 500k support tickets runs at half rate.",
+   cfg:[{k:"share", label:"async share %", val:5, min:0, max:80, step:1}]}
+];
+
+// ---- helpers ----
+function blendedPerM(m){
+  const base = IN_RATIO*m.in + OUT_RATIO*m.out;
+  // Self-hosted per-M is derived from GPU-hour cost; it scales with the
+  // customer's cloud/reservation/GPU choice. API rates are billed as quoted.
+  return (m.api === false) ? base * hostMultiplier() : base;
+}
+
+// Fixed annual overhead of running Akka Platform: a single figure that
+// captures compute, storage, network, licence and connectivity together.
+function platformFixed(){ return PLATFORM_FIXED; }
+
+// Variable margin declines log-scale with billion-token volume from
+// MARGIN_HI at MARGIN_V0 to MARGIN_LO at MARGIN_V1. Below v0 caps at hi;
+// above v1 floors at lo.
+function marginAt(volB){
+  if(volB <= MARGIN_V0) return MARGIN_HI;
+  if(volB >= MARGIN_V1) return MARGIN_LO;
+  const t = Math.log10(volB/MARGIN_V0) / Math.log10(MARGIN_V1/MARGIN_V0);
+  return MARGIN_HI + (MARGIN_LO - MARGIN_HI) * t;
+}
+function volTokens(){return (+$("vol").value||0) * 1e9;}
+function money(v){
+  if(v>=1e9) return "$"+(v/1e9).toFixed(2)+"B";
+  if(v>=1e6) return "$"+(v/1e6).toFixed(2)+"M";
+  if(v>=1e3) return "$"+(v/1e3).toFixed(0)+"K";
+  return "$"+v.toFixed(0);
+}
+function readCfg(lev){
+  const o={};
+  for(const c of lev.cfg){
+    const id="cfg_"+lev.k+"_"+c.k;
+    const el=$(id); if(!el) continue;
+    o[c.k]=(el.tagName==="SELECT")? (+el.value) : (+el.value/100);
+    if(c.type==="select") o[c.k]=+el.value;
+  }
+  return o;
+}
+function isOn(k){return $("sw_"+k).classList.contains("on");}
+
+// ---- resolve select-source references ----
+function resolveOptions(name){
+  if(name==="MIDTIER") return MIDTIER.map((m,i)=>({v:i,l:m.p+" "+m.m+" ($"+m.in.toFixed(2)+"/$"+m.out.toFixed(2)+")"}));
+  if(name==="COMMIT_TIERS") return COMMIT_TIERS.map((t,i)=>({v:i,l:t.label+(t.pct?" ("+(t.pct*100).toFixed(0)+"% off)":"")}));
+  return [];
+}
+
+function renderCatalog(){
+  const byCls = {};
+  ["frontier","mid","small","mid_sh","large_sh"].forEach(c => byCls[c] = []);
+  CATALOG.forEach(m => byCls[m.cls].push(m));
+  const groupLabel = {
+    frontier: "API frontier",
+    mid:      "API mid-tier",
+    small:    "Self-hosted small (3–10B)",
+    mid_sh:   "Self-hosted mid (30–50B)",
+    large_sh: "Self-hosted large (100B+)"
+  };
+
+  function groupHtml(clsKey){
+    const items = byCls[clsKey].map(m => {
+      const isSel = selected.has(m.key);
+      // API rows show billed input/output per-M. Self-hosted rows show no
+      // rate — their cost is GPU-hour based (see the audit trail note).
+      const rateCell = m.api
+        ? `<div class="cat-rate">$${m.in.toFixed(3)} / $${m.out.toFixed(3)} per M</div>`
+        : `<div class="cat-rate"></div>`;
+      return `<div class="catrow" data-model="${m.key}">
+        <input type="checkbox" data-mtoggle="${m.key}" ${isSel?"checked":""}>
+        <div class="cat-name">${m.name}</div>
+        ${rateCell}
+      </div>`;
+    }).join("");
+    return `<div class="catgroup"><div class="catgroup-h">${groupLabel[clsKey]}</div>${items}</div>`;
+  }
+
+  const apiCol = groupHtml("frontier") + groupHtml("mid");
+  const shCol = groupHtml("small") + groupHtml("mid_sh") + groupHtml("large_sh");
+  $("modelCatalog").innerHTML = `<div class="cat-col">${apiCol}</div><div class="cat-col">${shCol}</div>`;
+}
+
+// ---- compute ----
+function computeNotOptimized(baseM){
+  const V=volTokens();
+  const cheapPct = isOn("cheaper")? readCfg(BASE_LEVERS[0]).share : 0;
+  const cheapIdx = isOn("cheaper")? readCfg(BASE_LEVERS[0]).model : 0;
+  const cheap = MIDTIER[cheapIdx] || MIDTIER[0];
+  const basePerM = blendedPerM(baseM);
+  const cheapPerM = blendedPerM(cheap);
+  // 100% - cheapShare on frontier, cheapShare on the mid-tier
+  let cost = (V/1e6) * ((1-cheapPct)*basePerM + cheapPct*cheapPerM);
+  // commit: flat discount, tracked so the pcache saving below can apply on
+  // the discounted input tokens (otherwise pcache over-saves proportionally
+  // to the commit tier).
+  let commitPct = 0;
+  if(isOn("commit")){
+    commitPct = COMMIT_TIERS[readCfg(BASE_LEVERS[1]).tier].pct;
+    cost *= (1 - commitPct);
+  }
+  // provider prompt-cache: input-side reduction on hit share, applied to the
+  // COMMIT-DISCOUNTED input cost so the two levers stack proportionally.
+  if(isOn("pcache")){
+    const hit = readCfg(BASE_LEVERS[2]).hit;
+    const inputCost = (V/1e6) * IN_RATIO
+                    * ((1-cheapPct)*baseM.in + cheapPct*cheap.in)
+                    * (1 - commitPct);
+    cost -= inputCost * hit * (1 - CACHE_MULT);
+  }
+  // batch: API_BATCH_MULT discount on the async share. Distinct from main
+  // calc's BATCH_MULT, which is a throughput-uplift factor, not an API discount.
+  if(isOn("batch")){
+    const share = readCfg(BASE_LEVERS[3]).share;
+    cost *= (1 - share * (1 - API_BATCH_MULT));
+  }
+  return Math.max(0, cost);
+}
+
+function computeOptimized(baseM, activeOverride){
+  const list = selectedList();
+  const V = volTokens();
+
+  // No models selected: OPT collapses to NOT OPT — there is no destination for
+  // routing to send traffic to.
+  if(list.length === 0) return computeNotOptimized(baseM);
+
+  const use = (k) => {
+    // SLM training requires at least one self-hosted model in the selection.
+    if(k === "slm" && !hasSelfHosted(list)) return false;
+    return activeOverride ? activeOverride.has(k) : isOn(k);
+  };
+
+  // Baseline distribution: sum(share_i × blended_i) across selected models.
+  // This is the "tiered routing" story built into the selection itself.
+  const blendedRate = list.reduce((a, s) => a + s.share * blendedPerM(s.model), 0);
+  let cost = (V/1e6) * blendedRate;
+  // effectiveBlendedRate tracks the current per-token rate after each lever
+  // that modifies a share of the distribution. Downstream levers (like PW)
+  // subtract against this, not the stale blendedRate, so they cannot
+  // double-count against a slice that a previous lever already discounted.
+  let effectiveBlendedRate = blendedRate;
+
+  const cheap = cheapestSelected(list);
+  const front = frontierSelected(list);
+  const cheapPerM = blendedPerM(cheap.model);
+  const frontPerM = blendedPerM(front.model);
+
+  // Cascade: for the share of frontier-bound traffic subject to cascade, price
+  // it as (cheapest + esc × frontier) instead of frontier alone. Substitutes
+  // the frontier-share contribution to cost.
+  if(use("cascade") && list.length > 1){
+    const c = readCfg(OPT_LEVERS[1]);
+    const frontShare = front.share;
+    const cascadeAlt = cheapPerM + c.esc*frontPerM;
+    const cascadedFrontRate = c.share*cascadeAlt + (1 - c.share)*frontPerM;
+    cost -= (V/1e6) * frontShare * frontPerM;
+    cost += (V/1e6) * frontShare * cascadedFrontRate;
+    // Cascade replaced part of the frontier share's cost; the effective rate
+    // is now the same distribution with the front slice re-priced.
+    effectiveBlendedRate = effectiveBlendedRate
+      - frontShare * frontPerM
+      + frontShare * cascadedFrontRate;
+  }
+
+  // Planner/worker: for the agentic share of total traffic, replace the
+  // CURRENT effective rate with a planner+worker split — worker fraction pays
+  // the cheapest selected, remainder pays the most expensive selected.
+  // Subtracting effectiveBlendedRate (not blendedRate) preserves any earlier
+  // cascade discount instead of over-crediting on the overlap.
+  if(use("pw") && list.length > 1){
+    const c = readCfg(OPT_LEVERS[2]);
+    const pwRate = c.worker*cheapPerM + (1-c.worker)*frontPerM;
+    cost -= (V/1e6) * c.agentic * effectiveBlendedRate;
+    cost += (V/1e6) * c.agentic * pwRate;
+    // Update effective rate: agentic share now pays pwRate instead of previous.
+    effectiveBlendedRate = effectiveBlendedRate * (1 - c.agentic) + c.agentic * pwRate;
+  }
+
+  // Semantic response cache: hit-share pays nothing.
+  if(use("semCache")){
+    const c = readCfg(OPT_LEVERS[0]);
+    cost *= 1 - c.hit;
+  }
+
+  // ---- post-pipeline multipliers ----
+  const INPUT_WEIGHT = 0.5;
+  const CACHED_PREFIX_FRAC = 0.7;
+
+  if(use("sticky")){
+    const share = readCfg(OPT_LEVERS[3]).share;
+    cost *= 1 - share * CACHED_PREFIX_FRAC * INPUT_WEIGHT * (1 - CACHE_MULT);
+  }
+  if(use("compress")){
+    const c = readCfg(OPT_LEVERS[4]);
+    cost *= 1 - c.share * c.ratio * INPUT_WEIGHT;
+  }
+  if(use("slm")){
+    // Replace the eligible share with the SLM rate. Adapter compression from
+    // the ADAPT constant (shared with the main calc): inputRetained × input
+    // + outputRetained × output, all on a model computeMultiple as expensive
+    // per token. The full formula matches main's SLM Savings tab.
+    const eligible = readCfg(OPT_LEVERS[5]).eligible;
+    const shModel = cheapestSelfHostedSelected(list);
+    if(shModel){
+      const slmPerM = (IN_RATIO*shModel.model.in*ADAPT.inputRetained
+                    + OUT_RATIO*shModel.model.out*ADAPT.outputRetained)
+                    * ADAPT.computeMultiple;
+      // Compare SLM's per-token cost against the current effective rate so the
+      // saving reflects the actual per-token spend on the eligible slice
+      // after all previous levers have modified it.
+      cost *= 1 - eligible * (1 - slmPerM/effectiveBlendedRate);
+    }
+  }
+
+  // Apply Akka margin on the variable (compute) cost, then add the fixed
+  // platform floor. Both come from rates.json's runtime.akka block.
+  const volB = (+$("vol").value) || 0;
+  cost *= (1 + marginAt(volB));
+  cost += platformFixed();
+
+  return Math.max(0, cost);
+}
+
+// Break-even token volume: NOT OPT(V) = OPT(V). Since both are linear in V
+// once fixed costs are separated out, solve V* = fixed_cost / (r_notopt − r_opt).
+// r_opt is the per-token rate of OPT AFTER margin but BEFORE the fixed floor.
+// Returns null if OPT is more expensive than NOT OPT at every volume, or if
+// the delta is not meaningfully positive.
+function computeBreakEven(baseM){
+  const V = volTokens();
+  if(V < 1e9) return null;
+  const rNotOpt = computeNotOptimized(baseM) / V;   // $ per token
+  const optTotal = computeOptimized(baseM);
+  const fixed = platformFixed();
+  const rOpt = (optTotal - fixed) / V;
+  const delta = rNotOpt - rOpt;
+  if(delta <= 0) return null;                       // OPT never wins
+  const breakEvenTokens = fixed / delta;
+  return breakEvenTokens;                           // in absolute tokens
+}
+
+// ---- Audit trail generator ----
+// The trail starts from the NOT OPTIMIZED figure and walks down each active
+// OPT lever's marginal contribution. Each lever's savings is computed as
+// [cost with all-earlier active] minus [cost with the lever added].
+// The sum of savings equals (baseline − OPT), so the trail's math is closed:
+// row 1 total minus sum(rows 2..N) = final OPT total.
+const LEVER_ORDER = ["semCache","cascade","pw","sticky","compress","slm"];
+
+function generateAuditTrail(baseM, notOpt){
+  const trail = [];
+  const baseline_m = FRONTIER[+$("baseModel").value];
+  trail.push({label:`Not optimized — 100% at ${baseline_m.p} ${baseline_m.m} with your right-side concessions`,
+              cost:notOpt, delta:null, kind:"ref"});
+
+  const list = selectedList();
+  // Baseline for OPT walk = "Akka price for the base distribution before any
+  // routing lever is active" = compute with an empty active set, so margin and
+  // the fixed platform floor are already applied. Each subsequent lever's
+  // delta is then purely that lever's marginal reduction, not the one-time
+  // jump for adding platform overhead.
+  const baseline = computeOptimized(baseM, new Set());
+
+  if(Math.abs(baseline - notOpt) > 1){
+    const sel = list.length ? list.length+" model"+(list.length>1?"s":"") : "no models";
+    trail.push({label:"Akka price for base distribution across your "+sel+" (before routing techniques, includes margin and platform floor)",
+                cost:baseline, delta:baseline-notOpt, kind:"bridge"});
+  }
+
+  const active = new Set();
+  let prev = baseline;
+  const leverByK = Object.fromEntries(OPT_LEVERS.map(l=>[l.k,l]));
+  for(const k of LEVER_ORDER){
+    if(!isOn(k)) continue;
+    active.add(k);
+    const c = computeOptimized(baseM, active);
+    trail.push({label:leverByK[k].n, cost:c, delta:c-prev, kind:"lever"});
+    prev = c;
+  }
+
+  const optNow = computeOptimized(baseM);
+  trail.push({label:"Optimized total", cost:optNow, delta:null, kind:"tot"});
+  return trail;
+}
+
+// ---- render ----
+function renderLevers(where, list){
+  const html = list.map(lev => {
+    const cfg = lev.cfg.map(c => {
+      const id="cfg_"+lev.k+"_"+c.k;
+      if(c.type==="select"){
+        const opts = resolveOptions(c.options).map(o=>`<option value="${o.v}">${o.l}</option>`).join("");
+        return `<div class="row"><label for="${id}">${c.label}</label><select id="${id}">${opts}</select></div>`;
+      }
+      return `<div class="row"><label for="${id}">${c.label} <span id="${id}v" style="color:var(--blue)">${c.val}</span></label>
+        <input type="range" id="${id}" min="${c.min}" max="${c.max}" step="${c.step}" value="${c.val}" style="flex:1"></div>`;
+    }).join("");
+    return `<div class="lever ${lev.on?'on':''}" data-k="${lev.k}">
+      <div class="lever-h">
+        <div class="sw ${lev.on?'on':''}" id="sw_${lev.k}" role="switch" tabindex="0" aria-checked="${lev.on}"></div>
+        <div class="lever-tx">
+          <div class="lever-tn">${lev.n}</div>
+          <div class="lever-td">${lev.d}</div>
+        </div>
+      </div>
+      <div class="lever-c">${cfg}</div>
+    </div>`;
+  }).join("");
+  $(where).innerHTML = html;
+}
+
+function renderAudit(trail){
+  const rows = trail.map(e=>{
+    const deltaCell = e.delta===null ? "—" :
+      (e.delta<0 ? "<span style='color:var(--green)'>−"+money(-e.delta)+"</span>"
+                 : "<span style='color:var(--red)'>+"+money(e.delta)+"</span>");
+    const totCls = e.kind==="tot" ? " class='tot'" : (e.kind==="ref" ? " style='background:rgba(255,206,74,.05)'" : "");
+    return `<tr${totCls}>
+      <td class="nm">${e.label}</td>
+      <td class="n">${deltaCell}</td>
+      <td class="n">${money(e.cost)}</td>
+    </tr>`;
+  }).join("");
+  $("auditBody").innerHTML = rows;
+}
+
+function updateAll(){
+  const baseIdx = +$("baseModel").value;
+  const baseM = FRONTIER[baseIdx] || FRONTIER[0];
+  const notOpt = computeNotOptimized(baseM);
+  const optCost = computeOptimized(baseM);
+  $("kBase").textContent = money(notOpt);
+  $("kOpt").textContent = money(optCost);
+  renderAudit(generateAuditTrail(baseM, notOpt));
+
+  // Break-even display
+  const be = $("breakEvenBox");
+  if(be){
+    const bev = computeBreakEven(baseM);
+    if(bev === null){
+      be.innerHTML = "<b>Not reached</b>: routing savings do not cover Akka's platform overhead at any volume with this configuration.";
+    } else {
+      const bevBn = bev / 1e9;
+      const label = bevBn >= 1000 ? (bevBn/1000).toFixed(2)+" trillion" : bevBn.toFixed(1)+" billion";
+      be.innerHTML = `<b>${label}</b>: the tokens / year where Optimized is cheaper than Not Optimized`;
+    }
+  }
+
+
+  // SLM training requires at least one self-hosted model in the selection.
+  const list = selectedList();
+  const slmAvail = hasSelfHosted(list);
+  const slmLever = document.querySelector('.lever[data-k="slm"]');
+  if(slmLever){
+    if(!slmAvail){
+      slmLever.style.opacity = "0.4";
+      slmLever.style.pointerEvents = "none";
+      const tn = slmLever.querySelector(".lever-tn");
+      if(tn && !tn.dataset.orig){ tn.dataset.orig = tn.textContent; }
+      if(tn) tn.textContent = (tn.dataset.orig || tn.textContent) + " — pick a self-hosted model to unlock";
+    } else {
+      slmLever.style.opacity = "1";
+      slmLever.style.pointerEvents = "auto";
+      const tn = slmLever.querySelector(".lever-tn");
+      if(tn && tn.dataset.orig) tn.textContent = tn.dataset.orig;
+    }
+  }
+  // update range value labels
+  document.querySelectorAll("input[type=range]").forEach(el=>{
+    const v = $(el.id+"v"); if(v) v.textContent = el.value;
+  });
+  // workload mix per-slider value labels + allocation total
+  WORKLOADS.forEach(w=>{
+    const l=$("pc_"+w.key); if(l) l.textContent = mixVals[w.key]+"%";
+  });
+  const sum = WORKLOADS.reduce((a,w)=>a+mixVals[w.key],0);
+  if($("alloc")){ $("alloc").textContent = sum+"%"; $("alloc").className = "r"+(sum===100?"":" off"); }
+  // preset button highlight
+  document.querySelectorAll(".pbtn").forEach(b=>b.classList.toggle("on", +b.dataset.vol === +$("vol").value));
+}
+
+// ---- init ----
+function init(){
+  // populate frontier dropdown
+  $("baseModel").innerHTML = FRONTIER.map((m,i)=>
+    `<option value="${i}">${m.p} ${m.m} ($${m.in.toFixed(2)}/$${m.out.toFixed(2)})</option>`
+  ).join("");
+  const defIdx = FRONTIER.findIndex(m=>m.p==="Anthropic");
+  if(defIdx>=0) $("baseModel").value = defIdx;
+
+  // presets: numeric array, format as (p/1000)+"T"
+  $("presets").innerHTML = PRESETS.map(p=>{
+    const label = p>=1000 ? (p/1000).toFixed(p%1000===0?0:1)+"T" : p+"B";
+    return `<button class="pbtn" data-vol="${p}">${label}</button>`;
+  }).join("");
+  $("presets").addEventListener("click", e=>{
+    const b = e.target.closest(".pbtn"); if(!b) return;
+    $("vol").value = b.dataset.vol; updateAll();
+  });
+
+  // workload mix — five sliders matching the main calc's WORKLOADS pattern
+  $("mix").innerHTML = WORKLOADS.map(w=>
+    `<div class="field"><label>${w.short}<span class="v" id="pc_${w.key}">${w.def}%</span></label>`+
+    `<input type="range" min="0" max="100" step="1" value="${w.def}" id="mx_${w.key}" aria-label="${w.name}"></div>`
+  ).join("");
+  WORKLOADS.forEach(w=>{
+    $("mx_"+w.key).addEventListener("input", e=>{ mixVals[w.key]=+e.target.value; updateAll(); });
+  });
+
+  // model catalog
+  renderCatalog();
+  wireCatalog();
+
+  // Akka Platform infrastructure pickers: cloud + GPU source (combined).
+  $("hostCloud").innerHTML = Object.entries(PROVIDERS)
+    .map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("");
+  $("hostCloud").value = hostConfig.cloud;
+  renderHostSource();
+  $("hostCloud").addEventListener("change", e => {
+    hostConfig.cloud = e.target.value;
+    renderHostSource();
+    updateAll();
+  });
+  $("hostSource").addEventListener("change", e => {
+    hostConfig.source = e.target.value;
+    updateAll();
+  });
+
+  // render both lever columns
+  renderLevers("optLevers", OPT_LEVERS);
+  renderLevers("baseLevers", BASE_LEVERS);
+
+  // wire switches (excluding self-host which is wired separately)
+  document.querySelectorAll(".lever:not([data-k='selfhost']) .sw").forEach(sw=>{
+    sw.addEventListener("click", ()=>{
+      sw.classList.toggle("on");
+      const lev = sw.closest(".lever");
+      if(lev) lev.classList.toggle("on");
+      updateAll();
+    });
+    sw.addEventListener("keydown", e=>{
+      if(e.key===" "||e.key==="Enter"){ e.preventDefault(); sw.click(); }
+    });
+  });
+
+  // wire all input/select changes to trigger recompute
+  document.body.addEventListener("input", e=>{
+    if(e.target.matches("input, select")) updateAll();
+  });
+
+  updateAll();
+}
+
+function wireCatalog(){
+  document.querySelectorAll("input[type=checkbox][data-mtoggle]").forEach(cb => {
+    cb.addEventListener("change", () => {
+      const key = cb.dataset.mtoggle;
+      if(cb.checked){
+        if(selected.size >= MAX_SELECTED){ cb.checked = false; return; }
+        selected.add(key);
+      } else {
+        selected.delete(key);
+      }
+      updateAll();
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
