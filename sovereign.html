@@ -78,14 +78,33 @@ h1 .accent{color:var(--yellow);}
 .srcpick select option{background:var(--medium-black);color:var(--white);}
 
 /* break-even box under the VS bar */
-.be-box{text-align:center;margin:16px 0 0;padding:16px 20px;
-  border:2px solid var(--yellow);border-radius:8px;background:rgba(255,206,74,.12);
-  font-size:13px;color:var(--white);line-height:1.5;box-shadow:0 4px 12px rgba(255,206,74,.15);}
+.be-box{margin:14px 0 0;padding:12px 15px;
+  border:1px solid rgba(255,206,74,.32);border-radius:8px;background:rgba(255,206,74,.05);
+  font-size:12.5px;color:var(--soft-grey);line-height:1.45;}
 .be-box:empty{display:none;}
-.be-box b{font-family:var(--mono);color:var(--yellow);font-weight:700;
-  font-variant-numeric:tabular-nums;font-size:16px;}
-.be-box .proxies{margin-top:10px;font-size:12px;color:var(--soft-grey);line-height:1.5;}
-.be-box .proxy-item{margin:4px 0;}
+/* a statement, not a heading, so it stays at the body colour inherited from
+   .be-box; the yellow figure carries the emphasis on its own */
+.be-hd{text-align:center;}
+.be-hd b{font-family:var(--mono);color:var(--yellow);font-weight:600;
+  font-variant-numeric:tabular-nums;font-size:14.5px;}
+/* headcount table: the audit table's type scale, tightened a step. The
+   allocation column cannot wrap, so a narrow window scrolls the table rather
+   than losing the right-hand columns to body overflow-x:hidden. */
+.be-scroll{overflow-x:auto;margin-top:9px;}
+.be-tbl{min-width:640px;}
+.be-tbl th{padding-bottom:5px;}
+.be-tbl td{font-size:10.5px;padding:4px 10px 4px 0;}
+.be-tbl th:last-child,.be-tbl td:last-child{padding-right:0;}
+/* the allocation is the widest column and is held to a single line; the strings
+   in BE_PROXIES are written short enough to fit */
+.be-tbl .alloc{white-space:nowrap;}
+/* count and role read as one phrase, so they share a cell. The role stays at
+   body colour rather than taking td.nm's white: the row is already led by the
+   yellow count, and white on top of that reads as a heading. */
+.be-tbl .eq{white-space:nowrap;padding-right:14px;}
+.be-tbl td.eq b{font-family:var(--mono);font-variant-numeric:tabular-nums;
+  color:var(--yellow);font-weight:600;font-size:12px;}
+.be-tbl tr:last-child td{border-bottom:none;}
 
 /* form box */
 .form{border:1px solid var(--line);border-radius:10px;padding:15px 18px;background:var(--fill);margin:12px 0;}
@@ -308,6 +327,10 @@ details .body{margin-top:13px;}
   <p><b>Rate multipliers on self-hosted destinations.</b> The GPU source picker sets a multiplier applied to every self-hosted per-million-token rate in the compute. The reference is AWS reserved B200 at $56.97 per GPU-hour divided by throughput factor 3, giving $18.99 per throughput-normalised hour. Chosen&nbsp;/&nbsp;reference gives the multiplier: AWS reserved B200 lands at 1.00, on-demand at 2.00, Nebius committed B200 at 0.50, CoreWeave on-demand H100 at 2.60, GCP reserved B200 at 2.26. Cloud choice affects the multiplier when an in-VPC source is picked; a neocloud source is independent of the cloud choice.</p>
 
   <p><b>Akka Platform overhead and break-even.</b> The optimised figure applies a variable margin on the compute cost and adds a single fixed annual platform floor that covers compute, storage, network, licence and connectivity together. Margin is 50% at or below five trillion tokens a year and declines log-scale to 18.8% at one thousand trillion. The fixed floor is $100,000 a year. Break-even solves for the token volume where not-optimised equals optimised: V*&nbsp;=&nbsp;fixed&nbsp;/&nbsp;(rate_notopt&nbsp;−&nbsp;rate_opt_after_margin). Below V* the platform floor outweighs the routing savings and the customer pays less by staying on the not-optimised path; above V* the per-token savings dominate.</p>
+
+  <p><b>Headcount equivalents.</b> The break-even volume is restated as the number of people whose annual consumption matches it. Each row is an independent reading of the same volume rather than a component of a sum: the volume that matches four engineers is the same volume that matches six support agents, and the two are alternatives. A person is modelled on an eight-hour day with three hours away from the keyboard, leaving five working hours, and works AI-natively, with the assistant in the loop continuously rather than consulted occasionally. Working days are 230 a year — 260 weekdays less public holidays and paid leave — except support, which runs 250. Annual consumption is tokens a day times working days, and the headcount is the break-even volume divided by that annual figure.</p>
+
+  <p><b>Per-person token consumption.</b> Context replay dominates these figures, not prompt length. Inside an agent loop every turn resends the accumulated context — files read, tool results, prior reasoning — so a task running twenty-five turns against a context grown to 150,000 tokens bills on the order of two million tokens, roughly fifty times what its visible prompt suggests; counting prompts alone understates every role by more than an order of magnitude. The engineer's 20 million tokens a day is seven such tasks plus eight code reviews, trace debugging, and background agents that keep running while the engineer is away from the desk. The support agent's 12 million is forty retrieval-backed tickets, each a draft, critique and revise loop over knowledge-base chunks and full customer history, plus a live chat copilot held in context. The analyst's 12 million is twelve text-to-SQL cycles that replay full warehouse schema on every revision, three drafted reports and an hour of notebook agent work. The executive's 7 million is four long-document sessions with follow-ups and two deep-research runs across twenty to forty sources each. The power user's 200 million a day is a ceiling case rather than a role: five agentic systems driven concurrently through a six-hour day, with unattended loops — test repair, refactor sweeps, eval harnesses — continuing overnight, which decouples consumption from the hours the person is present. Across 230 days that is a billion tokens a week, an order of magnitude beyond the AI-native engineer, and it is bounded by agent wall-clock rather than human attention. The document row is throughput rather than a person: one fifty-page contract worked end to end — ingest, eight targeted extraction passes, clause classification, risk scoring and a summary with a QA check — is 350,000 tokens. Volume is counted as raw tokens processed, replay included; prompt caching changes what a token costs rather than how many are processed and is modelled separately on the not-optimized side, so replayed context is not discounted twice. These allocations are first-principles rather than measured, and consumption varies with how aggressively a team adopts agentic tooling.</p>
 
   <p><b>General.</b> All amounts are in US dollars at list price. No enterprise discount, private pricing agreement, reserved instance, savings plan, capacity block or other committed-use discount is applied beyond those stated in the volume-commit checkbox on the not-optimized side and the reserved rates on the GPU source picker. Amounts exclude customer personnel, third-party software and infrastructure outside the fleet described. Sources: Amazon Bedrock and Amazon EC2 pricing; Azure AI Foundry and Azure Virtual Machines pricing; Google Cloud Vertex AI and Compute Engine pricing; Anthropic, OpenAI and DeepSeek platform pricing; the Microsoft Azure LLM inference traces; Artificial Analysis; RouteLLM, GPTCache, FrugalGPT, AutoMix and LLMLingua published references for the routing-technique multipliers.</p>
 </div>
@@ -755,20 +778,68 @@ function computeBreakEven(baseM){
   return breakEvenTokens;                           // in absolute tokens
 }
 
-// ---- Break-even proxies: human-relatable token equivalents ----
-function generateBreakEvenProxies(tokens){
-  // Token consumption per role per year: assumes 200 working days
-  const proxies = [
-    {name: "software engineers", tokensPerYear: 6e6},      // ~30k/day (code, review, docs)
-    {name: "data analysts", tokensPerYear: 5e6},           // ~25k/day (queries, reports)
-    {name: "customer support agents", tokensPerYear: 8e6}, // ~40k/day (customer queries)
-    {name: "knowledge workers", tokensPerYear: 3e6}        // ~15k/day (general work)
-  ];
+// ---- Break-even proxies ----
+// A token count means nothing on its own, so it is restated as headcount for
+// people who work AI-natively: the assistant is in the loop continuously, not
+// consulted occasionally.
+//
+// The figures are dominated by context replay, not by prompt length. Inside an
+// agent loop every turn resends the whole accumulated context — files read,
+// tool results, prior reasoning — so a task that runs 25 turns against a
+// context grown to ~150k bills on the order of 2M tokens, roughly fifty times
+// what its visible prompt suggests. Counting only the prompts understates each
+// role by more than an order of magnitude.
+//
+// Volume here is raw tokens processed. Prompt caching changes what a token
+// costs, and is modelled separately as a right-side lever, so replayed context
+// is counted in full rather than discounted at source.
+//
+// Days: 230 = 260 weekdays less holidays and PTO. Support runs 250.
+const BE_PROXIES=[
+  {role:"Power user", perDay:200e6, days:230,
+   alloc:"5 concurrent agents driven 6h, plus unattended overnight loops: test repair, refactor sweeps, eval harnesses"},
+  {role:"Engineer", perDay:20e6, days:230,
+   alloc:"7 agentic tasks (~25 turns each replaying full repo context), 8 code reviews, trace debugging, background agents"},
+  {role:"Support agent", perDay:12e6, days:250,
+   alloc:"40 RAG tickets, each a draft/critique/revise loop over KB chunks and full customer history, live chat copilot"},
+  {role:"Data analyst", perDay:12e6, days:230,
+   alloc:"12 text-to-SQL cycles over full warehouse schema, 3 drafted reports, an hour of notebook agent work, dashboard Q&amp;A"},
+  {role:"Executive", perDay:7e6, days:230,
+   alloc:"4 long-document sessions with follow-ups, 2 deep-research runs across 20&ndash;40 sources, meeting transcript summaries"},
+  {role:"Document", unit:350e3, unitLabel:"350k each",
+   alloc:"50-page contract end to end: ingest, 8 targeted extraction passes, clause classification, risk scoring, summary + QA"}
+];
 
-  return proxies.map(p => {
-    const count = Math.round(tokens / p.tokensPerYear);
-    return `~${count} ${p.name} for 1 year`;
-  });
+function proxyYear(p){ return p.unit !== undefined ? p.unit : p.perDay * p.days; }
+
+function tokLabel(n){
+  if(n>=1e9) return (n/1e9).toFixed(1)+"B";
+  if(n>=1e6) return (n/1e6).toFixed(0)+"M";
+  if(n>=1e3) return (n/1e3).toFixed(0)+"k";
+  return String(n);
+}
+
+function proxyCount(n){
+  if(n>=1e6) return (n/1e6).toFixed(1)+"M";
+  if(n>=1e3) return Math.round(n).toLocaleString("en-US");
+  if(n>=10)  return String(Math.round(n));
+  return n.toFixed(1);
+}
+
+function renderProxyTable(tokens){
+  const rows = BE_PROXIES.map(p => {
+    const one = p.unit !== undefined;
+    const n   = tokens / proxyYear(p);
+    const role = p.role + (Math.round(n*10)===10 ? "" : "s");
+    return `<tr><td class="eq"><b>${proxyCount(n)}</b> ${role}</td>`+
+      `<td class="alloc">${p.alloc}</td>`+
+      `<td class="n">${one ? "&mdash;" : tokLabel(p.perDay)}</td>`+
+      `<td class="n">${one ? p.unitLabel : tokLabel(proxyYear(p))}</td></tr>`;
+  }).join("");
+  return `<div class="be-scroll"><table class="be-tbl"><thead><tr><th class="eq">Equivalent</th>`+
+    `<th>Day allocation</th>`+
+    `<th class="n">Tokens/day</th><th class="n">Tokens/yr</th>`+
+    `</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 // ---- Audit trail generator ----
@@ -870,14 +941,12 @@ function updateAll(){
   if(be){
     const bev = computeBreakEven(baseM);
     if(bev === null){
-      be.innerHTML = "<b>Not reached</b>: routing savings do not cover Akka's platform overhead at any volume with this configuration.";
+      be.innerHTML = `<div class="be-hd"><b>Not reached</b> — routing savings do not cover Akka's platform overhead at any volume with this configuration.</div>`;
     } else {
       const bevBn = bev / 1e9;
       const label = bevBn >= 1000 ? (bevBn/1000).toFixed(2)+" trillion" : bevBn.toFixed(1)+" billion";
-      const proxies = generateBreakEvenProxies(bev);
-      const proxiesHtml = proxies.map(p => `<div class="proxy-item">• ${p}</div>`).join("");
-      be.innerHTML = `<div><b>${label}</b> tokens/year where Optimized is cheaper</div>
-        <div class="proxies">${proxiesHtml}</div>`;
+      be.innerHTML = `<div class="be-hd">The optimized route is cheaper when you consume more than <b>${label}</b> tokens / year, the equivalent of:</div>
+        ${renderProxyTable(bev)}`;
     }
   }
 
