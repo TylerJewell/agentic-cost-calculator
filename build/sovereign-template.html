@@ -308,7 +308,7 @@ details .body{margin-top:13px;}
 
   <p><b>Model selection.</b> Traffic is split evenly across the selected destinations, so a selection of four models gives each 25% of tokens. The cheapest selection sets the cheap tier and the most expensive sets the frontier for the routing techniques below; the middle selections take the base distribution rate and nothing more. Selecting one model collapses cascade and planner/worker to no-ops, since neither has a distinct cheap tier or frontier to route between. Mixing API and self-hosted destinations is supported and expected.</p>
 
-  <p><b>Per-token API rates.</b> First-party direct-API rates from Anthropic, OpenAI and DeepSeek, verified 16&nbsp;August&nbsp;2026 and stored in <code>audit/rates.json</code>. GPT-5.6 Sol is listed at half its $5.00/$30.00 standard rate under a 50% discount; if that discount lapses the rate doubles. DeepSeek rates are cache-miss input; peak and off-peak pricing was announced for 16:00 UTC on 16&nbsp;August&nbsp;2026, so these rates are the flat-rate era and should be re-checked. Anthropic and OpenAI models are proprietary: weights and adapters are not distributed, so a routing decision that would send traffic to a self-hosted equivalent runs against an open-weight model rather than the API one.</p>
+  <p><b>Per-token API rates.</b> First-party direct-API rates from Anthropic, OpenAI and DeepSeek, verified 16&nbsp;August&nbsp;2026 and stored in <code>audit/rates.json</code>. <b style="color:var(--soft-grey)">Google and xAI rates are estimates, not published figures</b> — they are positioned against the OpenAI and Anthropic tiers in the same file and carry <code>confidence: estimated</code>; verify both against the vendors' published pricing before relying on any figure that includes them. Open-weight destinations are priced from the AWS Bedrock and Azure AI Foundry model gardens rather than a first-party endpoint, taking whichever of the two lists the model cheaper on an 85/15 input/output blend; the winning cloud is named in the destination label. GPT-5.6 Sol is listed at half its $5.00/$30.00 standard rate under a 50% discount; if that discount lapses the rate doubles. DeepSeek rates are cache-miss input; peak and off-peak pricing was announced for 16:00 UTC on 16&nbsp;August&nbsp;2026, so these rates are the flat-rate era and should be re-checked. Anthropic and OpenAI models are proprietary: weights and adapters are not distributed, so a routing decision that would send traffic to a self-hosted equivalent runs against an open-weight model rather than the API one.</p>
 
   <p><b>Self-hosted rates.</b> Self-hosted destinations do not have a per-token rate card. Their effective per-million-token cost is the chosen GPU hourly rate divided by serving throughput, further divided by 40% endpoint utilisation because a reserved node bills whether or not it is serving. The baseline calibration is $0.09 input and $0.62 output per million tokens on a mid-class 30–50B open-weight model, derived from a Google a4-highgpu-8g endpoint carrying eight NVIDIA B200 at $16.11 per GPU-hour and the throughput model described below. Small open-weight is modelled at half that rate and large open-weight at twice, on the basis that per-token cost scales roughly with active parameter count. A future rates.json refresh should carry canonical per-model-class per-million-token rates rather than a scalar multiplier.</p>
 
@@ -561,19 +561,25 @@ function resolveOptions(name){
 }
 
 function renderCatalog(){
+  // Buckets are created on demand: the class list lives in CATALOG, and a class
+  // added there must not have to be mirrored here to avoid a throw.
   const byCls = {};
-  ["frontier","mid","small","mid_sh","large_sh"].forEach(c => byCls[c] = []);
-  CATALOG.forEach(m => byCls[m.cls].push(m));
+  CATALOG.forEach(m => (byCls[m.cls] = byCls[m.cls] || []).push(m));
   const groupLabel = {
-    frontier: "API frontier",
-    mid:      "API mid-tier",
-    small:    "Self-hosted small (3–10B)",
-    mid_sh:   "Self-hosted mid (30–50B)",
-    large_sh: "Self-hosted large (100B+)"
+    frontier:   "API frontier",
+    mid:        "API mid-tier",
+    ow:         "API open-weight",
+    small:      "Self-hosted small (3–10B)",
+    compact_sh: "Self-hosted compact (10–30B)",
+    mid_sh:     "Self-hosted mid (30–50B)",
+    umid_sh:    "Self-hosted upper-mid (50–100B)",
+    large_sh:   "Self-hosted large (100B+)"
   };
 
   function groupHtml(clsKey){
-    const items = byCls[clsKey].map(m => {
+    const group = byCls[clsKey] || [];
+    if(!group.length) return "";
+    const items = group.map(m => {
       const isSel = selected.has(m.key);
       // API rows show billed input/output per-M. Self-hosted rows show no
       // rate — their cost is GPU-hour based (see the audit trail note).
@@ -589,8 +595,9 @@ function renderCatalog(){
     return `<div class="catgroup"><div class="catgroup-h">${groupLabel[clsKey]}</div>${items}</div>`;
   }
 
-  const apiCol = groupHtml("frontier") + groupHtml("mid");
-  const shCol = groupHtml("small") + groupHtml("mid_sh") + groupHtml("large_sh");
+  const apiCol = groupHtml("frontier") + groupHtml("mid") + groupHtml("ow");
+  const shCol = groupHtml("small") + groupHtml("compact_sh") + groupHtml("mid_sh")
+              + groupHtml("umid_sh") + groupHtml("large_sh");
   $("modelCatalog").innerHTML = `<div class="cat-col">${apiCol}</div><div class="cat-col">${shCol}</div>`;
 }
 

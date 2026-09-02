@@ -76,8 +76,36 @@ AKKA_MID_IN=$0.25 and AKKA_LARGE_IN=$0.37. So an inaccurate rate here
 flows directly into the OPTIMIZED figure — a 2× off rate produces a 2×
 off per-token cost on self-hosted destinations.
 
+## Google and xAI per-token rates are estimates
+
+`inference.google_direct` and `inference.xai_direct` carry
+`confidence: "estimated"` and no `verified` date. Unlike every other
+per-token block in this file, these figures were not read off a
+published price card. They were positioned against the OpenAI and
+Anthropic tiers already present, on the reasoning that a vendor's cheap
+and frontier tiers sit near their competitors':
+
+| Model | in / out | Positioned against |
+|---|---|---|
+| `gemini-3-flash` | 0.15 / 1.20 | `gpt-5.6-luna` at 0.20 / 1.20 |
+| `gemini-3-pro` | 2.00 / 12.00 | `gpt-5.6-terra` at 2.00 / 12.00 |
+| `grok-5-fast` | 0.25 / 1.50 | `gpt-5.6-luna`, one step up |
+| `grok-5` | 3.00 / 15.00 | `claude-sonnet-5` at 3.00 / 15.00 |
+
+Impact in the sovereign calculator: all four appear as selectable
+destinations. Selecting one sets the cheap tier or the frontier for
+every routing technique, so an inaccurate rate moves both the OPTIMIZED
+figure and the break-even volume. The four are the only entries in the
+model catalog not traceable to a published or corroborated source.
+
+These must be replaced with published figures before the page is shown
+to a customer.
+
 ## What to check on the next audit
 
+- Google Gemini published API pricing — replace the four estimated
+  entries above with verified figures and a `verified` date
+- xAI Grok published API pricing — same
 - CoreWeave committed H100 rate against a current CoreWeave contract quote
 - CoreWeave committed B200 rate against a current quote
 - Lambda `lambdalow.b200` value — should probably be 11.92, not 44
