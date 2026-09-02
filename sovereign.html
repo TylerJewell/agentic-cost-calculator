@@ -78,12 +78,14 @@ h1 .accent{color:var(--yellow);}
 .srcpick select option{background:var(--medium-black);color:var(--white);}
 
 /* break-even box under the VS bar */
-.be-box{text-align:center;margin:12px 0 0;padding:11px 18px;
-  border:1px solid var(--hair);border-radius:8px;background:rgba(255,206,74,.03);
-  font-size:12.5px;color:var(--soft-grey);line-height:1.4;}
+.be-box{text-align:center;margin:16px 0 0;padding:16px 20px;
+  border:2px solid var(--yellow);border-radius:8px;background:rgba(255,206,74,.12);
+  font-size:13px;color:var(--white);line-height:1.5;box-shadow:0 4px 12px rgba(255,206,74,.15);}
 .be-box:empty{display:none;}
-.be-box b{font-family:var(--mono);color:var(--yellow);font-weight:600;
-  font-variant-numeric:tabular-nums;font-size:14.5px;}
+.be-box b{font-family:var(--mono);color:var(--yellow);font-weight:700;
+  font-variant-numeric:tabular-nums;font-size:16px;}
+.be-box .proxies{margin-top:10px;font-size:12px;color:var(--soft-grey);line-height:1.5;}
+.be-box .proxy-item{margin:4px 0;}
 
 /* form box */
 .form{border:1px solid var(--line);border-radius:10px;padding:15px 18px;background:var(--fill);margin:12px 0;}
@@ -753,6 +755,22 @@ function computeBreakEven(baseM){
   return breakEvenTokens;                           // in absolute tokens
 }
 
+// ---- Break-even proxies: human-relatable token equivalents ----
+function generateBreakEvenProxies(tokens){
+  // Token consumption per role per year: assumes 200 working days
+  const proxies = [
+    {name: "software engineers", tokensPerYear: 6e6},      // ~30k/day (code, review, docs)
+    {name: "data analysts", tokensPerYear: 5e6},           // ~25k/day (queries, reports)
+    {name: "customer support agents", tokensPerYear: 8e6}, // ~40k/day (customer queries)
+    {name: "knowledge workers", tokensPerYear: 3e6}        // ~15k/day (general work)
+  ];
+
+  return proxies.map(p => {
+    const count = Math.round(tokens / p.tokensPerYear);
+    return `~${count} ${p.name} for 1 year`;
+  });
+}
+
 // ---- Audit trail generator ----
 // The trail starts from the NOT OPTIMIZED figure and walks down each active
 // OPT lever's marginal contribution. Each lever's savings is computed as
@@ -856,7 +874,10 @@ function updateAll(){
     } else {
       const bevBn = bev / 1e9;
       const label = bevBn >= 1000 ? (bevBn/1000).toFixed(2)+" trillion" : bevBn.toFixed(1)+" billion";
-      be.innerHTML = `<b>${label}</b>: the tokens / year where Optimized is cheaper than Not Optimized`;
+      const proxies = generateBreakEvenProxies(bev);
+      const proxiesHtml = proxies.map(p => `<div class="proxy-item">• ${p}</div>`).join("");
+      be.innerHTML = `<div><b>${label}</b> tokens/year where Optimized is cheaper</div>
+        <div class="proxies">${proxiesHtml}</div>`;
     }
   }
 
